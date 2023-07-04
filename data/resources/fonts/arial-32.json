@@ -1,0 +1,18 @@
+{
+    "name": "arial-32",
+    "kind": "material",
+    "base": "standard",
+    "shader": "font",
+    "properties": [
+        {
+            "name": "color",
+            "value": "#0000FFFF"
+        }
+    ],
+    "textures": [
+        {
+            "name": "albedo",
+            "key": "arial-32"
+        }
+    ]
+}

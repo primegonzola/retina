@@ -1,0 +1,17 @@
+{
+    "name": "blue",
+    "kind": "material",
+    "base": "standard",
+    "properties": [
+        {
+            "name": "color",
+            "value": "#0000FFFF"
+        }
+    ],
+    "textures": [
+        {
+            "name": "albedo",
+            "key": "panel-albedo"
+        }
+    ]
+}

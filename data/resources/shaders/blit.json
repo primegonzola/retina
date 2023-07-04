@@ -1,0 +1,136 @@
+{
+    "name": "blit",
+    "kind": "shader",
+    "base": "base",
+    "code": "resources/shaders/blit.wgsl",
+    "uniforms": [
+        {
+            "name": "camera",
+            "binding": 0,
+            "visibility": "vertex",
+            "layout": [
+                {
+                    "name": "view",
+                    "kind": "matrix",
+                    "binding": 0
+                },
+                {
+                    "name": "projection",
+                    "kind": "matrix",
+                    "binding": 1
+                }
+            ]
+        },
+        {
+            "name": "model",
+            "binding": 1,
+            "visibility": "vertex",
+            "layout": [
+                {
+                    "name": "world",
+                    "kind": "matrix",
+                    "binding": 0
+                },
+                {
+                    "name": "normal",
+                    "kind": "matrix",
+                    "binding": 1
+                }
+            ]
+        },
+        {
+            "name": "properties",
+            "binding": 2,
+            "visibility": "fragment",
+            "layout": [
+                {
+                    "name": "color",
+                    "kind": "color",
+                    "binding": 0
+                },
+                {
+                    "name": "opacity",
+                    "kind": "float",
+                    "binding": 1
+                }
+            ]
+        }
+    ],
+    "textures": [
+        {
+            "name": "albedo",
+            "binding": 3,
+            "visibility": "fragment"
+        }
+    ],
+    "groups": [
+        {
+            "name": "camera",
+            "binding": 0,
+            "layout": [
+                {
+                    "kind": "buffer",
+                    "binding": 0,
+                    "visibility": "vertex"
+                }
+            ]
+        },
+        {
+            "name": "model",
+            "binding": 1,
+            "layout": [
+                {
+                    "kind": "buffer",
+                    "binding": 0,
+                    "visibility": "vertex"
+                }
+            ]
+        },
+        {
+            "name": "properties",
+            "kind": "uniform",
+            "binding": 2,
+            "layout": [
+                {
+                    "kind": "buffer",
+                    "binding": 0,
+                    "visibility": "fragment"
+                }
+            ]
+        },
+        {
+            "name": "albedo",
+            "kind": "texture",
+            "binding": 3,
+            "layout": [
+                {
+                    "kind": "texture",
+                    "binding": 0,
+                    "visibility": "fragment"
+                },
+                {
+                    "kind": "sampler",
+                    "binding": 1,
+                    "visibility": "fragment"
+                }
+            ]
+        }
+    ],
+    "buffers": [
+        {
+            "name": "positions",
+            "kind": "vector3",
+            "location": 0
+        },
+        {
+            "name": "texels",
+            "kind": "vector2",
+            "location": 1
+        },
+        {
+            "name": "normals",
+            "kind": "vector3",
+            "location": 2
+        }
+    ]
+}

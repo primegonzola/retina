@@ -1,0 +1,17 @@
+{
+    "name": "red",
+    "kind": "material",
+    "base": "standard",
+    "properties": [
+        {
+            "name": "color",
+            "value": "#FF0000FF"
+        }
+    ],
+    "textures": [
+        {
+            "name": "albedo",
+            "key": "panel-albedo"
+        }
+    ]
+}
