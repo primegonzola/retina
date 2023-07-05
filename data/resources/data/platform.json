@@ -1,0 +1,89 @@
+{
+    "name": "platform",
+    "kind": "resources",
+    "resources": {
+        "shaders": [
+            {
+                "name": "blit",
+                "kind": "shader",
+                "uri": "resources/shaders/blit.json"
+            },
+            {
+                "name": "font",
+                "kind": "shader",
+                "uri": "resources/shaders/font.json"
+            },
+            {
+                "name": "panel",
+                "kind": "shader",
+                "uri": "resources/shaders/panel.json"
+            },
+            {
+                "name": "standard",
+                "kind": "shader",
+                "uri": "resources/shaders/standard.json"
+            }
+        ],
+        "textures": [
+            {
+                "name": "arial-32",
+                "kind": "texture",
+                "uri": "resources/fonts/arial-32_0.png"
+            },
+            {
+                "name": "panel-albedo",
+                "kind": "texture",
+                "uri": "resources/textures/panel-albedo.png"
+            },
+            {
+                "name": "panel-albedo",
+                "kind": "texture",
+                "uri": "resources/textures/panel-albedo.png"
+            }
+        ],
+        "materials": [
+            {
+                "name": "standard",
+                "kind": "material",
+                "uri": "resources/materials/standard.json"
+            },
+            {
+                "name": "arial-32",
+                "kind": "material",
+                "uri": "resources/fonts/arial-32.json"
+            },
+            {
+                "name": "blit",
+                "kind": "material",
+                "uri": "resources/materials/blit.json"
+            },
+            {
+                "name": "red",
+                "kind": "material",
+                "uri": "resources/materials/red.json"
+            },
+            {
+                "name": "green",
+                "kind": "material",
+                "uri": "resources/materials/green.json"
+            },
+            {
+                "name": "blue",
+                "kind": "material",
+                "uri": "resources/materials/blue.json"
+            },
+            {
+                "name": "panel",
+                "kind": "material",
+                "uri": "resources/materials/panel.json"
+            }
+        ],
+        "fonts": [
+            {
+                "name": "arial-32",
+                "kind": "font",
+                "uri": "resources/fonts/arial-32.fnt"
+            }
+        ]
+    }
+}

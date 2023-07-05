@@ -52,6 +52,10 @@ export { InputGamepadButtonOptions } from "./devices/input/device";
 // input
 
 // definitions
+export { LevelDefinition } from "./definitions";
+export { LevelResourceDefinition } from "./definitions";
+export { LevelResourcesDefinition } from "./definitions";
+
 export { MaterialDefinition } from "./definitions";
 export { MaterialPropertyDefinition } from "./definitions";
 export { MaterialTextureDefinition } from "./definitions";

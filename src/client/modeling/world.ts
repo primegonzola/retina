@@ -40,18 +40,9 @@ export class World extends Model {
                 Quaternion.identity,
                 Vector3.one.multiply(new Vector3(16, 16, 16)))));
 
-        // add a block
-        const orange = chunk.blocks.add(
-            new Block(chunk.blocks, "block", new Transform(
-                new Vector3(-1, 0, 0).divide(chunk.transform.scale),
-                Quaternion.identity,
-                Vector3.one.multiply(new Vector3(0.25, 0.25, 0.25).divide(chunk.transform.scale))),
-                this.platform.resources.getMesh("platform", "cube"),
-                this.platform.resources.getMaterial("platform", "orange")));
-
         const red = chunk.blocks.add(
             new Block(chunk.blocks, "block", new Transform(
-                new Vector3(0, 0, 0).divide(chunk.transform.scale),
+                new Vector3(-1, 0, 0).divide(chunk.transform.scale),
                 Quaternion.identity,
                 Vector3.one.multiply(new Vector3(0.25, 0.25, 0.25).divide(chunk.transform.scale))),
                 this.platform.resources.getMesh("platform", "cube"),
@@ -59,7 +50,7 @@ export class World extends Model {
 
         const blue = chunk.blocks.add(
             new Block(chunk.blocks, "block", new Transform(
-                new Vector3(1, 0, 0).divide(chunk.transform.scale),
+                new Vector3(0, 0, 0).divide(chunk.transform.scale),
                 Quaternion.identity,
                 Vector3.one.multiply(new Vector3(0.25, 0.25, 0.25).divide(chunk.transform.scale))),
                 this.platform.resources.getMesh("platform", "cube"),
@@ -67,19 +58,11 @@ export class World extends Model {
 
         const green = chunk.blocks.add(
             new Block(chunk.blocks, "block", new Transform(
-                new Vector3(0, 1, 0).divide(chunk.transform.scale),
+                new Vector3(1, 0, 0).divide(chunk.transform.scale),
                 Quaternion.identity,
                 Vector3.one.multiply(new Vector3(0.25, 0.25, 0.25).divide(chunk.transform.scale))),
                 this.platform.resources.getMesh("platform", "cube"),
                 this.platform.resources.getMaterial("platform", "green")));
-
-        const yellow = chunk.blocks.add(
-            new Block(chunk.blocks, "block", new Transform(
-                new Vector3(0, -1, 0).divide(chunk.transform.scale),
-                Quaternion.identity,
-                Vector3.one.multiply(new Vector3(0.25, 0.25, 0.25).divide(chunk.transform.scale))),
-                this.platform.resources.getMesh("platform", "cube"),
-                this.platform.resources.getMaterial("platform", "yellow")));
     }
 
     public override extractShapes(platform: Platform, camera: Camera, shapes: Shape[]): Shape[] {

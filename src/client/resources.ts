@@ -1,12 +1,14 @@
 import {
     Color,
     Font,
+    Geometry,
     IShader,
     ITexture,
     InputDefinition,
     InputDeviceMap,
     InputDeviceMapAction,
     InputDeviceMapActionBinding,
+    LevelDefinition,
     Material,
     MaterialDefinition,
     MaterialProperty,
@@ -44,6 +46,44 @@ export class Resources {
         this._textures = new Map<string, Map<string, ITexture>>();
         this._fonts = new Map<string, Map<string, Font>>();
         this._inputs = new Map<string, Map<string, InputDeviceMap>>();
+    }
+
+    public async loadResources(domain: string, uri: string): Promise<void> {
+        // download
+        const data = await Utils.downloadText(uri);
+
+        // parse definition
+        const definition = JSON.parse(data) as LevelDefinition;
+
+        // loop over resources and register
+        for (const shader of definition.resources.shaders)
+            await this.registerShaderByUri(domain, shader.name, shader.uri);
+
+        for (const texture of definition.resources.textures)
+            await this.registerTextureByUri(domain, texture.name, texture.uri);
+
+        for (const material of definition.resources.materials)
+            await this.registerMaterialByUri(domain, material.name, material.uri);
+
+        for (const font of definition.resources.fonts)
+            await this.registerFontByUri(domain, font.name, font.uri);
+
+        // defaults
+        // register panel mesh
+        await this.registerMesh("platform",
+            "panel", new Mesh(this.platform, Geometry.quad()));
+
+        // register blit mesh
+        await this.registerMesh("platform",
+            "blit", new Mesh(this.platform, Geometry.quad()));
+
+        // register quad mesh
+        await this.registerMesh("platform",
+            "quad", new Mesh(this.platform, Geometry.quad()));
+
+        // register cube mesh
+        await this.registerMesh("platform",
+            "cube", new Mesh(this.platform, Geometry.cube()));
     }
 
     public getShader(domain: string, name: string): Shader {

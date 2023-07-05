@@ -9,7 +9,27 @@ import {
 export enum ResourceKindOptions {
     Material = "material",
     Input = "input",
+    Level = "level",
     Shader = "shader",
+}
+
+export type LevelResourceDefinition = {
+    readonly name: string;
+    readonly kind: ResourceKindOptions;
+    readonly uri: string;
+}
+
+export type LevelResourcesDefinition = {
+    readonly materials?: Iterable<LevelResourceDefinition>;
+    readonly shaders?: Iterable<LevelResourceDefinition>;
+    readonly textures?: Iterable<LevelResourceDefinition>;
+    readonly fonts?: Iterable<LevelResourceDefinition>;
+}
+
+export type LevelDefinition = {
+    readonly name: string;
+    readonly kind: ResourceKindOptions;
+    readonly resources: LevelResourcesDefinition;
 }
 
 // #region Material Definition
