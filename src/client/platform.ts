@@ -23,7 +23,8 @@ import {
     Vector2,
     Size,
     SimulationTimer,
-    Matrix4
+    Matrix4,
+    TextureKindOptions
 } from "./index";
 
 export class Platform {
@@ -57,6 +58,23 @@ export class Platform {
         this.rootPanel = new Panel();
     }
 
+    private static createBorderedTexture(size: Size, color: Color, borderColor: Color, borderSize: number): Color[] {
+        // create colors
+        const colors: Color[] = new Array<Color>(size.width * size.height);
+        // loop
+        for (let y = 0; y < size.height; y++) {
+            for (let x = 0; x < size.width; x++) {
+                if (y < borderSize || y > size.height - 1 - borderSize)
+                    colors[y * size.width + x] = borderColor;
+                else if (x < borderSize || x > size.width - 1 - borderSize)
+                    colors[y * size.width + x] = borderColor;
+                else
+                    colors[y * size.width + x] = color;
+            }
+        }
+        return colors;
+    }
+
     public static async create(id: string): Promise<Platform> {
 
         // create the graphics device
@@ -75,11 +93,18 @@ export class Platform {
         await platform.resources.registerTextureByUri("platform",
             "smiley", "resources/textures/smiley.png");
 
+        await platform.resources.registerTexture("platform",
+            "purple", platform.graphics.createTexture(
+                TextureKindOptions.Flat,
+                new Size(64, 64),
+                Platform.createBorderedTexture(new Size(64, 64), Color.white, Color.red, 2)
+            ));
+
         // register shaders
         await platform.resources.registerShaderByUri("platform",
             "panel", "resources/shaders/panel.json");
 
-            await platform.resources.registerShaderByUri("platform",
+        await platform.resources.registerShaderByUri("platform",
             "blit", "resources/shaders/blit.json");
 
         await platform.resources.registerShaderByUri("platform",
@@ -105,7 +130,7 @@ export class Platform {
         // register materials
         await platform.resources.registerMaterialByUri("platform",
             "standard", "resources/materials/standard.json");
-            
+
         await platform.resources.registerMaterialByUri("platform",
             "red", "resources/materials/red.json");
 
@@ -163,9 +188,8 @@ export class Platform {
                     value: 1.0
                 }], [{
                     name: "albedo",
-                    key: platform.resources.getTexture("platform", "panel-albedo")
+                    key: platform.resources.getTexture("platform", "purple")
                 }]));
-
 
         // register panel mesh
         await platform.resources.registerMesh("platform",
@@ -194,6 +218,10 @@ export class Platform {
         // register font 
         await platform.resources.registerFontByUri("platform",
             "arial-32", "resources/fonts/arial-32.fnt");
+
+        // register input 
+        await platform.resources.registerInputByUri(
+            "standard", "resources/inputs/standard.json");
 
         // add panels
         platform.rootPanel.children.push(new Panel(
@@ -227,6 +255,12 @@ export class Platform {
         // update timer
         this.timer.update();
 
+        // update input
+        this.input.update();
+
+        // update graphics
+        this.graphics.update();
+
         // update camera
         this.camera.update();
 
@@ -237,7 +271,7 @@ export class Platform {
         this.renderer.capture(Color.trBlack, 1.0, () => {
 
             // render extracted shapes
-            // this.renderer.render(this.camera, shapes);
+            this.renderer.render(this.camera, shapes);
 
             // render text
             this.renderer.writeLine(0, `FPS:${Math.round(this.timer.fps)} - APS:${Math.round(this.timer.aps)}`);

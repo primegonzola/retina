@@ -3,6 +3,10 @@ import {
     Font,
     IShader,
     ITexture,
+    InputDefinition,
+    InputDeviceMap,
+    InputDeviceMapAction,
+    InputDeviceMapActionBinding,
     Material,
     MaterialDefinition,
     MaterialProperty,
@@ -29,6 +33,7 @@ export class Resources {
     private readonly _materials: Map<string, Map<string, Material>>;
     private readonly _textures: Map<string, Map<string, ITexture>>;
     private readonly _fonts: Map<string, Map<string, Font>>;
+    private readonly _inputs: Map<string, Map<string, InputDeviceMap>>;
 
     constructor(platform: Platform) {
         // init
@@ -38,6 +43,7 @@ export class Resources {
         this._meshes = new Map<string, Map<string, Mesh>>();
         this._textures = new Map<string, Map<string, ITexture>>();
         this._fonts = new Map<string, Map<string, Font>>();
+        this._inputs = new Map<string, Map<string, InputDeviceMap>>();
     }
 
     public getShader(domain: string, name: string): Shader {
@@ -248,5 +254,45 @@ export class Resources {
 
         // all done
         return texture;
+    }
+
+    public async registerInputByUri(name: string, uri: string): Promise<void> {
+
+        // download
+        const data = await Utils.downloadText(uri);
+
+        // parse definition
+        const definition = JSON.parse(data) as InputDefinition;
+
+        // loop over maps
+        for (const map of definition.maps) {
+
+            // create map
+            const im = new InputDeviceMap(map.name);
+
+            // add to domain
+            this.platform.input.maps.set(im.name, im);
+
+            // loop over actions
+            for (const action of map.actions) {
+
+                // create action
+                const ia = new InputDeviceMapAction(action.name, action.kind);
+
+                // add to map
+                im.actions.set(ia.name, ia);
+
+                // loop over bindings
+                for (const binding of action.bindings) {
+
+                    // create binding
+                    const ib = new InputDeviceMapActionBinding(
+                        binding.device, binding.values);
+
+                    // add to action
+                    ia.bindings.set(ib.device, ib);
+                }
+            }
+        }
     }
 }

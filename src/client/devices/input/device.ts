@@ -1,15 +1,14 @@
-import 
-{
+import {
     Vector2
 } from "../../index";
 
-export enum InputDeviceTypeOptions {
+export enum InputDeviceKindOptions {
     Keyboard = "keyboard",
     Gamepad = "gamepad",
     Mouse = "mouse"
 }
 
-export enum InputControlTypeOptions {
+export enum InputControlKindOptions {
     Axis = "axis",
     Tap = "tap"
 }
@@ -58,32 +57,77 @@ type InputGamepadState = {
 };
 
 type InputState = {
-    deviceType: InputDeviceTypeOptions;
+    deviceType: InputDeviceKindOptions;
     previous?: InputKeyboardState | InputMouseState | InputGamepadState;
     current?: InputKeyboardState | InputMouseState | InputGamepadState;
 };
+
+export class InputDeviceMapActionBinding {
+    readonly device: InputDeviceKindOptions;
+    readonly values: Array<Array<string>>;
+
+    constructor(device: InputDeviceKindOptions, values: Array<Array<string>>) {
+        // init
+        this.device = device;
+        this.values = values;
+    }
+}
+
+export class InputDeviceMapAction {
+    public readonly name: string;
+    public readonly kind: InputControlKindOptions;
+    public readonly bindings: Map<InputDeviceKindOptions, InputDeviceMapActionBinding>;
+
+    constructor(name: string, kind: InputControlKindOptions) {
+        // init
+        this.name = name;
+        this.kind = kind;
+        this.bindings = new Map<InputDeviceKindOptions, InputDeviceMapActionBinding>();
+    }
+}
+
+export class InputDeviceMap {
+    public readonly name: string;
+    public readonly actions: Map<string, InputDeviceMapAction>;
+
+    constructor(name: string) {
+        // init
+        this.name = name;
+        this.actions = new Map<string, InputDeviceMapAction>();
+    }
+}
 
 
 export class InputDevice {
 
     private readonly _handle?: HTMLCanvasElement;
-    private readonly  states: Map<InputDeviceTypeOptions, InputState>;
+    private readonly states: Map<InputDeviceKindOptions, InputState>;
+    public readonly maps: Map<string, InputDeviceMap>;
 
     constructor(handle: HTMLCanvasElement) {
 
         // init
-        this.states = new Map<InputDeviceTypeOptions, InputState>();
         this._handle = handle;
+        this.states = new Map<InputDeviceKindOptions, InputState>();
+        this.maps = new Map<string, InputDeviceMap>();
 
         // attach handlers
-        // register our listeners
         document.addEventListener("keydown", evt => this.processEvent("keydown", evt));
         document.addEventListener("keyup", evt => this.processEvent("keyup", evt));
         window.addEventListener('mousemove', evt => this.processEvent("mousemove", evt));
         window.addEventListener('mousedown', evt => this.processEvent("mousedown", evt));
         window.addEventListener('mouseup', evt => this.processEvent("mouseup", evt));
-        window.addEventListener("gamepadconnected", evt => this.processEvent("gamepadconnected", evt));
+        // window.addEventListener("gamepadconnected", evt => this.processEvent("gamepadconnected", evt));
         window.addEventListener("gamepaddisconnected", evt => this.processEvent("gamepaddisconnected", evt));
+        window.addEventListener("gamepadconnected", (e) => {
+            console.log(
+                "Gamepad connected at index %d: %s. %d buttons, %d axes.",
+                e.gamepad.index,
+                e.gamepad.id,
+                e.gamepad.buttons.length,
+                e.gamepad.axes.length
+            );
+        });
     }
 
     public static async create(id: string): Promise<InputDevice> {
@@ -95,11 +139,18 @@ export class InputDevice {
     }
 
     private processEvent(name: string, evt: unknown): void {
-
+        // console.log(`${name}: ${evt}`);
     }
 
     public async update(): Promise<void> {
-
+        // get available gamepads
+        const gps = navigator.getGamepads();
+        // iterate over gamepads
+        for (let i = 0; i < gps.length; i++) {
+            if (gps[i] !== null) {
+                console.log(gps[i]);
+            }
+        }
     }
 
     public destroy(): void {

@@ -12,7 +12,8 @@ import {
     Shader,
     Size,
     Texture,
-    TextureKindOptions
+    TextureKindOptions,
+    Color
 } from "../../index";
 
 export interface IGraphicsDevice extends IDevice {
@@ -20,7 +21,7 @@ export interface IGraphicsDevice extends IDevice {
     get size(): Size;
     createF32Buffer(kind: BufferKindOptions, data: number[]): IBuffer;
     createSampler(kind: SamplerKindOptions): ISampler;
-    createTexture(kind: TextureKindOptions, size: Size): ITexture;
+    createTexture(kind: TextureKindOptions, size: Size, data?: Color[]): ITexture;
 }
 
 export class GraphicsDevice extends Device<GPUDevice> implements IGraphicsDevice {
@@ -142,13 +143,15 @@ export class GraphicsDevice extends Device<GPUDevice> implements IGraphicsDevice
         }
     }
 
-    public createTexture(kind: TextureKindOptions, size: Size): ITexture {
+    public createTexture(kind: TextureKindOptions, size: Size, data?: Color[]): ITexture {
         switch (kind) {
-            case TextureKindOptions.Flat:
-                return new Texture(this, kind, size,
+            case TextureKindOptions.Flat: {
+                let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
+                usage = !data ? usage | GPUTextureUsage.RENDER_ATTACHMENT : usage;
+                const texture = new Texture(this, kind, size,
                     this.handle.createTexture({
                         format: "bgra8unorm",
-                        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+                        usage: usage,
                         dimension: "2d",
                         mipLevelCount: 1,
                         sampleCount: 1,
@@ -158,7 +161,31 @@ export class GraphicsDevice extends Device<GPUDevice> implements IGraphicsDevice
                             depthOrArrayLayers: 1
                         },
                     }));
-
+                // see if to write data
+                if (data) {
+                    const bytes: number[] = [];
+                    data.forEach((color, index) => {
+                        bytes.push(color.b * 255);
+                        bytes.push(color.g * 255);
+                        bytes.push(color.r * 255);
+                        bytes.push(color.a * 255);
+                    });
+                    this.handle.queue.writeTexture(
+                        {
+                            texture: texture.handle,
+                        },
+                        new Uint8Array(bytes),
+                        {
+                            bytesPerRow: size.width * 4,
+                        },
+                        {
+                            width: size.width,
+                            height: size.height,
+                        }
+                    );
+                }
+                return texture;
+            }
             case TextureKindOptions.Depth:
                 return new Texture(this, kind, size,
                     this.handle.createTexture({

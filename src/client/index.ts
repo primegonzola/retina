@@ -38,8 +38,18 @@ export { ShaderStageOptions } from "./devices/graphics/shader";
 export { Texture } from "./devices/graphics/texture";
 export { TextureKindOptions } from "./devices/graphics/texture";
 
-// input
+// inputs
 export { InputDevice } from "./devices/input/device";
+export { InputDeviceMap } from "./devices/input/device";
+export { InputDeviceMapAction } from "./devices/input/device";
+export { InputDeviceMapActionBinding } from "./devices/input/device";
+
+export { InputControlKindOptions } from "./devices/input/device";
+export { InputDeviceKindOptions } from "./devices/input/device";
+export { InputGamepadAxisOptions } from "./devices/input/device";
+export { InputGamepadButtonOptions } from "./devices/input/device";
+
+// input
 
 // definitions
 export { MaterialDefinition } from "./definitions";
@@ -51,6 +61,11 @@ export { ShaderDataKindOptions } from "./definitions";
 export { ShaderTextureDefinition } from "./definitions";
 export { ShaderUniformDefinition } from "./definitions";
 export { ShaderUniformLayoutDefinition } from "./definitions";
+
+export { InputDefinition } from "./definitions";
+export { InputMapDefinition } from "./definitions";
+export { InputMapActionDefinition } from "./definitions";
+export { InputMapActionBindingDefinition } from "./definitions";
 
 // engine
 export { Cache } from "./cache";

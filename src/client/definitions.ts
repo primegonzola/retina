@@ -1,4 +1,6 @@
 import {
+    InputControlKindOptions,
+    InputDeviceKindOptions,
     MaterialModeOptions,
     MaterialPropertyKindOptions,
     ShaderStageOptions,
@@ -6,6 +8,7 @@ import {
 
 export enum ResourceKindOptions {
     Material = "material",
+    Input = "input",
     Shader = "shader",
 }
 
@@ -79,4 +82,31 @@ export type ShaderDefinition = {
     textures?: ShaderTextureDefinition[];
     buffers?: ShaderBufferDefinition[];
 }
+// #endregion
+
+// #region Input Definition
+
+export type InputMapActionBindingDefinition = {
+    readonly device: InputDeviceKindOptions;
+    readonly values: Array<Array<string>>;
+}
+
+export type InputMapActionDefinition = {
+    readonly name: string;
+    readonly kind: InputControlKindOptions;
+    readonly bindings: Iterable<InputMapActionBindingDefinition>;
+}
+
+export type InputMapDefinition = {
+    readonly name: string;
+    readonly actions: Iterable<InputMapActionDefinition>;
+}
+
+export type InputDefinition = {
+    readonly name: string;
+    readonly kind: ResourceKindOptions;
+    readonly maps: Iterable<InputMapDefinition>;
+}
+
+
 // #endregion
