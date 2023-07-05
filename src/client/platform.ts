@@ -38,6 +38,7 @@ export class Platform {
     public readonly degrees: Vector3;
     public readonly timer: SimulationTimer;
     public readonly rootPanel: Panel;
+    public readonly leftAxis: Vector2;
 
     protected constructor(graphics: GraphicsDevice, input: InputDevice) {
         // init
@@ -56,6 +57,7 @@ export class Platform {
         this.world = World.create(this, "World");
         this.timer = new SimulationTimer();
         this.rootPanel = new Panel();
+        this.leftAxis = Vector2.zero;
     }
 
     private static createBorderedTexture(size: Size, color: Color, borderColor: Color, borderSize: number): Color[] {
@@ -247,6 +249,32 @@ export class Platform {
         this.renderer?.destroy();
     }
 
+    public processInput(): void {
+        if (this.input.isKeyDown("a")) {
+            this.leftAxis.x = -1;
+        }
+        if (this.input.isKeyDown("d")) {
+            this.leftAxis.x = 1;
+        }
+        if (!this.input.isKeyDown("a") && !this.input.isKeyDown("d")) {
+            this.leftAxis.x = 0;
+        }
+        if (this.input.isKeyDown("w")) {
+            this.leftAxis.y = 1;
+        }
+        if (this.input.isKeyDown("s")) {
+            this.leftAxis.y = -1;
+        }
+        if (!this.input.isKeyDown("w") && !this.input.isKeyDown("s")) {
+            this.leftAxis.y = 0;
+        }
+
+        // update camera
+        const cameraSpeed = 0.01;
+        this.camera.transform.position.x += cameraSpeed * this.leftAxis.x;
+        this.camera.transform.position.y += cameraSpeed * this.leftAxis.y;
+    }
+
     public async update(): Promise<void> {
 
         // wait to get rid of async warning
@@ -254,6 +282,9 @@ export class Platform {
 
         // update timer
         this.timer.update();
+
+        // handle input
+        this.processInput();
 
         // update input
         this.input.update();

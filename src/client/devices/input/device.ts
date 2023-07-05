@@ -97,12 +97,21 @@ export class InputDeviceMap {
     }
 }
 
+export type InputKeyState = {
+    key: string;
+    code: string;
+    state: boolean;
+    down: boolean;
+    up: boolean;
+}
+
 
 export class InputDevice {
 
     private readonly _handle?: HTMLCanvasElement;
     private readonly states: Map<InputDeviceKindOptions, InputState>;
     public readonly maps: Map<string, InputDeviceMap>;
+    public readonly keys: Map<string, InputKeyState>;
 
     constructor(handle: HTMLCanvasElement) {
 
@@ -110,6 +119,7 @@ export class InputDevice {
         this._handle = handle;
         this.states = new Map<InputDeviceKindOptions, InputState>();
         this.maps = new Map<string, InputDeviceMap>();
+        this.keys = new Map<string, InputKeyState>();
 
         // attach handlers
         document.addEventListener("keydown", evt => this.processEvent("keydown", evt));
@@ -139,7 +149,56 @@ export class InputDevice {
     }
 
     private processEvent(name: string, evt: unknown): void {
-        // console.log(`${name}: ${evt}`);
+        // check name
+        switch (name) {
+            case "keydown": {
+                const tevt = evt as KeyboardEvent;
+                // check if key exists
+                if (!this.keys.has(tevt.key))
+                    this.keys.set(tevt.key, {
+                        key: tevt.key,
+                        code: tevt.code,
+                        state: true,
+                        down: true,
+                        up: false
+                    });
+                else {
+                    // update 
+                    this.keys.get(tevt.key).up = false;
+                    this.keys.get(tevt.key).down = true;
+                    this.keys.get(tevt.key).state = false;
+                }
+                break;
+            }
+            case "keyup": {
+                const tevt = evt as KeyboardEvent;
+                // check if key exists
+                if (!this.keys.has(tevt.key))
+                    this.keys.set(tevt.key, {
+                        key: tevt.key,
+                        code: tevt.code,
+                        state: false,
+                        down: false,
+                        up: true
+                    });
+                else {
+                    // update 
+                    this.keys.get(tevt.key).up = true;
+                    this.keys.get(tevt.key).down = false;
+                    this.keys.get(tevt.key).state = false;
+                }
+                break;
+
+            }
+        }
+
+        // // console.log(`${name}: ${evt}`);
+        // if (evt instanceof KeyboardEvent) {
+        //     const kevt = evt as KeyboardEvent;
+
+        //     console.log(`${kevt.key} ${kevt.code} ${kevt.repeat}`);
+
+        // }
     }
 
     public async update(): Promise<void> {
@@ -151,9 +210,35 @@ export class InputDevice {
                 console.log(gps[i]);
             }
         }
+
+        // // loop over keys
+        // for (const key of this.keys.values()) {
+        //     // update key state
+        //     key.up = false;
+        //     key.down = false;
+        // }
     }
 
     public destroy(): void {
 
     }
+
+    public isKey(key: string): boolean {
+
+        // check if key is there, if not bail out
+        if (!this.keys.has(key)) return false
+
+        // get key state
+        return this.keys.get(key).state;
+    }
+
+    public isKeyDown(key: string): boolean {
+
+        // check if key is there, if not bail out
+        if (!this.keys.has(key)) return false
+
+        // get key state
+        return this.keys.get(key).down;
+    }
+
 }
