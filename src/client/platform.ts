@@ -145,7 +145,7 @@ export class Platform {
                     name: "opacity",
                     kind: MaterialPropertyKindOptions.Float,
                     binding: 1,
-                    value: 0.9
+                    value: 1
                 }]));
 
         await platform.resources.registerMaterial("platform", "yellow",
@@ -237,11 +237,11 @@ export class Platform {
         this.renderer.capture(Color.trBlack, 1.0, () => {
 
             // render extracted shapes
-            this.renderer.render(this.camera, shapes);
+            // this.renderer.render(this.camera, shapes);
 
             // render text
-            // this.renderer.writeLine(0, "The brown fox jumps over the lazy dog?");
             this.renderer.writeLine(0, `FPS:${Math.round(this.timer.fps)} - APS:${Math.round(this.timer.aps)}`);
+            this.renderer.writeLine(2, "The brown fox jumps over the lazy dog!");
 
             // render panel
             this.renderer.renderPanel(this.rootPanel);
