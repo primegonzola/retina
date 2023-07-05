@@ -48,7 +48,7 @@ export class Material {
     public readonly shader: IShader;
     public readonly mode: MaterialModeOptions;
     public readonly properties: HashMap<string, MaterialProperty>;
-    public readonly textures: Map<string, MaterialTexture>;
+    public readonly textures: HashMap<string, MaterialTexture>;
     public readonly uniforms: Map<string, IBuffer>;
 
     constructor(platform: Platform, name: string, shader: IShader, mode: MaterialModeOptions,
@@ -60,7 +60,7 @@ export class Material {
         this.mode = mode;
         this.uniforms = new Map<string, IBuffer>();
         this.properties = new HashMap<string, MaterialProperty>();
-        this.textures = new Map<string, MaterialTexture>();
+        this.textures = new HashMap<string, MaterialTexture>();
 
         // copy incoming properties if any
         if (properties !== undefined)

@@ -114,6 +114,18 @@
                     "visibility": "fragment"
                 }
             ]
+        },
+        {
+            "name": "albedo-map",
+            "kind": "uniform",
+            "binding": 4,
+            "layout": [
+                {
+                    "kind": "buffer",
+                    "binding": 0,
+                    "visibility": "fragment"
+                }
+            ]
         }
     ],
     "buffers": [
