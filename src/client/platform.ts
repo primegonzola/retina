@@ -183,15 +183,15 @@ export class Platform {
             // render extracted shapes
             this.renderer.render(this.camera, shapes);
 
-            // render text
-            this.renderer.writeLine(0, `FPS:${Math.round(this.timer.fps)} - APS:${Math.round(this.timer.aps)}`);
-            this.renderer.writeLine(2, "The brown fox jumps over the lazy dog!");
+            // // render text
+            // this.renderer.writeLine(0, `FPS:${Math.round(this.timer.fps)} - APS:${Math.round(this.timer.aps)}`);
+            // this.renderer.writeLine(2, "The brown fox jumps over the lazy dog!");
 
-            // render panel
-            this.renderer.renderPanel(this.rootPanel);
+            // // render panel
+            // this.renderer.renderPanel(this.rootPanel);
 
-            // render lines
-            this.renderer.renderLines();
+            // // render lines
+            // this.renderer.renderLines();
         });
     }
 }

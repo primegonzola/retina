@@ -27,7 +27,7 @@ export class Renderer {
     private _screenCamera?: IBuffer;
     private _renderCamera?: IBuffer;
     private _screenLines?: string[];
-    private _direct: boolean = false;
+    private _direct: boolean = true;
     private _internalSize = new Size(2048, 2048);
     private _panelCache: Cache;
 

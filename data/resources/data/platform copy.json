@@ -4,6 +4,21 @@
     "resources": {
         "shaders": [
             {
+                "name": "blit",
+                "kind": "shader",
+                "uri": "resources/shaders/blit.json"
+            },
+            {
+                "name": "font",
+                "kind": "shader",
+                "uri": "resources/shaders/font.json"
+            },
+            {
+                "name": "panel",
+                "kind": "shader",
+                "uri": "resources/shaders/panel.json"
+            },
+            {
                 "name": "standard",
                 "kind": "shader",
                 "uri": "resources/shaders/standard.json"
