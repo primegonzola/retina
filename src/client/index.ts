@@ -35,6 +35,9 @@ export { Sampler } from "./devices/graphics/sampler";
 export { SamplerKindOptions } from "./devices/graphics/sampler";
 export { Shader } from "./devices/graphics/shader";
 export { ShaderStageOptions } from "./devices/graphics/shader";
+export { ShaderLayoutKindOptions } from "./devices/graphics/shader";
+export { ShaderUniformKindOptions } from "./devices/graphics/shader";
+
 export { Texture } from "./devices/graphics/texture";
 export { TextureKindOptions } from "./devices/graphics/texture";
 

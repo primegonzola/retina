@@ -3,7 +3,9 @@ import {
     InputDeviceKindOptions,
     MaterialModeOptions,
     MaterialPropertyKindOptions,
+    ShaderLayoutKindOptions,
     ShaderStageOptions,
+    ShaderUniformKindOptions,
 } from "./index";
 
 export enum ResourceKindOptions {
@@ -31,6 +33,38 @@ export type LevelDefinition = {
     readonly kind: ResourceKindOptions;
     readonly resources: LevelResourcesDefinition;
 }
+
+
+// #region Shader Definition
+
+export type ShaderUniformDefinition2 = {
+    readonly name: string;
+    readonly kind: ShaderUniformKindOptions;
+}
+
+export type ShaderGroupLayoutDefinition2 = {
+    readonly name: string;
+    readonly kind: ShaderLayoutKindOptions;
+    readonly binding: number;
+    readonly layout: Iterable<ShaderUniformDefinition2>;
+}
+
+export type ShaderGroupDefinition2 = {
+    readonly name: string;
+    readonly visibility: ShaderStageOptions;
+    readonly binding: number;
+    readonly layout: Iterable<ShaderGroupLayoutDefinition2>;
+}
+
+export type ShaderDefinition2 = {
+    readonly name: string;
+    readonly kind: ResourceKindOptions;
+    readonly code: string;
+    readonly base?: string;
+    readonly uniforms?: Iterable<ShaderGroupDefinition2>;
+}
+
+// #endregion
 
 // #region Material Definition
 export type MaterialPropertyDefinition = {

@@ -99,21 +99,9 @@
             ]
         },
         {
-            "name": "albedo-map",
-            "kind": "uniform",
-            "binding": 3,
-            "layout": [
-                {
-                    "kind": "buffer",
-                    "binding": 0,
-                    "visibility": "fragment"
-                }
-            ]
-        },
-        {
             "name": "albedo",
             "kind": "texture",
-            "binding": 4,
+            "binding": 3,
             "layout": [
                 {
                     "kind": "texture",

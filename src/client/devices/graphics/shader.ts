@@ -27,6 +27,24 @@ export type ShaderUniform = {
     layout: GPUBindGroupLayout;
 }
 
+export enum ShaderUniformKindOptions {
+    Boolean = "boolean",
+    Color = "color",
+    Float = "float",
+    Integer = "integer",
+    Matrix4x4 = "matrix4x4",
+    Vector2 = "vector2",
+    Vector3 = "vector3",
+    Vector4 = "vector4"
+}
+
+export enum ShaderLayoutKindOptions {
+    Sampler = "sampler",
+    Texture2D = "texture-2D",
+    Texture3D = "texture-3D",
+    Uniform = "uniform"
+}
+
 export type ShaderTexture = {
     name: string;
     binding: number;
