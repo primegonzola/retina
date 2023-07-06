@@ -144,10 +144,10 @@ export class Renderer {
             shape.uniforms.set("model",
                 this.extractModel(shape.world));
         }
-
-        // copy material properties into shape
-        shape.uniforms.set("properties",
-            shape.material.uniforms.get("properties"));
+        
+        // copy material uniforms
+        shape.material.uniforms.forEach((value, key) =>
+            shape.uniforms.set(key, value));
 
         //  copy material textures into shape
         shape.material.textures.forEach((value, key) =>
