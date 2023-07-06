@@ -126,7 +126,7 @@ export class RenderTarget {
         this._transparent = transparent;
     }
 
-    public render(camera: IBuffer, items: Iterable<RenderData>) {
+    public render(context: IBuffer, items: Iterable<RenderData>) {
 
         // loop over shapes
         for (const item of items) {
@@ -134,8 +134,8 @@ export class RenderTarget {
             // bind pipeline with proper transparency
             item.shader.bindPipeline(this._renderPass, this._transparent, this._depth);
 
-            // bind camera
-            item.shader.bindUniform(this._renderPass, "camera", camera);
+            // bind context
+            item.shader.bindUniform(this._renderPass, "context", context);
 
             // bind buffers
             item.buffers.forEach((buffer, name) =>

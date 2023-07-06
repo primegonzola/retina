@@ -5,7 +5,7 @@
     "code": "resources/shaders/panel.wgsl",
     "uniforms": [
         {
-            "name": "camera",
+            "name": "context",
             "binding": 0,
             "visibility": "vertex",
             "layout": [
@@ -58,7 +58,7 @@
     ],
     "groups": [
         {
-            "name": "camera",
+            "name": "context",
             "binding": 0,
             "layout": [
                 {
