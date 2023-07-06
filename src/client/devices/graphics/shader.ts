@@ -15,6 +15,7 @@ export type BindingGroupLayout = {
 }
 
 export enum ShaderStageOptions {
+    Both = "both",
     Compute = "compute",
     Fragment = "fragment",
     Vertex = "vertex",
@@ -71,14 +72,17 @@ export class Shader implements IShader {
 
         // create uniforms
         definition.uniforms?.forEach(uniform => {
-            let visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT;
+            let visibility = undefined;
             // resolve visibility
             switch (uniform.visibility) {
-                case ShaderStageOptions.Vertex:
-                    visibility = GPUShaderStage.VERTEX;
+                case ShaderStageOptions.Both:
+                    visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT;
                     break;
                 case ShaderStageOptions.Fragment:
                     visibility = GPUShaderStage.FRAGMENT;
+                    break;
+                case ShaderStageOptions.Vertex:
+                    visibility = GPUShaderStage.VERTEX;
                     break;
                 default: throw new Error(`Unknown shader uniform visibility: ${uniform.visibility}`);
             }
@@ -99,14 +103,17 @@ export class Shader implements IShader {
 
         // create textures
         definition.textures?.forEach(texture => {
-            let visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT;
+            let visibility = undefined;
             // resolve visibility
             switch (texture.visibility) {
-                case ShaderStageOptions.Vertex:
-                    visibility = GPUShaderStage.VERTEX;
+                case ShaderStageOptions.Both:
+                    visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT;
                     break;
                 case ShaderStageOptions.Fragment:
                     visibility = GPUShaderStage.FRAGMENT;
+                    break;
+                case ShaderStageOptions.Vertex:
+                    visibility = GPUShaderStage.VERTEX;
                     break;
                 default: throw new Error(`Unknown shader texture visibility: ${texture.visibility}`);
             }

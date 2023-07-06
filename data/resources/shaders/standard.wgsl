@@ -8,12 +8,12 @@ struct ModelUniform {
     normal: mat4x4<f32>,
 };
 
-struct MaterialUniform {
+struct MaterialPropertiesUniform {
     color: vec4<f32>,
     opacity: f32,
 };
 
-struct MaterialTexture {
+struct MaterialTextureUniform {
     offset: vec2<f32>,
     scale: vec2<f32>,
 };
@@ -28,16 +28,15 @@ var<uniform> model: ModelUniform;
 
 // material uniform
 @group(2) @binding(0)
-var<uniform> material: MaterialUniform;
+var<uniform> properties: MaterialPropertiesUniform;
 
 // textures uniform
 @group(3) @binding(0)
 var albedo_texture: texture_2d<f32>;
 @group(3) @binding(1)
 var albedo_sampler: sampler;
-
-@group(4) @binding(0)
-var<uniform> albedo_map: MaterialUniform;
+@group(3) @binding(2)
+var<uniform> albedo_map: MaterialTextureUniform;
 
 struct VertexShaderInput {
   @location(0) position: vec3<f32>,
@@ -80,6 +79,6 @@ fn fragment_main(input: VertexShaderOutput) -> FragmentShaderOutput
   var albedo : vec4<f32> = textureSample(albedo_texture, albedo_sampler, input.texel);
 
   var color = albedo;
-  output.color = vec4<f32>(color.rgb * material.color.rgb, material.opacity * color.a);
+  output.color = vec4<f32>(color.rgb * properties.color.rgb, properties.opacity * color.a);
   return output;
 }

@@ -5,7 +5,7 @@
     "code": "resources/shaders/font.wgsl",
     "uniforms": [
         {
-            "name": "context",
+            "name": "camera",
             "binding": 0,
             "visibility": "vertex",
             "layout": [
@@ -65,7 +65,7 @@
     ],
     "groups": [
         {
-            "name": "context",
+            "name": "camera",
             "binding": 0,
             "layout": [
                 {
