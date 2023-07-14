@@ -1,5 +1,4 @@
 
-
 export class HashMap<S, T> {
     private readonly _map: Map<S, T>;
     private readonly _handlers: Array<(kind: string, key: S, value: T) => void>;

@@ -9,8 +9,8 @@
     "baseUrl": ".",
     "declaration": false,
     "typeRoots": [
-      "../../node_modules/@webgpu/types",
       "../../node_modules/@types",
+      "../../node_modules/@webgpu/types",
       "../../node_modules/types/dom-webcodecs",
     ],    
     "paths": {
