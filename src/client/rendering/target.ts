@@ -12,7 +12,7 @@ import {
     TextureKindOptions,
 } from "../index";
 
-export type RenderTargetBufffer = {
+export type RenderTargetBuffer = {
     albedo: ITexture;
     depth: ITexture;
 }
@@ -41,7 +41,7 @@ export class RenderTarget {
         this._initialize();
     }
 
-    public get buffers(): RenderTargetBufffer[] {
+    public get buffers(): RenderTargetBuffer[] {
         return [{
             albedo: this._albedoTexture,
             depth: this._depthTexture

@@ -3,14 +3,8 @@ import {
     Camera,
     CameraKindOptions,
     Color,
-    Geometry,
     GraphicsDevice,
     InputDevice,
-    Material,
-    MaterialModeOptions,
-    MaterialPropertyKindOptions,
-    Mesh,
-    Panel,
     Quaternion,
     Range,
     Rectangle,
@@ -38,7 +32,6 @@ export class Platform {
     public readonly camera: Camera;
     public readonly degrees: Vector3;
     public readonly timer: SimulationTimer;
-    public readonly rootPanel: Panel;
     public readonly leftAxis: Vector2;
     public readonly shapes: Shape[] = [];
 
@@ -57,7 +50,6 @@ export class Platform {
             new Range(1.0, 256.0)
         );
         this.timer = new SimulationTimer();
-        this.rootPanel = new Panel();
         this.leftAxis = Vector2.zero;
     }
 

@@ -103,11 +103,8 @@ export { MaterialPropertyKindOptions } from "./rendering/material";
 export { MaterialProperty } from "./rendering/material";
 export { MaterialTexture } from "./rendering/material";
 export { Mesh } from "./rendering/mesh";
-export { Panel } from "./rendering/panel";
-export { RenderBatch } from "./rendering/batch";
-export { RenderShaderBatch } from "./rendering/batch";
 export { Renderer } from "./rendering/renderer";
 export { RenderTarget } from "./rendering/target";
-export { RenderTargetBufffer } from "./rendering/target";
+export { RenderTargetBuffer } from "./rendering/target";
 export { Shape } from "./rendering/shape";
 
