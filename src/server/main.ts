@@ -16,14 +16,10 @@ app.use(urlencoded({ extended: false }));
 app.use(json());
 app.use(cookieParser());
 
-// app.get('/resources', (req, res) => {
-//     res.send('Hello Resources!')
-// });
-
 // set up static folders
+app.use(express.static(path.resolve(__dirname, '../data')));
 app.use(express.static(path.resolve(__dirname, '../build')));
 app.use(express.static(path.resolve(__dirname, '../src/static')));
-app.use(express.static(path.resolve(__dirname, '../data')));
 
 // start the app and listen on give port
 app.listen(8080, () => {
