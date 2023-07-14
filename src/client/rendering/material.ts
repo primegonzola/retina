@@ -7,6 +7,8 @@ import {
     ITexture,
     Matrix4,
     Platform,
+    SamplerKindOptions,
+    ShaderData,
     Utils,
     Vector2,
     Vector3,
@@ -28,7 +30,7 @@ export type MaterialProperty = {
     readonly name: string;
     readonly kind: MaterialPropertyKindOptions;
     readonly binding: number;
-    value: unknown;
+    readonly value: unknown;
 }
 
 export class MaterialTexture {
@@ -49,7 +51,7 @@ export class Material {
     public readonly mode: MaterialModeOptions;
     public readonly properties: HashMap<string, MaterialProperty>;
     public readonly textures: HashMap<string, MaterialTexture>;
-    public readonly uniforms: Map<string, IBuffer>;
+    public readonly groups: Map<string, Map<string, ShaderData>>;
 
     constructor(platform: Platform, name: string, shader: IShader, mode: MaterialModeOptions,
         properties?: Iterable<MaterialProperty>, textures?: Iterable<MaterialTexture>) {
@@ -58,7 +60,7 @@ export class Material {
         this.name = name;
         this.shader = shader;
         this.mode = mode;
-        this.uniforms = new Map<string, IBuffer>();
+        this.groups = new Map<string, Map<string, ShaderData>>();
         this.properties = new HashMap<string, MaterialProperty>();
         this.textures = new HashMap<string, MaterialTexture>();
 
@@ -72,34 +74,33 @@ export class Material {
             for (const texture of textures)
                 this.textures.set(texture.name, texture);
 
-        // set properties
-        this.uniforms.set("properties",
-            this.extractProperties(Array.from(this.properties.values())));
+        // setup
+        this.properties.notify((kind: string, key: string, value: MaterialProperty) =>
+            this.synchronizeProperties());
+
+        // sync
+        this.synchronizeProperties();
 
         // setup
-        this.properties.notify((kind: string, key: string, value: MaterialProperty) => {
-            // check kind
-            switch (kind) {
-                case "set":
-                case "clear": {
-                    // check if properties is already present or not
-                    if (this.uniforms.has("properties"))
-                        this.uniforms.get("properties").destroy();
-                    // recreate properties buffer
-                    this.uniforms.set("properties",
-                        this.extractProperties(Array.from(this.properties.values())));
-                    break;
-                }
-                default:
-                    throw new Error(`Unsupported material property kind ${kind}`);
-            }
-        });
+        this.textures.notify((kind: string, key: string, value: MaterialTexture) =>
+            this.synchronizeTextures());
+
+        // sync
+        this.synchronizeTextures();
     }
 
-    private extractProperties(properties: MaterialProperty[]): IBuffer {
+    private synchronizeProperties(): void {
+        // check if we have properties
+        if (this.groups.has("properties")) {
+            // check if we have properties
+            if (this.groups.get("properties").has("properties")) {
+                // destroy buffer
+                (this.groups.get("properties").get("properties").value as IBuffer).destroy();
+            }
+        }
 
         // sort ascending
-        const sorted = properties.sort((a, b) => a.binding - b.binding);
+        const sorted = Array.from(this.properties.values()).sort((a, b) => a.binding - b.binding);
 
         // empty sourc
         let source: number[] = [];
@@ -138,8 +139,43 @@ export class Material {
             }
         });
 
-        // create buffer
-        return this.platform.graphics.createF32Buffer(
-            BufferKindOptions.Uniform, source);
+        // set
+        this.groups.set("properties", new Map<string, ShaderData>());
+        this.groups.get("properties").set("properties", {
+            name: "properties",
+            value: this.platform.graphics.createF32Buffer(
+                BufferKindOptions.Uniform, source)
+        });
+    }
+
+    private synchronizeTextures(): void {
+        // check if we have textures
+        if (this.groups.has("textures")) {
+            // loop and destroy if needed
+            this.groups.get("textures").forEach((value, key) => {
+                if (value.value as IBuffer !== undefined)
+                    (value.value as IBuffer).destroy();
+            });
+            // clean up
+            this.groups.get("textures").clear();
+        }
+
+        // create new group
+        this.groups.set("textures", new Map<string, ShaderData>());
+        this.textures.forEach((value, key) => {
+            this.groups.get("textures").set(`${key}-map`, {
+                name: `${key}-map`,
+                value: this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform,
+                    [0, 0, 1, 1])
+            });
+            this.groups.get("textures").set(`${key}-texture`, {
+                name: `${key}-texture`,
+                value: value.key
+            });
+            this.groups.get("textures").set(`${key}-sampler`, {
+                name: `${key}-sampler`,
+                value: this.platform.graphics.createSampler(SamplerKindOptions.Albedo)
+            });
+        });
     }
 }

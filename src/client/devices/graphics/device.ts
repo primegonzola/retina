@@ -119,9 +119,9 @@ export class GraphicsDevice extends Device<GPUDevice> implements IGraphicsDevice
         switch (kind) {
             case SamplerKindOptions.Albedo:
                 return new Sampler(kind, this.handle.createSampler({
-                    addressModeU: "clamp-to-edge",
-                    addressModeV: "clamp-to-edge",
-                    addressModeW: "clamp-to-edge",
+                    addressModeU: "repeat",
+                    addressModeV: "repeat",
+                    addressModeW: "repeat",
                     magFilter: "linear",
                     minFilter: "nearest",
                     mipmapFilter: "nearest"

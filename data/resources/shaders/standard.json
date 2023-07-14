@@ -3,115 +3,102 @@
     "kind": "shader",
     "base": "base",
     "code": "resources/shaders/standard.wgsl",
-    "uniforms": [
-        {
-            "name": "camera",
-            "binding": 0,
-            "visibility": "vertex",
-            "layout": [
-                {
-                    "name": "view",
-                    "kind": "matrix",
-                    "binding": 0
-                },
-                {
-                    "name": "projection",
-                    "kind": "matrix",
-                    "binding": 1
-                }
-            ]
-        },
-        {
-            "name": "model",
-            "binding": 1,
-            "visibility": "vertex",
-            "layout": [
-                {
-                    "name": "world",
-                    "kind": "matrix",
-                    "binding": 0
-                },
-                {
-                    "name": "normal",
-                    "kind": "matrix",
-                    "binding": 1
-                }
-            ]
-        },
-        {
-            "name": "properties",
-            "binding": 2,
-            "visibility": "fragment",
-            "layout": [
-                {
-                    "name": "color",
-                    "kind": "color",
-                    "binding": 0
-                },
-                {
-                    "name": "opacity",
-                    "kind": "float",
-                    "binding": 1
-                }
-            ]
-        }
-    ],
-    "textures": [
-        {
-            "name": "albedo",
-            "binding": 3,
-            "visibility": "fragment"
-        }
-    ],
     "groups": [
         {
             "name": "camera",
-            "binding": 0,
-            "layout": [
+            "index": 0,
+            "visibility": "vertex",
+            "bindings": [
                 {
-                    "kind": "buffer",
-                    "binding": 0,
-                    "visibility": "vertex"
+                    "name": "camera",
+                    "kind": "uniform",
+                    "index": 0,
+                    "layout": [
+                        {
+                            "name": "view",
+                            "kind": "matrix4"
+                        },
+                        {
+                            "name": "projection",
+                            "kind": "matrix4"
+                        }
+                    ]
                 }
             ]
         },
         {
             "name": "model",
-            "binding": 1,
-            "layout": [
+            "index": 1,
+            "visibility": "vertex",
+            "bindings": [
                 {
-                    "kind": "buffer",
-                    "binding": 0,
-                    "visibility": "vertex"
+                    "name": "model",
+                    "kind": "uniform",
+                    "index": 0,
+                    "layout": [
+                        {
+                            "name": "world",
+                            "kind": "matrix4"
+                        },
+                        {
+                            "name": "normal",
+                            "kind": "matrix4"
+                        }
+                    ]
                 }
             ]
         },
         {
             "name": "properties",
-            "kind": "uniform",
-            "binding": 2,
-            "layout": [
+            "index": 2,
+            "visibility": "fragment",
+            "bindings": [
                 {
-                    "kind": "buffer",
-                    "binding": 0,
-                    "visibility": "fragment"
+                    "name": "properties",
+                    "kind": "uniform",
+                    "index": 0,
+                    "layout": [
+                        {
+                            "name": "color",
+                            "kind": "color"
+                        },
+                        {
+                            "name": "opacity",
+                            "kind": "float"
+                        }
+                    ]
                 }
             ]
         },
         {
-            "name": "albedo",
-            "kind": "texture",
-            "binding": 3,
-            "layout": [
+            "name": "textures",
+            "index": 3,
+            "visibility": "fragment",
+            "bindings": [
                 {
-                    "kind": "texture",
-                    "binding": 0,
-                    "visibility": "fragment"
+                    "name": "albedo-map",
+                    "kind": "uniform",
+                    "index": 0,
+                    "layout": [
+                        {
+                            "name": "offset",
+                            "kind": "vector2"
+                        },
+                        {
+                            "name": "scale",
+                            "kind": "vector2"
+                        }
+                    ]
                 },
                 {
+                    "name": "albedo-texture",
+                    "kind": "texture",
+                    "index": 1
+                },
+                {
+                    "name": "albedo-sampler",
                     "kind": "sampler",
-                    "binding": 1,
-                    "visibility": "fragment"
+                    "index": 2
                 }
             ]
         }

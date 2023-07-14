@@ -6,18 +6,17 @@ import {
     Font,
     IBuffer,
     Matrix4,
+    ModelMeshEntry,
+    Panel,
     Platform,
     Quaternion,
+    RenderData,
     RenderTarget,
-    RenderDataDestroyOptions,
     Shape,
     Size,
     Vector3,
     Utils,
-    RenderData,
-    ModelMeshEntry,
 } from "../index";
-import { Panel } from "./panel";
 
 export class Renderer {
     public platform: Platform;
@@ -91,42 +90,42 @@ export class Renderer {
         // delegate to target
         this._target?.capture(this._direct, color, depth, action);
 
-        // blit to screen if required
-        if (!this._direct) this._blit();
+        // // blit to screen if required
+        // if (!this._direct) this._blit();
     }
 
-    private _blit(): void {
+    // private _blit(): void {
 
-        // create camera 
-        const camera = Camera.screen(this.platform, 1.0);
+    //     // create camera 
+    //     const camera = Camera.screen(this.platform, 1.0);
 
-        // update camera
-        this._screenCamera.write(
-            [].concat(camera.view.values, camera.projection.values));
+    //     // update camera
+    //     this._screenCamera.write(
+    //         [].concat(camera.view.values, camera.projection.values));
 
-        // init
-        const blit = new Shape(
-            Utils.uuid(),
-            Matrix4.construct(Vector3.zero, Quaternion.identity, Vector3.one),
-            this.platform.resources.getMesh("platform", "blit"),
-            this.platform.resources.getMaterial("platform", "blit"));
+    //     // init
+    //     const blit = new Shape(
+    //         Utils.uuid(),
+    //         Matrix4.construct(Vector3.zero, Quaternion.identity, Vector3.one),
+    //         this.platform.resources.getMesh("platform", "blit"),
+    //         this.platform.resources.getMaterial("platform", "blit"));
 
-        // extract shape info
-        this.extractShape(blit, true);
+    //     // extract shape info
+    //     this.extractShape(blit, true);
 
-        // override texture buffer
-        blit.textures.set("albedo", this._target?.buffers[0].albedo);
+    //     // override texture buffer
+    //     blit.textures.set("albedo", this._target?.buffers[0].albedo);
 
-        // override pipeline
-        this._swap.pipeline(true, false);
+    //     // override pipeline
+    //     this._swap.pipeline(true, false);
 
-        // delegate to blit
-        this._swap?.capture(!this._direct, Color.red, 1.0,
-            () => this._swap.render(this._screenCamera, [blit]));
+    //     // delegate to blit
+    //     this._swap?.capture(!this._direct, Color.red, 1.0,
+    //         () => this._swap.render(this._screenCamera, [blit]));
 
-        // clean up shape
-        blit.destroy(RenderDataDestroyOptions.None);
-    }
+    //     // clean up shape
+    //     blit.destroy(RenderDataDestroyOptions.None);
+    // }
 
     private extractModel(model: Matrix4): IBuffer {
         return this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform,
@@ -139,19 +138,9 @@ export class Renderer {
         shape.mesh.buffers.forEach((value, key) =>
             shape.buffers.set(key, value));
 
-        // check if model is already present or not
-        if (!shape.uniforms.has("model") && extractModel) {
-            shape.uniforms.set("model",
-                this.extractModel(shape.world));
-        }
-        
-        // copy material uniforms
-        shape.material.uniforms.forEach((value, key) =>
-            shape.uniforms.set(key, value));
-
-        //  copy material textures into shape
-        shape.material.textures.forEach((value, key) =>
-            shape.textures.set(key, value.key));
+        // // copy material groups
+        shape.material.groups.forEach((value, key) =>
+            shape.groups.set(key, value));
     }
 
     public render(camera: Camera, shapes: Shape[]): void {
@@ -177,66 +166,66 @@ export class Renderer {
             this._screenLines[index] = text;
     }
 
-    private renderLine(name: string, model: Matrix4, line: string): void {
+    // private renderLine(name: string, model: Matrix4, line: string): void {
 
-        // get font
-        const font = this.platform.resources.getFont("platform", name);
+    //     // get font
+    //     const font = this.platform.resources.getFont("platform", name);
 
-        // get mesh
-        const entry = font.cacheItem(line, model, 5000);
+    //     // get mesh
+    //     const entry = font.cacheItem(line, model, 5000);
 
-        // create camera 
-        const camera = Camera.screen(this.platform, 1.0);
+    //     // create camera 
+    //     const camera = Camera.screen(this.platform, 1.0);
 
-        // update camera
-        this._screenCamera.write(
-            [].concat(camera.view.values, camera.projection.values));
+    //     // update camera
+    //     this._screenCamera.write(
+    //         [].concat(camera.view.values, camera.projection.values));
 
-        // init shape
-        const text = new Shape(
-            Utils.uuid(),
-            model,
-            entry.mesh,
-            this.platform.resources.getMaterial("platform", name));
+    //     // init shape
+    //     const text = new Shape(
+    //         Utils.uuid(),
+    //         model,
+    //         entry.mesh,
+    //         this.platform.resources.getMaterial("platform", name));
 
-        // extract shape info
-        this.extractShape(text, false);
+    //     // extract shape info
+    //     this.extractShape(text, false);
 
-        // override mode
-        text.uniforms.set("model", entry.model);
+    //     // override mode
+    //     text.uniforms.set("model", entry.model);
 
-        // override texture buffer
-        text.textures.set("albedo",
-            this.platform.resources.getTexture("platform", name));
+    //     // override texture buffer
+    //     text.textures.set("albedo",
+    //         this.platform.resources.getTexture("platform", name));
 
-        // override pipeline, enable transparency, ignore depth
-        this._target.pipeline(true, false);
+    //     // override pipeline, enable transparency, ignore depth
+    //     this._target.pipeline(true, false);
 
-        // delegate to target
-        this._target?.render(this._screenCamera, [text]);
+    //     // delegate to target
+    //     this._target?.render(this._screenCamera, [text]);
 
-        // clean up shape
-        text.destroy(RenderDataDestroyOptions.None);
-    }
+    //     // clean up shape
+    //     text.destroy(RenderDataDestroyOptions.None);
+    // }
 
-    public renderLines(): void {
-        // define size
-        const size = 0.0025 * 0.25;
-        const height = 0.025;
-        const aspect = this.platform.graphics.aspect;
+    // public renderLines(): void {
+    //     // define size
+    //     const size = 0.0025 * 0.25;
+    //     const height = 0.025;
+    //     const aspect = this.platform.graphics.aspect;
 
-        // loop over lines
-        this._screenLines?.forEach((line, index) => {
+    //     // loop over lines
+    //     this._screenLines?.forEach((line, index) => {
 
-            // define model
-            const model = Matrix4.construct(
-                Vector3.zero.add(new Vector3(-0.5, 0.5 - index * height * aspect, 0.5)),
-                Quaternion.identity, new Vector3(size, size * aspect, 1.0));
+    //         // define model
+    //         const model = Matrix4.construct(
+    //             Vector3.zero.add(new Vector3(-0.5, 0.5 - index * height * aspect, 0.5)),
+    //             Quaternion.identity, new Vector3(size, size * aspect, 1.0));
 
-            // render line
-            this.renderLine("arial-32", model, line);
-        });
-    }
+    //         // render line
+    //         this.renderLine("arial-32", model, line);
+    //     });
+    // }
 
     public destroy(): void {
 
@@ -250,70 +239,70 @@ export class Renderer {
         this._swap?.destroy();
     }
 
-    public renderPanel(panel: Panel) {
-        // draw if material is present
-        if (panel.material)
-            this.drawPanel(panel);
+    // public renderPanel(panel: Panel) {
+    //     // draw if material is present
+    //     if (panel.material)
+    //         this.drawPanel(panel);
 
-        // loop over children and render each one
-        panel.children.forEach(child => this.renderPanel(child));
-    }
+    //     // loop over children and render each one
+    //     panel.children.forEach(child => this.renderPanel(child));
+    // }
 
-    private drawPanel(panel: Panel) {
+    // private drawPanel(panel: Panel) {
 
-        // default duration
-        const duration = 5000;
+    //     // default duration
+    //     const duration = 5000;
 
-        // create camera 
-        const camera = Camera.screen(this.platform, 1.0);
+    //     // create camera 
+    //     const camera = Camera.screen(this.platform, 1.0);
 
-        // get panel model
-        const model = panel.model();
+    //     // get panel model
+    //     const model = panel.model();
 
-        // cache entry
-        const entry = this._panelCache.cacheItem(panel.id, (entry) => {
+    //     // cache entry
+    //     const entry = this._panelCache.cacheItem(panel.id, (entry) => {
 
-            // construct final model
-            const fmodel = [].concat(model.values, model.inverse.transpose.values);
+    //         // construct final model
+    //         const fmodel = [].concat(model.values, model.inverse.transpose.values);
 
-            // check if existing
-            if (entry) {
-                // update
-                entry.duration = duration;
-                // update buffer
-                (entry as ModelMeshEntry).model.write(fmodel);
-            }
-            else
-                // create cache entry
-                return new ModelMeshEntry(panel.id, duration,
-                    this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform, fmodel),
-                    this.platform.resources.getMesh("platform", "panel"));
-        }) as ModelMeshEntry;
+    //         // check if existing
+    //         if (entry) {
+    //             // update
+    //             entry.duration = duration;
+    //             // update buffer
+    //             (entry as ModelMeshEntry).model.write(fmodel);
+    //         }
+    //         else
+    //             // create cache entry
+    //             return new ModelMeshEntry(panel.id, duration,
+    //                 this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform, fmodel),
+    //                 this.platform.resources.getMesh("platform", "panel"));
+    //     }) as ModelMeshEntry;
 
-        // update camera
-        this._screenCamera.write(
-            [].concat(camera.view.values, camera.projection.values));
+    //     // update camera
+    //     this._screenCamera.write(
+    //         [].concat(camera.view.values, camera.projection.values));
 
-        // init shape
-        const shape = new Shape(
-            Utils.uuid(),
-            model,
-            entry.mesh,
-            panel.material);
+    //     // init shape
+    //     const shape = new Shape(
+    //         Utils.uuid(),
+    //         model,
+    //         entry.mesh,
+    //         panel.material);
 
-        // extract shape info
-        this.extractShape(shape, false);
+    //     // extract shape info
+    //     this.extractShape(shape, false);
 
-        // override model
-        shape.uniforms.set("model", entry.model);
+    //     // override model
+    //     shape.uniforms.set("model", entry.model);
 
-        // override pipeline, enable transparency, ignore depth
-        this._target.pipeline(false, false);
+    //     // override pipeline, enable transparency, ignore depth
+    //     this._target.pipeline(false, false);
 
-        // delegate to target
-        this._target?.render(this._screenCamera, [shape]);
+    //     // delegate to target
+    //     this._target?.render(this._screenCamera, [shape]);
 
-        // clean up shape
-        shape.destroy(RenderDataDestroyOptions.None);
-    }
+    //     // clean up shape
+    //     shape.destroy(RenderDataDestroyOptions.None);
+    // }
 }

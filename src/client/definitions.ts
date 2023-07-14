@@ -3,7 +3,8 @@ import {
     InputDeviceKindOptions,
     MaterialModeOptions,
     MaterialPropertyKindOptions,
-    ShaderLayoutKindOptions,
+    ShaderDataKindOptions,
+    ShaderGroupBindingKindOptions,
     ShaderStageOptions,
     ShaderUniformKindOptions,
 } from "./index";
@@ -37,31 +38,38 @@ export type LevelDefinition = {
 
 // #region Shader Definition
 
-export type ShaderUniformDefinition2 = {
+export type ShaderUniformDefinition = {
     readonly name: string;
     readonly kind: ShaderUniformKindOptions;
 }
 
-export type ShaderGroupLayoutDefinition2 = {
+export type ShaderGroupBindingDefinition = {
     readonly name: string;
-    readonly kind: ShaderLayoutKindOptions;
-    readonly binding: number;
-    readonly layout: Iterable<ShaderUniformDefinition2>;
+    readonly kind: ShaderGroupBindingKindOptions;
+    readonly index: number;
+    readonly uniforms: Iterable<ShaderUniformDefinition>;
 }
 
-export type ShaderGroupDefinition2 = {
+export type ShaderGroupDefinition = {
     readonly name: string;
     readonly visibility: ShaderStageOptions;
-    readonly binding: number;
-    readonly layout: Iterable<ShaderGroupLayoutDefinition2>;
+    readonly index: number;
+    readonly bindings: Iterable<ShaderGroupBindingDefinition>;
 }
 
-export type ShaderDefinition2 = {
+export type ShaderBufferDefinition = {
+    name: string;
+    location: number;
+    kind: ShaderDataKindOptions
+}
+
+export type ShaderDefinition = {
     readonly name: string;
     readonly kind: ResourceKindOptions;
-    readonly code: string;
+    code: string;
     readonly base?: string;
-    readonly uniforms?: Iterable<ShaderGroupDefinition2>;
+    readonly groups: Iterable<ShaderGroupDefinition>;
+    readonly buffers: Iterable<ShaderBufferDefinition>;
 }
 
 // #endregion
@@ -90,55 +98,6 @@ export type MaterialDefinition = {
 }
 // #endregion
 
-
-// #region Shader Definition
-export enum ShaderDataKindOptions {
-    Color = "color",
-    Matrix = "matrix",
-    Float = "float",
-    Integer = "integer",
-    Vector2 = "vector2",
-    Vector3 = "vector3",
-    Vector4 = "vector4",
-}
-
-export type ShaderUniformLayoutDefinition = {
-    name: string;
-    kind: ShaderDataKindOptions;
-    binding: number;
-}
-
-export type ShaderUniformDefinition = {
-    name: string;
-    binding: number;
-    visibility: ShaderStageOptions;
-    layout: ShaderUniformLayoutDefinition[];
-}
-
-export type ShaderTextureDefinition = {
-    name: string;
-    binding: number;
-    visibility: ShaderStageOptions;
-}
-
-export type ShaderBufferDefinition = {
-    name: string;
-    location: number;
-    kind: ShaderDataKindOptions
-}
-
-export type ShaderDefinition = {
-    name: string;
-    kind: ResourceKindOptions;
-    code: string;
-    base?: string;
-    uniforms?: ShaderUniformDefinition[];
-    textures?: ShaderTextureDefinition[];
-    buffers?: ShaderBufferDefinition[];
-}
-// #endregion
-
-// #region Input Definition
 
 export type InputMapActionBindingDefinition = {
     readonly device: InputDeviceKindOptions;

@@ -30,12 +30,15 @@ export { IShader } from "./devices/graphics/shader";
 export { ITexture } from "./devices/graphics/texture";
 export { RenderPass } from "./devices/graphics/pass";
 export { RenderData } from "./devices/graphics/target";
-export { RenderDataDestroyOptions } from "./devices/graphics/target";
 export { Sampler } from "./devices/graphics/sampler";
 export { SamplerKindOptions } from "./devices/graphics/sampler";
 export { Shader } from "./devices/graphics/shader";
+export { ShaderData } from "./devices/graphics/shader";
+export { ShaderDataKindOptions } from "./devices/graphics/shader";
+export { ShaderGroup } from "./devices/graphics/shader";
+export { ShaderGroupBinding } from "./devices/graphics/shader";
+export { ShaderGroupBindingKindOptions } from "./devices/graphics/shader";
 export { ShaderStageOptions } from "./devices/graphics/shader";
-export { ShaderLayoutKindOptions } from "./devices/graphics/shader";
 export { ShaderUniformKindOptions } from "./devices/graphics/shader";
 
 export { Texture } from "./devices/graphics/texture";
@@ -64,10 +67,9 @@ export { MaterialPropertyDefinition } from "./definitions";
 export { MaterialTextureDefinition } from "./definitions";
 export { ResourceKindOptions } from "./definitions";
 export { ShaderDefinition } from "./definitions";
-export { ShaderDataKindOptions } from "./definitions";
-export { ShaderTextureDefinition } from "./definitions";
+export { ShaderGroupDefinition } from "./definitions";
+export { ShaderGroupBindingDefinition } from "./definitions";
 export { ShaderUniformDefinition } from "./definitions";
-export { ShaderUniformLayoutDefinition } from "./definitions";
 
 export { InputDefinition } from "./definitions";
 export { InputMapDefinition } from "./definitions";
@@ -109,9 +111,3 @@ export { RenderTarget } from "./rendering/target";
 export { RenderTargetBufffer } from "./rendering/target";
 export { Shape } from "./rendering/shape";
 
-// modeling
-export { Model } from "./modeling/model";
-export { ModelCollection } from "./modeling/model";
-export { World } from "./modeling/world";
-export { Chunk } from "./modeling/chunk";
-export { Block } from "./modeling/block";

@@ -134,20 +134,19 @@ export class RenderTarget {
             // bind pipeline with proper transparency
             item.shader.bindPipeline(this._renderPass, this._transparent, this._depth);
 
-            // bind context
-            item.shader.bindUniform(this._renderPass, "camera", camera);
-
             // bind buffers
             item.buffers.forEach((buffer, name) =>
                 item.shader.bindBuffer(this._renderPass, name, buffer));
 
-            // bind uniforms
-            item.uniforms.forEach((buffer, name) =>
-                item.shader.bindUniform(this._renderPass, name, buffer));
+            // bind camera
+            item.shader.bindData(this._renderPass, "camera", [{
+                name: "camera",
+                value: camera,
+            }]);
 
-            // bind textures
-            item.textures.forEach((texture, name) =>
-                item.shader.bindTexture(this._renderPass, name, texture, this._albedoSampler));
+            // bind data
+            item.groups.forEach((group, name) =>
+                item.shader.bindData(this._renderPass, name, Array.from(group.values())));
 
             // see if indices are there
             if (item.buffers.has("indices")) {
@@ -158,7 +157,8 @@ export class RenderTarget {
                 // draw indexed
                 this._renderPass.drawIndexed(item.buffers.get("indices").count);
             }
-            else {
+            else if (item.buffers.has("positions")) {
+
                 // draw non-indexed
                 this._renderPass.draw(item.buffers.get("positions").count);
             }

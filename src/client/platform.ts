@@ -18,13 +18,15 @@ import {
     Resources,
     Transform,
     Vector3,
-    World,
     Utils,
     Vector2,
     Size,
     SimulationTimer,
     Matrix4,
-    TextureKindOptions
+    TextureKindOptions,
+    Shape,
+    ShaderData,
+    BufferKindOptions
 } from "./index";
 
 export class Platform {
@@ -34,11 +36,11 @@ export class Platform {
     public readonly resources: Resources;
     public readonly renderer: Renderer;
     public readonly camera: Camera;
-    public readonly world: World;
     public readonly degrees: Vector3;
     public readonly timer: SimulationTimer;
     public readonly rootPanel: Panel;
     public readonly leftAxis: Vector2;
+    public readonly shapes: Shape[] = [];
 
     protected constructor(graphics: GraphicsDevice, input: InputDevice) {
         // init
@@ -54,7 +56,6 @@ export class Platform {
             Rectangle.screen,
             new Range(1.0, 256.0)
         );
-        this.world = World.create(this, "World");
         this.timer = new SimulationTimer();
         this.rootPanel = new Panel();
         this.leftAxis = Vector2.zero;
@@ -104,17 +105,24 @@ export class Platform {
         await platform.resources.registerInputByUri(
             "standard", "resources/inputs/standard.json");
 
-        // add panels
-        platform.rootPanel.children.push(new Panel(
-            new Rectangle(new Vector2(0, 0.0), new Size(1.0, 0.05)),
-            platform.resources.getMaterial("platform", "panel")));
+        // create shape
+        const shape = new Shape(
+            Utils.uuid(),
+            Matrix4.identity,
+            platform.resources.getMesh("platform", "cube"),
+            platform.resources.getMaterial("platform", "red")
+        );
 
-        platform.rootPanel.children.push(new Panel(
-            new Rectangle(new Vector2(0, 0.95), new Size(1.0, 0.05)),
-            platform.resources.getMaterial("platform", "orange-panel")));
+        // add model group
+        shape.groups.set("model", new Map<string, ShaderData>());
+        shape.groups.get("model").set("model", {
+            name: "model",
+            value: graphics.createF32Buffer(BufferKindOptions.Uniform,
+                [].concat(shape.world.values, shape.world.inverse.transpose.values))
+        });
 
-        // generate world
-        await platform.world.generate();
+        // add shape
+        platform.shapes.push(shape);
 
         // all done
         return platform;
@@ -174,14 +182,11 @@ export class Platform {
         // update camera
         this.camera.update();
 
-        // extract shapes from world
-        const shapes = this.world.extractShapes(this, this.camera, []);
-
         // start rendering with background color and depth
         this.renderer.capture(Color.trBlack, 1.0, () => {
 
             // render extracted shapes
-            this.renderer.render(this.camera, shapes);
+            this.renderer.render(this.camera, this.shapes);
 
             // // render text
             // this.renderer.writeLine(0, `FPS:${Math.round(this.timer.fps)} - APS:${Math.round(this.timer.aps)}`);

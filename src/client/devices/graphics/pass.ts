@@ -1,12 +1,11 @@
-import { IBuffer, ISampler, IShader, ITexture } from "../../index";
+import { IBuffer, ISampler, IShader, ITexture, ShaderData } from "../../index";
 
 
 export interface IRenderPass {
     get handle(): unknown;
-    bindIndices(buffer: IBuffer): void;
     bindBuffer(shader: IShader, name: string, buffer: IBuffer): void;
-    bindUniform(shader: IShader, name: string, uniform: IBuffer): void;
-    bindTexture(shader: IShader, name: string, texture: ITexture, sampler: ISampler): void;
+    bindData(shader: IShader, name: string, data: Iterable<ShaderData>): void;
+    bindIndices(buffer: IBuffer): void;
     draw(vertexCount: number): void;
     drawIndexed(indexCount: number): void;
     end(): void;
@@ -14,6 +13,7 @@ export interface IRenderPass {
 }
 
 export class RenderPass implements IRenderPass {
+    
     public readonly handle: unknown;
 
     constructor(handle: unknown) {
@@ -31,7 +31,6 @@ export class RenderPass implements IRenderPass {
         (this.handle as GPURenderPassEncoder).draw(vertexCount);
     }
 
-
     public drawIndexed(indexCount: number): void {
         // delegate
         (this.handle as GPURenderPassEncoder).drawIndexed(indexCount);
@@ -42,14 +41,9 @@ export class RenderPass implements IRenderPass {
         shader.bindBuffer(this, name, buffer);
     }
 
-    public bindUniform(shader: IShader, name: string, uniform: IBuffer): void {
+    public bindData(shader: IShader, name: string, data: Iterable<ShaderData>): void {
         // delegate
-        shader.bindUniform(this, name, uniform);
-    }
-
-    public bindTexture(shader: IShader, name: string, texture: ITexture, sampler: ISampler): void {
-        // delegate
-        shader.bindTexture(this, name, texture, sampler);
+        shader.bindData(this, name, data);
     }
 
     public viewport(x: number, y: number, width: number, height: number, minDepth: number, maxDepth: number): void {
