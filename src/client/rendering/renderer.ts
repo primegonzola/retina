@@ -127,22 +127,6 @@ export class Renderer {
     //     blit.destroy(RenderDataDestroyOptions.None);
     // }
 
-    private extractModel(model: Matrix4): IBuffer {
-        return this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform,
-            [].concat(model.values, model.inverse.transpose.values));
-    }
-
-    private extractShape(shape: Shape, extractModel: boolean): void {
-
-        // copy mesh buffers into shape
-        shape.mesh.buffers.forEach((value, key) =>
-            shape.buffers.set(key, value));
-
-        // // copy material groups
-        shape.material.groups.forEach((value, key) =>
-            shape.groups.set(key, value));
-    }
-
     public render(camera: Camera, shapes: Shape[]): void {
 
         // override pipeline
@@ -151,9 +135,6 @@ export class Renderer {
         // update camera
         this._renderCamera.write(
             [].concat(camera.view.values, camera.projection.values));
-
-        // extract shape info
-        shapes.forEach(shape => this.extractShape(shape, true));
 
         // render shapes
         this._target?.render(this._renderCamera, shapes);
