@@ -110,7 +110,7 @@ export class Platform {
             Utils.uuid(),
             Matrix4.identity,
             platform.resources.getMesh("platform", "cube"),
-            platform.resources.getMaterial("platform", "red")
+            platform.resources.getMaterial("platform", "green")
         );
 
         // add model group
@@ -157,7 +157,7 @@ export class Platform {
         }
 
         // update camera
-        const cameraSpeed = 0.01;
+        const cameraSpeed = 0.05;
         this.camera.transform.position.x += cameraSpeed * this.leftAxis.x;
         this.camera.transform.position.y += cameraSpeed * this.leftAxis.y;
     }
