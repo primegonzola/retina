@@ -1,0 +1,67 @@
+name: extract
+kind: shader
+base: base
+code: resources/shaders/extract.wgsl
+groups:
+  - name: camera
+    index: 0
+    visibility: vertex
+    bindings:
+      - name: camera
+        kind: uniform
+        index: 0
+        layout:
+          - name: position
+            kind: vector4
+          - name: view
+            kind: matrix4
+          - name: projection
+            kind: matrix4
+  - name: model
+    index: 1
+    visibility: vertex
+    bindings:
+      - name: model
+        kind: uniform
+        index: 0
+        layout:
+          - name: world
+            kind: matrix4
+          - name: normal
+            kind: matrix4
+  - name: material
+    index: 2
+    visibility: fragment
+    bindings:
+      - name: properties
+        kind: uniform
+        index: 0
+        layout:
+          - name: color
+            kind: color
+          - name: options
+            kind: vector4
+      - name: albedo-map
+        kind: uniform
+        index: 1
+        layout:
+          - name: offset
+            kind: vector2
+          - name: scale
+            kind: vector2
+      - name: albedo-texture
+        kind: albedo-texture-array
+        index: 2
+      - name: albedo-sampler
+        kind: albedo-sampler
+        index: 3
+buffers:
+  - name: positions
+    kind: vector3
+    location: 0
+  - name: texels
+    kind: vector2
+    location: 1
+  - name: normals
+    kind: vector3
+    location: 2

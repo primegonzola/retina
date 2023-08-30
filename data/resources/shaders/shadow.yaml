@@ -1,0 +1,35 @@
+name: shadow
+kind: shader
+base: base
+code: resources/shaders/shadow.wgsl
+groups:
+  - name: camera
+    index: 0
+    visibility: vertex
+    bindings:
+      - name: camera
+        kind: uniform
+        index: 0
+        layout:
+          - name: position
+            kind: vector4
+          - name: view
+            kind: matrix4
+          - name: projection
+            kind: matrix4
+  - name: model
+    index: 1
+    visibility: vertex
+    bindings:
+      - name: model
+        kind: uniform
+        index: 0
+        layout:
+          - name: world
+            kind: matrix4
+          - name: normal
+            kind: matrix4
+buffers:
+  - name: positions
+    kind: vector3
+    location: 0

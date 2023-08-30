@@ -1,0 +1,120 @@
+name: standard
+kind: shader
+base: base
+code: resources/shaders/standard.wgsl
+groups:
+  - name: camera
+    index: 0
+    visibility: both
+    bindings:
+      - name: camera
+        kind: uniform
+        index: 0
+        layout:
+          - name: position
+            kind: vector4
+          - name: view
+            kind: matrix4
+          - name: projection
+            kind: matrix4
+  - name: model
+    index: 1
+    visibility: vertex
+    bindings:
+      - name: model
+        kind: uniform
+        index: 0
+        layout:
+          - name: world
+            kind: matrix4
+          - name: normal
+            kind: matrix4
+  - name: material
+    index: 2
+    visibility: fragment
+    bindings:
+      - name: properties
+        kind: uniform
+        index: 0
+        layout:
+          - name: conditions
+            kind: vector4
+          - name: color
+            kind: color
+          - name: specular
+            kind: vector4
+          - name: opacity
+            kind: float
+      - name: albedo-map
+        kind: uniform
+        index: 1
+        layout:
+          - name: offset
+            kind: vector2
+          - name: scale
+            kind: vector2
+      - name: albedo-texture
+        kind: albedo-texture
+        index: 2
+      - name: albedo-sampler
+        kind: albedo-sampler
+        index: 3
+  - name: light
+    index: 3
+    visibility: both
+    bindings:
+      - name: light
+        kind: uniform
+        index: 0
+        layout:
+          - name: position
+            kind: vector3
+          - name: direction
+            kind: vector3
+          - name: view
+            kind: matrix4
+          - name: projection
+            kind: matrix4
+      - name: info
+        kind: uniform
+        index: 1
+        layout:
+          - name: info
+            kind: vector4
+          - name: color
+            kind: color
+          - name: position
+            kind: vector4
+          - name: direction
+            kind: vector4
+          - name: view
+            kind: matrix4
+          - name: projection
+            kind: matrix4
+          - name: shadow
+            kind: vector4
+          - name: padding2
+            kind: vector4
+          - name: padding3
+            kind: vector4
+          - name: padding4
+            kind: vector4
+      - name: shadow-sampler
+        kind: depth-sampler
+        index: 2
+      - name: shadow-directional-atlas
+        kind: depth-texture-array
+        index: 3
+      - name: shadow-textures
+        kind: depth-texture-cube-array
+        index: 4
+buffers:
+  - name: positions
+    kind: vector3
+    location: 0
+  - name: texels
+    kind: vector2
+    location: 1
+  - name: normals
+    kind: vector3
+    location: 2

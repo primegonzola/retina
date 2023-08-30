@@ -1,0 +1,24 @@
+{
+    "name": "mars",
+    "kind": "material",
+    "mode": "opaque",
+    "shader": "standard",
+    "properties": [
+        {
+            "name": "color",
+            "kind": "color",
+            "value": "#FFFFFFFF"
+        },
+        {
+            "name": "opacity",
+            "kind": "float",
+            "value": "1.0"
+        }
+    ],
+    "textures": [
+        {
+            "name": "albedo",
+            "key": "mars-albedo"
+        }
+    ]
+}

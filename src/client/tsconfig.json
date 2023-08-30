@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2020",
+    "noImplicitAny": true,
+    "sourceMap": false,
+    "outDir": "../../build",
+    "rootDir": ".",
+    "baseUrl": ".",
+    "declaration": false,
+    "typeRoots": [
+      "../../node_modules/@types",
+      "../../node_modules/@webgpu/types",
+      "../../node_modules/types/dom-webcodecs",
+    ],    
+    "paths": {
+      "*": [
+        "../../node_modules/*"
+      ]
+    }
+  }
+}

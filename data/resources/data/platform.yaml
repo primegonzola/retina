@@ -1,0 +1,359 @@
+name: platform
+kind: resources
+resources:
+  colors:
+    - name: tron-black
+      kind: color
+      value: "#0C141FFF"
+    - name: tron-red
+      kind: color
+      value: "#FF410DFF"
+    - name: tron-green
+      kind: color
+      value: "#95CC5EFF"
+    - name: tron-blue
+      kind: color
+      value: "#00ADEFFF"
+    - name: tron-cyan
+      kind: color
+      value: "#6EE2FFFF"
+    - name: tron-orange
+      kind: color
+      value: "#F79D1EFF"
+    - name: tron-yellow
+      kind: color
+      value: "#F7C530FF"
+    - name: tron-violet
+      kind: color
+      value: "#A844FFFF"
+    - name: tron-gray
+      kind: color
+      value: "#748AA6FF"
+    - name: tron-dark-gray
+      kind: color
+      value: "#A9A9A9FF"
+  shaders:
+    - name: standard
+      kind: shader
+      uri: resources/shaders/standard.yaml
+    - name: blit
+      kind: shader
+      uri: resources/shaders/blit.yaml
+    - name: extract
+      kind: shader
+      uri: resources/shaders/extract.yaml
+    - name: shadow
+      kind: shader
+      uri: resources/shaders/shadow.yaml
+    - name: font
+      kind: shader
+      uri: resources/shaders/font.yaml
+  textures:
+    - name: arial-16
+      kind: texture
+      uri: resources/fonts/arial-16_0.png
+    - name: arial-32
+      kind: texture
+      uri: resources/fonts/arial-32_0.png
+    - name: panel-albedo
+      kind: texture
+      uri: resources/textures/panel-albedo.png
+    - name: panel-metallic
+      kind: texture
+      uri: resources/textures/panel-metallic.png
+    - name: panel-normal
+      kind: texture
+      uri: resources/textures/panel-normal.png
+    - name: panel
+      uri:
+        - resources/textures/panel-albedo.png
+        - resources/textures/panel-metallic.png
+        - resources/textures/panel-normal.png
+    - name: metal-panel
+      uri:
+        - resources/textures/metal-panel-albedo.png
+        - resources/textures/metal-panel-metallic.png
+        - resources/textures/metal-panel-normal.png
+  materials:
+    - name: blit
+      kind: material
+      mode: transparent
+      shader: blit
+      properties:
+        - name: color
+          kind: color
+          value: "#FFFFFFFF"
+        - name: opacity
+          kind: float
+          value: 1.0
+
+    - name: extract
+      kind: material
+      mode: transparent
+      shader: extract
+      properties:
+        - name: color
+          kind: color
+          value: "#FFFFFFFF"
+        - name: options
+          kind: vector4
+          value: [1, 0, 0, 0]
+
+    - name: shadow
+      kind: material
+      mode: opaque
+      shader: shadow
+      properties:
+        - name: color
+          kind: color
+          value: "#FFFFFFFF"
+
+    - name: standard
+      kind: material
+      mode: opaque
+      shader: standard
+      properties:
+        - name: color
+          kind: color
+          value: "#FFFFFFFF"
+        - name: specular
+          kind: vector4
+          value: [0.0, 0.0, 0.0, 64.0]
+        - name: textures
+          kind: vector4
+          value: [0, -1, -1, -1]
+        - name: opacity
+          kind: float
+          value: "1.0"
+      textures:
+        - name: albedo
+          key: smiley
+
+    - name: arial-16
+      kind: material
+      shader: font
+      properties:
+        - name: color
+          kind: color
+          value: "#FFFF00FF"
+        - name: opacity
+          kind: float
+          value: "1.0"
+      textures:
+        - name: albedo
+          key: arial-16
+
+    - name: arial-32
+      kind: material
+      shader: font
+      properties:
+        - name: color
+          kind: color
+          value: "#FFFF00FF"
+        - name: opacity
+          kind: float
+          value: "1.0"
+      textures:
+        - name: albedo
+          key: arial-32
+
+    - name: black
+      kind: material
+      base: standard
+      mode: opaque
+      properties:
+        - name: color
+          value: "#FFFFFFFF"
+      textures:
+        - name: albedo
+          key: tron-black
+
+    - name: red
+      kind: material
+      base: standard
+      mode: transparent
+      properties:
+        - name: color
+          value: "FF0000FF"
+        - name: opacity
+          value: "0.5"
+      textures:
+        - name: albedo
+          key: tron-red
+
+    - name: green
+      kind: material
+      base: standard
+      mode: transparent
+      properties:
+        - name: color
+          value: "00FF00FF"
+        - name: opacity
+          value: "0.5"
+      textures:
+        - name: albedo
+          key: tron-green
+
+    - name: blue
+      kind: material
+      base: standard
+      mode: transparent
+      properties:
+        - name: color
+          value: "0000FFFF"
+        - name: opacity
+          value: "0.5"
+      textures:
+        - name: albedo
+          key: tron-blue
+
+    - name: orange
+      kind: material
+      base: standard
+      mode: transparent
+      properties:
+        - name: color
+          value: "#F79D1EFF"
+        - name: opacity
+          value: "0.5"
+      textures:
+        - name: albedo
+          key: tron-orange
+
+    - name: red-door
+      kind: material
+      base: standard
+      mode: transparent
+      properties:
+        - name: color
+          value: "FF0000FF"
+        - name: opacity
+          value: "0.50"
+      textures:
+        - name: albedo
+          key: tron-red
+
+    - name: green-door
+      kind: material
+      base: standard
+      mode: transparent
+      properties:
+        - name: color
+          value: "#00FF00FF"
+        - name: opacity
+          value: "1.0"
+      textures:
+        - name: albedo
+          key: tron-green
+
+    - name: yellow-door
+      kind: material
+      base: standard
+      mode: opaque
+      properties:
+        - name: color
+          value: "#F7C530FF"
+        - name: opacity
+          value: "1.0"
+      textures:
+        - name: albedo
+          key: tron-yellow
+
+    - name: transparent-door
+      kind: material
+      base: standard
+      mode: opaque
+      properties:
+        - name: color
+          value: "#FFFFFFFF"
+      textures:
+        - name: albedo
+          key: tron-violet
+
+    - name: base
+      kind: material
+      base: standard
+      mode: opaque
+      properties:
+        - name: color
+          value: "#FFFFFFFF"
+      textures:
+        - name: albedo
+          key: tron-black
+
+    - name: concrete
+      kind: material
+      base: standard
+      mode: opaque
+      properties:
+        - name: color
+          value: "#FFFFFFFF"
+        - name: textures
+          value : [0, 1, 2, -1]
+      textures:
+        - name: albedo
+          key: tron-dark-gray
+
+    - name: solid
+      kind: material
+      base: standard
+      mode: opaque
+      properties:
+        - name: color
+          value: "#FFFFFFFF"
+      textures:
+        - name: albedo
+          key: tron-gray
+
+    - name: test
+      kind: material
+      base: standard
+      mode: opaque
+      properties:
+        - name: color
+          value: "#FFFFFFFF"
+        - name: textures
+          value : [0, 1, 2, -1]
+      textures:
+        - name: albedo
+          key: panel
+
+    - name: grid
+      kind: material
+      base: standard
+      shader: standard
+      mode: transparent
+      properties:
+        - name: color
+          value: "#FFFFFFFF"
+        - name: specular
+          kind: vector4
+          value: [0.0, 0.0, 0.0, 0.0]
+        - name: textures
+          kind: vector4
+          value: [0, -1, -1, -1]
+        - name: opacity
+          value: "0.5"
+      textures:
+        - name: albedo
+          key: tron-blue
+
+    - name: player
+      kind: material
+      base: standard
+      mode: transparent
+      properties:
+        - name: color
+          value: "#F79D1EFF"
+        - name: opacity
+          value: "0.75"
+      textures:
+        - name: albedo
+          key: tron-orange
+  fonts:
+    - name: arial-16
+      kind: font
+      uri: resources/fonts/arial-16.fnt
+    - name: arial-32
+      kind: font
+      uri: resources/fonts/arial-32.fnt

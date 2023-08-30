@@ -1,0 +1,47 @@
+{
+    "name": "standard",
+    "kind": "input",
+    "maps": [
+        {
+            "name": "world",
+            "actions": [
+                {
+                    "name": "confirm",
+                    "kind": "tap",
+                    "bindings": [
+                        {
+                            "device": "keyboard",
+                            "values": [
+                                [
+                                    "enter"
+                                ]
+                            ]
+                        },
+                        {
+                            "device": "gamepad",
+                            "values": [
+                                [
+                                    "BRC"
+                                ]
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "cancel",
+                    "kind": "tap",
+                    "bindings": [
+                        {
+                            "device": "keyboard",
+                            "values": [
+                                [
+                                    "escape"
+                                ]
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
