@@ -95,7 +95,7 @@ export class Platform {
 
         // create transform
         const transform = new Transform(
-            Vector3.zero, Quaternion.identity, Vector3.one.scale(4));
+            Vector3.zero, Quaternion.identity, Vector3.one.scale(8));
 
         // create model
         const model = this.graphics.createF32Buffer(BufferKindOptions.Uniform,
