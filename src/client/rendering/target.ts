@@ -274,17 +274,17 @@ export class RenderTarget {
         shader.bindPipeline(this._renderPass, transparent, depth, this.depth && this.depth.stencil);
     }
 
-    public drawDirect(vertexCount: number, instanceCount?: number, firstVertex?: number, firstInstance?: number): void {
+    private _drawDirect(vertexCount: number, instanceCount?: number, firstVertex?: number, firstInstance?: number): void {
         // draw non-indexed
         this._renderPass.draw(vertexCount, instanceCount, firstVertex, firstInstance);
     }
 
-    public drawIndexed(indexCount: number, firstIndex?: number, baseVertex?: number, firstInstance?: number): void {
+    private _drawIndexed(indexCount: number, firstIndex?: number, baseVertex?: number, firstInstance?: number): void {
         // draw non-indexed
         this._renderPass.drawIndexed(indexCount, firstIndex, baseVertex, firstInstance);
     }
 
-    public bindIndices(indices: IBuffer): void {
+    public _bindIndices(indices: IBuffer): void {
         // draw non-indexed
         this._renderPass.bindIndices(indices);
     }
@@ -298,19 +298,18 @@ export class RenderTarget {
             if (buffers.has("indices")) {
 
                 // set indices
-                this.bindIndices(buffers.get("indices"));
+                this._bindIndices(buffers.get("indices"));
 
                 // draw indexed
-                this.drawIndexed(buffers.get("indices").count);
+                this._drawIndexed(buffers.get("indices").count);
             }
             else if (buffers.has("positions")) {
 
                 // draw non-indexed
-                this.drawDirect(buffers.get("positions").count);
+                this._drawDirect(buffers.get("positions").count);
             }
         }
     }
-
 
     private _drawBuffers(shader: IShader, item: RenderData) {
 

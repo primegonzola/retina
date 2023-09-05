@@ -9,7 +9,6 @@ import {
     IBuffer,
     InputDevice,
     Light,
-    LightKindOptions,
     Quaternion,
     Range,
     Rectangle,
