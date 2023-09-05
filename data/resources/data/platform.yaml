@@ -334,3 +334,25 @@ resources:
       textures:
         - name: albedo
           key: tron-blue
+
+    - name: basic
+      kind: material
+      # base: standard
+      shader: basic
+      mode: opaque
+      properties:
+        - name: color
+          kind: color
+          value: "#FF00FFFF"
+        - name: opacity
+          kind: float
+          value: "1.0"
+
+    - name: hull-floor
+      kind: material
+      base: basic
+      properties:
+        - name: color
+          value: "#00FF00FF"
+        - name: opacity
+          value: "1.0"

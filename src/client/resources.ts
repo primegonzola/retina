@@ -208,7 +208,7 @@ export class Resources {
                         value = Vector4.fromNumbers((property.value as Array<number>))[0];
                         break;
                     default:
-                        throw new Error(`Unknown material property kind '${property.kind}'.`);
+                        throw new Error(`Unknown material property kind '${kind}'.`);
                 };
 
                 // set
