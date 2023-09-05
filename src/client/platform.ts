@@ -8,6 +8,8 @@ import {
     Hull,
     IBuffer,
     InputDevice,
+    Light,
+    LightKindOptions,
     Quaternion,
     Range,
     Rectangle,
@@ -28,6 +30,7 @@ export class Platform {
     public readonly resources: Resources;
     public readonly timer: SimulationTimer;
     public readonly controller: CameraController;
+    public readonly lights: Light[];
     public readonly hulls: Hull[];
 
     protected constructor(graphics: GraphicsDevice, input: InputDevice) {
@@ -37,8 +40,9 @@ export class Platform {
         this.timer = new SimulationTimer();
         this.resources = new Resources(this);
 
-        // hulls to start with
+        // to start with
         this.hulls = [];
+        this.lights = [];
 
         // main render
         this.renderer = new Renderer(this, Color.trBlack, 1.0);
@@ -107,6 +111,15 @@ export class Platform {
 
         // add 
         this.hulls.push(hull);
+
+        // add a directional lighht
+        this.lights.push(Light.createDirectional(
+            new Transform(Vector3.zero, Quaternion.degrees(-45, 45, 0), Vector3.one),
+            Color.white,
+            1.0,
+            this.camera.area,
+            this.camera.range,
+        ));
     }
 
     public async destroy(): Promise<void> {
@@ -154,10 +167,11 @@ export class Platform {
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
 
             // render hulls
-            this.renderer?.render(this.camera.frustum, this.hulls);
+            this.renderer?.render(this.camera.frustum, this.lights, this.hulls);
 
             // output diagnostics
-            this.renderer.writeLine(0, `FPS:${Math.round(this.timer.fps)} - APS:${Math.round(this.timer.aps)}`);
+            this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);
+            this.renderer.writeLine(1, `Hulls: ${this.hulls.length} - Lights: ${this.lights.length}`);
         });
     }
 }

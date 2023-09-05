@@ -426,7 +426,11 @@ export class Renderer {
     }
 
 
-    public render(frustum: Frustum, hulls: Iterable<Hull>): void {
+    public render(frustum: Frustum, lights: Light[], hulls: Iterable<Hull>): void {
+
+        // collect the lights
+        this._lighting?.write(this._collectLighting(lights));
+
         // delegate
         this._render(this._target, frustum, hulls);
     }

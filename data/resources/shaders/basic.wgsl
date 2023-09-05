@@ -112,7 +112,7 @@ fn fragment_main(input: VertexShaderOutput) -> FragmentShaderOutput {
 
     // precaculate
     var surface_normal = normalize(input.normal);
-    var light_direction = normalize(vec3<f32>(0.0, 0.0, 1.0));
+    var light_direction = normalize(lighting.directionals[0].direction.xyz);
 
     // calculate directional component
     var light = max(dot(surface_normal, -light_direction), 0.0);
