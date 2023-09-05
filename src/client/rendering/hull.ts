@@ -1,5 +1,6 @@
 import {
     Frustum,
+    Geometry,
     IBuffer,
     IShader,
     ITexture,
@@ -16,6 +17,32 @@ export interface IHullRenderer {
     bindIndices(indices: IBuffer): void;
     draw(count: number): void;
     drawIndexed(count: number): void;
+}
+
+// export class GeometryBuffer {
+
+//     public readonly buffers: Map<string, IBuffer>;
+//     public readonly stride: number;
+
+//     constructor(buffers: Map<string, IBuffer>, index:number, size: number) {
+//         // init
+//         this.buffers = buffers;
+//         this.stride = stride;
+//     }
+// }
+
+export class BufferLocation {
+
+    public readonly buffer: IBuffer;
+    public readonly index: number
+    public readonly size: number;
+
+    constructor(buffer: IBuffer, index: number, size: number) {
+        // init
+        this.buffer = buffer;
+        this.index = index;
+        this.size = size;
+    }
 }
 
 export class Hull {

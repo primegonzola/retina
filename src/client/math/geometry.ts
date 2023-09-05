@@ -4,7 +4,12 @@ import {
     Vector3
 } from "../index";
 
+export enum GeometryTopology {
+    TriangleList = "triangle-list",
+}
+
 export class Geometry {
+    public readonly topology: GeometryTopology
     public readonly positions: Vector3[];
     public readonly indices: number[] | undefined;
     public readonly texels: Vector2[] | undefined;
@@ -12,7 +17,9 @@ export class Geometry {
     public readonly tangents: Vector3[] | undefined;
     public readonly bounds: Bounds;
 
-    constructor(positions: Vector3[], indices?: number[], texels?: Vector2[], normals?: Vector3[], tangents?: Vector3[]) {
+    constructor(
+        topology: GeometryTopology, positions: Vector3[], indices?: number[], texels?: Vector2[], normals?: Vector3[], tangents?: Vector3[]) {
+        this.topology = topology;
         this.positions = positions;
         this.indices = indices;
         this.texels = texels;
@@ -174,6 +181,7 @@ export class Geometry {
         ];
 
         return new Geometry(
+            GeometryTopology.TriangleList,
             Vector3.fromNumbers(tps),
             indices,
             Vector2.fromNumbers(texels),
@@ -246,6 +254,7 @@ export class Geometry {
         ];
 
         return new Geometry(
+            GeometryTopology.TriangleList,
             Vector3.fromNumbers(positions),
             indices,
             Vector2.fromNumbers(texels),
@@ -270,6 +279,7 @@ export class Geometry {
         ];
 
         return new Geometry(
+            GeometryTopology.TriangleList,
             Vector3.fromNumbers(positions),
             indices,
             Vector2.fromNumbers(texels),
@@ -313,6 +323,7 @@ export class Geometry {
         }
 
         return new Geometry(
+            GeometryTopology.TriangleList,
             Vector3.fromNumbers(positions),
             indices,
             Vector2.fromNumbers(texels),
