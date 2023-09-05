@@ -17,6 +17,7 @@ import {
     BufferKindOptions,
     Vector4,
     TextureDimensionOptions,
+    ISampler,
 } from "../index";
 
 export type RenderTargetBuffer = {
@@ -220,6 +221,22 @@ export class RenderTarget {
             }]);
     }
 
+    public bindTextures(shader: IShader, sampler: ISampler, textures: ITexture[]) {
+        // // bind buffer
+        // shader.bindData(
+        //     this._renderPass, group, [{
+        //         name: name,
+        //         kind: ShaderGroupBindingKindOptions.Uniform,
+        //         value: uniform,
+        //     }]);
+    }
+
+    public bindBuffers(shader: IShader, buffers: Map<string, IBuffer>) {
+        // bind buffers
+        buffers.forEach((buffer, name) =>
+            shader.bindBuffer(this._renderPass, name, buffer));
+    }
+
     private _bindModel(shader: IShader, model: IBuffer) {
         // bind model
         shader.bindData(
@@ -236,9 +253,40 @@ export class RenderTarget {
             shader.bindData(this._renderPass, name, Array.from(group.values())));
     }
 
+    public bindCamera(shader: IShader) {
+        // delegate to native one
+        this._bindCamera(this._camera, shader);
+    }
+
+    public bindPipeline(shader: IShader, transparent?: boolean, depth?: boolean) {
+
+        // override if needed
+        this._transparent = transparent || this._transparent;
+        this._depth = depth || this._depth;
+
+        // bind pipeline
+        shader.bindPipeline(this._renderPass,
+            this._transparent, this._depth, this._depth && this.depth.stencil);
+    }
+
     private _bindPipeline(shader: IShader, transparent: boolean, depth: boolean) {
         // bind pipeline
         shader.bindPipeline(this._renderPass, transparent, depth, this.depth && this.depth.stencil);
+    }
+
+    public draw(vertexCount: number, instanceCount?: number, firstVertex?: number, firstInstance?: number): void {
+        // draw non-indexed
+        this._renderPass.draw(vertexCount, instanceCount, firstVertex, firstInstance);
+    }
+
+    public drawIndexed(indexCount: number, firstIndex?: number, baseVertex?: number, firstInstance?: number): void {
+        // draw non-indexed
+        this._renderPass.drawIndexed(indexCount, firstIndex, baseVertex, firstInstance);
+    }
+
+    public bindIndices(indices: IBuffer): void {
+        // draw non-indexed
+        this._renderPass.bindIndices(indices);
     }
 
     private _drawBuffers(shader: IShader, item: RenderData) {

@@ -1,7 +1,7 @@
-name: standard
+name: basic
 kind: shader
 base: base
-code: resources/shaders/standard.wgsl
+code: resources/shaders/basic.wgsl
 groups:
   - name: camera
     index: 0

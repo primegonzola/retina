@@ -1,10 +1,12 @@
 import {
+    BufferKindOptions,
     Camera,
     CameraController,
     CameraKindOptions,
     Color,
     GraphicsDevice,
     Hull,
+    IBuffer,
     InputDevice,
     Quaternion,
     Range,
@@ -54,16 +56,6 @@ export class Platform {
         this.reset();
     }
 
-    public createContent(): void {
-
-        // create a hull
-        const hull = new Hull(null, new Transform(
-            Vector3.zero, Quaternion.identity, Vector3.one));
-
-        // add 
-        this.hulls.push(hull);
-    }
-
     public static async create(id: string): Promise<Platform> {
 
         // create the graphics device
@@ -87,6 +79,34 @@ export class Platform {
 
         // all done
         return platform;
+    }
+
+    public createContent(): void {
+
+        // get mesh
+        const mesh = this.resources.getMesh("platform", "cube");
+
+        // get material
+        const material = this.resources.getMaterial("platform", "hull-concrete");
+
+        // create transform
+        const transform = new Transform(
+            Vector3.zero, Quaternion.identity, Vector3.one.scale(4));
+
+        // create model
+        const model = this.graphics.createF32Buffer(BufferKindOptions.Uniform,
+            [].concat(transform.model.values, transform.model.inverse.transpose.values));
+
+        // create a hull
+        const hull = new Hull(null,
+            transform,
+            model,
+            mesh.buffers,
+            material.shader,
+            material.groups.get("material").get("properties").value as IBuffer);
+
+        // add 
+        this.hulls.push(hull);
     }
 
     public async destroy(): Promise<void> {
@@ -133,8 +153,8 @@ export class Platform {
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
 
-            // loop through hulls
-            // this.hulls.forEach(hull => hull.render(this.renderer));
+            // render hulls
+            this.renderer?.render(this.camera.frustum, this.hulls);
 
             // output diagnostics
             this.renderer.writeLine(0, `FPS:${Math.round(this.timer.fps)} - APS:${Math.round(this.timer.aps)}`);

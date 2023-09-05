@@ -5,8 +5,8 @@ import {
     CameraKindOptions,
     Color,
     Frustum,
+    Hull,
     IBuffer,
-    IHullRenderer,
     IShader,
     ITexture,
     Light,
@@ -65,7 +65,7 @@ type PointLightBufferInfo = {
     far_plane: number,
 };
 
-export class HullRenderer implements IHullRenderer {
+export class HullRenderer {
 
     public readonly platform: Platform;
     public readonly color: Color;
@@ -177,34 +177,6 @@ export class HullRenderer implements IHullRenderer {
         // delegate to swap target
         this._swap?.capture(Camera.screen().view, Camera.screen().projection, 0, 1,
             () => this._swap.single(bm.shader, [bm.groups], bs));
-    }
-
-    bindModel(shader: IShader, model: IBuffer): void {
-        // delegate to target
-        this._target?.bindUniform(shader, "model", "model", model);
-    }
-
-    bindProperties(shader: IShader, properties: IBuffer): void {
-        // delegate to target
-        this._target?.bindUniform(shader, "material", "properties", properties);
-    }
-
-    bindTextures(shader: IShader, textures: ITexture[]): void {
-
-    }
-
-    bindBuffers(shader: IShader, buffers: Map<string, IBuffer>): void {
-
-    }
-
-    bindIndices(indices: IBuffer): void {
-
-    }
-    draw(count: number): void {
-
-    }
-    drawIndexed(count: number): void {
-
     }
 
     public capture(camera: Camera, color: Color, depth: number, action: () => void): void {
@@ -916,5 +888,73 @@ export class Renderer {
 
         // destroy directional shadow 
         this._shadowDirectionalAtlas?.destroy();
+    }
+
+    private _draw(hull: Hull) {
+
+        // check if buffers is there
+        if (hull?.buffers) {
+
+            // see if indices are there
+            if (hull.buffers.has("indices")) {
+
+                // set indices
+                this._target?.bindIndices(hull.buffers.get("indices"));
+
+                // draw indexed
+                this._target?.drawIndexed(hull.buffers.get("indices").count);
+            }
+            else if (hull.buffers.has("positions")) {
+
+                // draw non-indexed
+                this._target?.draw(hull.buffers.get("positions").count);
+            }
+        }
+    }
+
+    public render(frustum: Frustum, hulls: Iterable<Hull>): void {
+
+        // ensure initialized
+        this._ensureInitialized();
+
+        // loop over hulls
+        for (const hull of hulls) {
+
+            // cache graph
+            const graph = hull.graph;
+
+            // check if intersecting
+            if (frustum.wbox(graph.position, graph.rotation, graph.scale)) {
+
+                // check if shader
+                if (hull.shader) {
+
+                    // bind pipeline
+                    this._target?.bindPipeline(hull.shader, true, true);
+
+                    // bind camera
+                    this._target?.bindCamera(hull.shader);
+
+                    // check to bind buffers
+                    if (hull.buffers)
+                        this._target?.bindBuffers(hull.shader, hull.buffers);
+
+                    // check to bind model
+                    if (hull.model)
+                        this._target?.bindUniform(hull.shader, "model", "model", hull.model);
+
+                    // check to bind properties
+                    if (hull.properties)
+                        this._target?.bindUniform(hull.shader, "material", "properties", hull.properties);
+
+                    // // bind textures
+                    // // if (hull.textures)
+                    // //     this._target?.bindTextures(hull.shader, this.textures);
+
+                    // // render the hull
+                    this._draw(hull);
+                }
+            }
+        }
     }
 }

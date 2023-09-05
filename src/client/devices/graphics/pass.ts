@@ -1,6 +1,6 @@
 import {
     IBuffer,
-    IShader, 
+    IShader,
     ShaderData
 } from "../../index";
 
@@ -9,8 +9,8 @@ export interface IRenderPass {
     bindBuffer(shader: IShader, name: string, buffer: IBuffer): void;
     bindData(shader: IShader, name: string, data: Iterable<ShaderData>): void;
     bindIndices(buffer: IBuffer): void;
-    draw(vertexCount: number): void;
-    drawIndexed(indexCount: number): void;
+    draw(vertexCount: number, instanceCount?: number, firstVertex?: number, firstInstance?: number): void;
+    drawIndexed(indexCount: number, firstIndex?: number, baseVertex?: number, firstInstance?: number): void;
     end(): void;
     viewport(x: number, y: number, width: number, height: number, minDepth?: number, maxDepth?: number): void;
 }
@@ -28,14 +28,14 @@ export class RenderPass implements IRenderPass {
         (this.handle as GPURenderPassEncoder).setIndexBuffer(buffer.handle as GPUBuffer, "uint32");
     }
 
-    public draw(vertexCount: number): void {
+    public draw(vertexCount: number, instanceCount?: number, firstVertex?: number, firstInstance?: number): void {
         // delegate
-        (this.handle as GPURenderPassEncoder).draw(vertexCount);
+        (this.handle as GPURenderPassEncoder).draw(vertexCount, instanceCount, firstVertex, firstInstance);
     }
 
-    public drawIndexed(indexCount: number): void {
+    public drawIndexed(indexCount: number, firstIndex?: number, baseVertex?: number, firstInstance?: number): void {
         // delegate
-        (this.handle as GPURenderPassEncoder).drawIndexed(indexCount);
+        (this.handle as GPURenderPassEncoder).drawIndexed(indexCount, firstIndex, baseVertex, firstInstance);
     }
 
     public bindBuffer(shader: IShader, name: string, buffer: IBuffer): void {

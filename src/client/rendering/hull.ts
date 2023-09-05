@@ -9,16 +9,6 @@ import {
     Utils
 } from "../index";
 
-export interface IHullRenderer {
-    bindModel(shader: IShader, model: IBuffer): void;
-    bindProperties(shader: IShader, properties: IBuffer): void;
-    bindTextures(shader: IShader, textures: ITexture[]): void;
-    bindBuffers(shader: IShader, buffers: Map<string, IBuffer>): void;
-    bindIndices(indices: IBuffer): void;
-    draw(count: number): void;
-    drawIndexed(count: number): void;
-}
-
 // export class GeometryBuffer {
 
 //     public readonly buffers: Map<string, IBuffer>;
@@ -57,8 +47,8 @@ export class Hull {
     public readonly textures: ITexture[];
     public readonly children: Hull[];
 
-    constructor(parent: Hull, transform: Transform, shader?: IShader,
-        buffers?: Map<string, IBuffer>, model?: IBuffer, properties?: IBuffer, textures?: ITexture[]) {
+    constructor(parent: Hull, transform: Transform,
+        model?: IBuffer, buffers?: Map<string, IBuffer>, shader?: IShader, properties?: IBuffer, textures?: ITexture[]) {
 
         // init
         this.id = Utils.uuid();
@@ -76,44 +66,6 @@ export class Hull {
         return this.parent ?
             this.parent.graph.multiply(this.transform.model) :
             Matrix4.identity.multiply(this.transform.model);
-    }
-
-    private _draw(renderer: IHullRenderer): void {
-
-        // check if shader is there
-        if (this.shader) {
-
-            // check for buffers are available
-            if (this.buffers)
-                renderer.bindBuffers(this.shader, this.buffers);
-
-            // check if model is available
-            if (this.model)
-                renderer.bindModel(this.shader, this.model);
-
-            // check if properties are available
-            if (this.properties)
-                renderer.bindProperties(this.shader, this.properties);
-
-            // bind textures
-            if (this.textures)
-                renderer.bindTextures(this.shader, this.textures);
-
-            // see if indices are there
-            if (this.buffers.has("indices")) {
-
-                // set indices
-                renderer.bindIndices(this.buffers.get("indices"));
-
-                // draw indexed
-                renderer.drawIndexed(this.buffers.get("indices").count);
-            }
-            else if (this.buffers.has("positions")) {
-
-                // draw non-indexed
-                renderer.draw(this.buffers.get("positions").count);
-            }
-        }
     }
 
     public extract(frustum: Frustum, depth?: number): Hull[] {
@@ -145,21 +97,5 @@ export class Hull {
 
         // all done
         return found;
-    }
-
-    public render(frustum: Frustum, renderer: IHullRenderer): void {
-
-        // cache graph
-        const graph = this.graph;
-
-        // check if we are in the frustum
-        if (frustum.wbox(graph.position, graph.rotation, graph.scale)) {
-
-            // render children
-            this.children.forEach(child => child.render(frustum, renderer));
-
-            // draw current hull
-            this._draw(renderer);
-        }
     }
 }

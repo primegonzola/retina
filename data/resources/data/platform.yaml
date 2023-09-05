@@ -337,7 +337,6 @@ resources:
 
     - name: basic
       kind: material
-      # base: standard
       shader: basic
       mode: opaque
       properties:
@@ -348,7 +347,7 @@ resources:
           kind: float
           value: "1.0"
 
-    - name: hull-floor
+    - name: hull-concrete
       kind: material
       base: basic
       properties:

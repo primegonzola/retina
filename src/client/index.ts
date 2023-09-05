@@ -91,7 +91,6 @@ export { Camera } from "./rendering/camera";
 export { CameraKindOptions } from "./rendering/camera";
 export { Font } from "./rendering/font";
 export { Hull } from "./rendering/hull";
-export { IHullRenderer } from "./rendering/hull";
 export { ModelMeshEntry } from "./rendering/cache";
 export { Material } from "./rendering/material";
 export { MaterialModeOptions } from "./rendering/material";
