@@ -45,7 +45,7 @@ groups:
     index: 3
     visibility: both
     bindings:
-      - name: info
+      - name: lighting
         kind: uniform
         index: 0
         layout:

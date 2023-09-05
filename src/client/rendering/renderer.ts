@@ -7,6 +7,7 @@ import {
     Hull,
     IBuffer,
     Light,
+    LightKindOptions,
     Matrix4,
     ModelMeshEntry,
     Platform,
@@ -19,6 +20,19 @@ import {
     Vector3,
     Vector4,
 } from "../index";
+
+type LightBufferInfo = {
+    info: Vector4;
+    color: Vector4;
+    position: Vector4,
+    direction: Vector4
+    view: Matrix4,
+    projection: Matrix4,
+    components: Vector4;
+    lighting: Vector4;
+    shadowing: Vector4;
+    sampling: Vector4;
+}
 
 export class Renderer {
     public platform: Platform;
@@ -35,6 +49,7 @@ export class Renderer {
 
     // buffers
     private _screen?: IBuffer;
+    private _lighting?: IBuffer;
 
     private _screenLines?: string[];
     private static readonly SCREEN_LINES_COUNT = 20;
@@ -75,6 +90,10 @@ export class Renderer {
                 [].concat(
                     Vector4.toNumbers([Vector4.xyz(Camera.screen().view.inverse.position, 1)]),
                     Camera.screen().view.values, Camera.screen().projection.values));
+
+            // init lighting buffer
+            this._lighting = this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform,
+                this._collectLighting());
 
             // create main target which is can be offline/online and stencil
             this._target = new RenderTarget(this.platform, this.offline ? this.offlineSize : this._size, this.offline,
@@ -158,7 +177,7 @@ export class Renderer {
             () => this._swap.single(bm.shader, [bm.groups], bs));
     }
 
-    private _collectLights(lights?: Light[]): number[] {
+    private _collectLighting(lights?: Light[]): number[] {
         // get directionals
         let directionals = lights?.filter(light => light.kind === LightKindOptions.Directional);
         directionals = directionals?.slice(0, Math.min(directionals.length, Settings.MaxDirectionalLightCount));
@@ -352,29 +371,8 @@ export class Renderer {
         this._swap?.destroy();
     }
 
-    private _draw(target: RenderTarget, hull: Hull) {
+    private _render(target: RenderTarget, frustum: Frustum, hulls: Iterable<Hull>): void {
 
-        // check if buffers is there
-        if (target && hull?.buffers) {
-
-            // see if indices are there
-            if (hull.buffers.has("indices")) {
-
-                // set indices
-                target?.bindIndices(hull.buffers.get("indices"));
-
-                // draw indexed
-                target?.drawIndexed(hull.buffers.get("indices").count);
-            }
-            else if (hull.buffers.has("positions")) {
-
-                // draw non-indexed
-                target?.draw(hull.buffers.get("positions").count);
-            }
-        }
-    }
-
-    private _render(target:RenderTarget, frustum: Frustum, hulls: Iterable<Hull>): void {
         // ensure initialized
         this._ensureInitialized();
 
@@ -394,16 +392,16 @@ export class Renderer {
                 if (shader) {
 
                     // bind pipeline
-                    target?.bindPipeline(shader, true, true);
+                    target?.bindPipeline(shader);
 
                     // bind camera
                     target?.bindCamera(shader);
 
                     // check to bind lights
-                    // if (hull?.properties)
-                    //     target?.bindUniform(shader, "material", "properties", hull.properties);
+                    if (this?._lighting)
+                        target?.bindUniform(shader, "lighting", "lighting", this._lighting);
 
-                        // check to bind buffers
+                    // check to bind buffers
                     if (hull?.buffers)
                         target?.bindBuffers(shader, hull.buffers);
 
@@ -419,8 +417,9 @@ export class Renderer {
                     if (hull?.textures)
                         target?.bindTextures(shader, null, hull.textures);
 
-                    // render the hull
-                    this._draw(target, hull);
+                    // draw hull
+                    if (hull?.buffers)
+                        target?.draw(hull?.buffers);
                 }
             }
         }

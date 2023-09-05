@@ -274,7 +274,7 @@ export class RenderTarget {
         shader.bindPipeline(this._renderPass, transparent, depth, this.depth && this.depth.stencil);
     }
 
-    public draw(vertexCount: number, instanceCount?: number, firstVertex?: number, firstInstance?: number): void {
+    public drawDirect(vertexCount: number, instanceCount?: number, firstVertex?: number, firstInstance?: number): void {
         // draw non-indexed
         this._renderPass.draw(vertexCount, instanceCount, firstVertex, firstInstance);
     }
@@ -288,6 +288,29 @@ export class RenderTarget {
         // draw non-indexed
         this._renderPass.bindIndices(indices);
     }
+
+    public draw(buffers: Map<string, IBuffer>) {
+
+        // check if buffers is there
+        if (buffers) {
+
+            // see if indices are there
+            if (buffers.has("indices")) {
+
+                // set indices
+                this.bindIndices(buffers.get("indices"));
+
+                // draw indexed
+                this.drawIndexed(buffers.get("indices").count);
+            }
+            else if (buffers.has("positions")) {
+
+                // draw non-indexed
+                this.drawDirect(buffers.get("positions").count);
+            }
+        }
+    }
+
 
     private _drawBuffers(shader: IShader, item: RenderData) {
 
