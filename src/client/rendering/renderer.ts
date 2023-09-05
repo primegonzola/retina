@@ -6,11 +6,13 @@ import {
     Frustum,
     Hull,
     IBuffer,
+    Light,
     Matrix4,
     ModelMeshEntry,
     Platform,
     Quaternion,
     RenderTarget,
+    Settings,
     Shape,
     Size,
     TextureDimensionOptions,
@@ -154,6 +156,113 @@ export class Renderer {
         // delegate to blit
         this._swap?.capture(Camera.screen().view, Camera.screen().projection, 0, 1,
             () => this._swap.single(bm.shader, [bm.groups], bs));
+    }
+
+    private _collectLights(lights?: Light[]): number[] {
+        // get directionals
+        let directionals = lights?.filter(light => light.kind === LightKindOptions.Directional);
+        directionals = directionals?.slice(0, Math.min(directionals.length, Settings.MaxDirectionalLightCount));
+
+        // get spots
+        let spots = lights?.filter(light => light.kind === LightKindOptions.Spot);
+        spots = spots?.slice(0, Math.min(spots.length, Settings.MaxSpotLightCount));
+
+        // get points
+        let points = lights?.filter(light => light.kind === LightKindOptions.Point);
+        points = points?.slice(0, Math.min(points.length, Settings.MaxPointLightCount));
+
+        // get areas
+        let areas = lights?.filter(light => light.kind === LightKindOptions.Area);
+        areas = areas?.slice(0, Math.min(areas.length, Settings.MaxAreaLightCount));
+
+        const serializeLight = (light: Light, index: number) => {
+            // populate
+            let lbi: LightBufferInfo = {
+                info: light ? new Vector4(light.kind, light.intensity, 0, 0) : Vector4.zero,
+                color: light ? Vector4.xyz(light.color.rgb, 0) : Vector4.zero,
+                position: light ? Vector4.xyz(light.transform.position, 0) : Vector4.zero,
+                direction: light ? Vector4.xyz(light.transform.rotation.direction, 0) : Vector4.zero,
+                view: light?.view || Matrix4.identity,
+                projection: light?.projection || Matrix4.identity,
+                components: new Vector4(0, 0, 0, 0),
+                lighting: new Vector4(0, 0, 0, 0),
+                shadowing: new Vector4(0, 0, 0, 0),
+                sampling: new Vector4(index, 1, 2, 0.007),
+            };
+
+            // init
+            let buffer: number[] = [];
+
+            // add all fields
+            buffer = buffer.concat(
+                Vector4.toNumbers([
+                    lbi.info, lbi.color, lbi.position, lbi.direction
+                ]),
+                lbi.view.values,
+                lbi.projection.values,
+                Vector4.toNumbers([
+                    lbi.components, lbi.lighting, lbi.shadowing, lbi.sampling
+                ])
+            );
+
+            // all done
+            return buffer;
+        };
+
+        const serializeLights = (lights: Light[], max: number) => {
+            // init
+            let buffer: number[] = [];
+            // loop 
+            for (let i = 0; i < max; i++) {
+
+                // get light
+                const light = lights && i < lights.length ? lights[i] : undefined;
+
+                // serialize and add to buffer
+                buffer = buffer.concat(serializeLight(light, i));
+            }
+
+            // done
+            return buffer;
+        }
+
+        // final buffer
+        let buffer: number[] = [];
+
+        // add light counts
+        buffer = buffer.concat([
+            directionals?.length || 0,
+            spots?.length || 0,
+            points?.length || 0,
+            areas?.length || 0
+        ]);
+
+        // add shadow max counts
+        buffer = buffer.concat([
+            Settings.MaxDirectionalShadowCount,
+            Settings.MaxSpotLightCount,
+            Settings.MaxPointShadowCount,
+            Settings.MaxAreaShadowCount
+        ]);
+
+        // serialize directionals
+        buffer = buffer.concat(
+            serializeLights(directionals, Settings.MaxDirectionalLightCount));
+
+        // serialize spots
+        buffer = buffer.concat(
+            serializeLights(spots, Settings.MaxSpotLightCount));
+
+        // serialize points
+        buffer = buffer.concat(
+            serializeLights(points, Settings.MaxPointLightCount));
+
+        // serialize areas
+        buffer = buffer.concat(
+            serializeLights(areas, Settings.MaxAreaLightCount));
+
+        // all done
+        return buffer;
     }
 
     public capture(camera: Camera, color: Color, depth: number, action: () => void): void {
