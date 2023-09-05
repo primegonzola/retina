@@ -343,6 +343,9 @@ resources:
         - name: color
           kind: color
           value: "#FF00FFFF"
+        - name: components
+          kind: vector4
+          value: [0, 1, 1, 1]
         - name: lighting
           kind: vector4
           value: [1, 1, 1, 1]

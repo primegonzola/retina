@@ -11,6 +11,7 @@ struct ModelUniform {
 
 struct PropertiesUniform {
     color: vec4<f32>,
+    components: vec4<f32>,
     lighting: vec4<f32>,
 };
 
@@ -52,6 +53,13 @@ var<uniform> properties: PropertiesUniform;
 @group(3) @binding(0)
 var<uniform> lighting: LightingUniform;
 
+
+struct LightContribution {
+    ambient: vec4<f32>,
+    diffuse: vec4<f32>,
+    specular: vec4<f32>,
+    shadows: f32
+}
 
 struct VertexShaderInput {
     @location(0) position: vec3<f32>,
@@ -113,13 +121,30 @@ fn fragment_main(input: VertexShaderOutput) -> FragmentShaderOutput {
     // precaculate
     var surface_normal = normalize(input.normal);
     var light_direction = normalize(lighting.directionals[0].direction.xyz);
+    var light_color = lighting.directionals[0].color;
+
+    // define initial light contribution
+    var contribution = LightContribution(
+        vec4<f32>(0.0, 0.0, 0.0, 0.0),
+        vec4<f32>(0.0, 0.0, 0.0, 0.0),
+        vec4<f32>(0.0, 0.0, 0.0, 0.0),
+        0.0
+    );
 
     // calculate directional component
-    var light = max(dot(surface_normal, -light_direction), 0.0);
+    var directional_component = max(dot(surface_normal, -light_direction), 0.0);
+
+    // update contribution
+    contribution.ambient = light_color * properties.components.x;
+    contribution.diffuse = light_color * properties.components.y * directional_component;
+    contribution.specular = light_color * 0.0;
+
+    // surface color is the sum of all contributions
+    var surface_color = contribution.ambient + contribution.diffuse + contribution.specular;
 
     // final output color
     output.color = vec4<f32>(
-        light * properties.color.rgb,
+        properties.color.rgb * surface_color.rgb,
         properties.color.a
     );
 
