@@ -6,6 +6,7 @@ import {
     GraphicsDevice,
     Hull,
     InputDevice,
+    Quaternion,
     Range,
     Rectangle,
     Renderer,
@@ -33,6 +34,8 @@ export class Platform {
         this.graphics = graphics;
         this.timer = new SimulationTimer();
         this.resources = new Resources(this);
+
+        // hulls to start with
         this.hulls = [];
 
         // main render
@@ -51,9 +54,14 @@ export class Platform {
         this.reset();
     }
 
-    public createContent():void {
+    public createContent(): void {
 
+        // create a hull
+        const hull = new Hull(null, new Transform(
+            Vector3.zero, Quaternion.identity, Vector3.one));
 
+        // add 
+        this.hulls.push(hull);
     }
 
     public static async create(id: string): Promise<Platform> {
@@ -125,6 +133,8 @@ export class Platform {
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
 
+            // loop through hulls
+            // this.hulls.forEach(hull => hull.render(this.renderer));
 
             // output diagnostics
             this.renderer.writeLine(0, `FPS:${Math.round(this.timer.fps)} - APS:${Math.round(this.timer.aps)}`);

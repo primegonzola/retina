@@ -4,7 +4,11 @@ import {
     Camera,
     CameraKindOptions,
     Color,
+    Frustum,
     IBuffer,
+    IHullRenderer,
+    IShader,
+    ITexture,
     Light,
     LightKindOptions,
     MaterialModeOptions,
@@ -60,6 +64,168 @@ type PointLightBufferInfo = {
     near_plane: number,
     far_plane: number,
 };
+
+export class HullRenderer implements IHullRenderer {
+
+    public readonly platform: Platform;
+    public readonly color: Color;
+    public readonly depth: number;
+
+    private _size: Size;
+    private _target: RenderTarget;
+    private _swap?: RenderTarget;
+
+    constructor(platform: Platform, size: Size, color: Color, depth: number) {
+        // init
+        this.platform = platform;
+        this._size = size || Size.zero;
+        this.color = color || Color.red;
+        this.depth = depth || 1.0;
+    }
+
+    private _ensureInitialized(force?: boolean): void {
+
+        // check screen size changed
+        if (!this._size.equals(this.platform.graphics.size) || force) {
+
+            // update new size
+            this._size = this.platform.graphics.size;
+
+            // destroy target
+            this._target?.destroy();
+
+            // create main target which is offline and with stencil enabled
+            this._target = new RenderTarget(this.platform, this._size, true,
+                [{
+                    color: this.color,
+                    texture: {
+                        dimension: TextureDimensionOptions.Two,
+                        layers: 1,
+                        samples: 1,
+                    }
+                }],
+                {
+                    value: this.depth,
+                    stencil: true,
+                    texture: {
+                        dimension: TextureDimensionOptions.Two,
+                        layers: 1,
+                    }
+                });
+
+            // create swap target with screen size which is always online and no stencil
+            this._swap = new RenderTarget(this.platform, this._size, false,
+                [{
+                    color: Color.yellow,
+                    texture: {
+                        dimension: TextureDimensionOptions.Two,
+                        layers: 1,
+                    }
+                }],
+                {
+                    value: 1.0,
+                    stencil: false,
+                    texture: {
+                        dimension: TextureDimensionOptions.Two,
+                        layers: 1,
+                    }
+                });
+        }
+    }
+
+    private _blit(): void {
+
+        // ensure initialized
+        this._ensureInitialized();
+
+        // create model
+        const model = Matrix4.construct(Vector3.zero, Quaternion.identity, Vector3.one);
+
+        // cache item
+        const entry = Cache.instance.cacheItem("blit", (entry) => {
+
+            // construct final model
+            const fmodel = [].concat(model.values, model.inverse.transpose.values);
+
+            // check if existing
+            if (entry) {
+                // update buffer
+                (entry as ModelMeshEntry).model.write(fmodel);
+            }
+            else
+                // create font cache entry
+                return new ModelMeshEntry("blit", 2000,
+                    this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform, fmodel),
+                    this.platform.resources.getMesh("platform", "blit"));
+        }) as ModelMeshEntry;
+
+        // get blit material
+        const bm = this.platform.resources.getMaterial("platform", "blit");
+
+        // init blit shape
+        const bs = new Shape(entry.model, model, entry.mesh, bm);
+
+        // override pipelines
+        this._swap.pipeline(true, false);
+
+        // override texture buffer
+        bm.textures.set("albedo", {
+            name: "albedo",
+            key: this._target?.buffers[0].attachments[0],
+        });
+
+        // delegate to swap target
+        this._swap?.capture(Camera.screen().view, Camera.screen().projection, 0, 1,
+            () => this._swap.single(bm.shader, [bm.groups], bs));
+    }
+
+    bindModel(shader: IShader, model: IBuffer): void {
+        // delegate to target
+        this._target?.bindUniform(shader, "model", "model", model);
+    }
+
+    bindProperties(shader: IShader, properties: IBuffer): void {
+        // delegate to target
+        this._target?.bindUniform(shader, "material", "properties", properties);
+    }
+
+    bindTextures(shader: IShader, textures: ITexture[]): void {
+
+    }
+
+    bindBuffers(shader: IShader, buffers: Map<string, IBuffer>): void {
+
+    }
+
+    bindIndices(indices: IBuffer): void {
+
+    }
+    draw(count: number): void {
+
+    }
+    drawIndexed(count: number): void {
+
+    }
+
+    public capture(camera: Camera, color: Color, depth: number, action: () => void): void {
+
+        // ensure initialized
+        this._ensureInitialized();
+
+        // override pipeline
+        this._target.pipeline(true, true);
+
+        // delegate to target
+        this._target?.capture(camera.view, camera.projection, 0, 1, () => {
+
+            // delegate action
+            action();
+        });
+
+        // blit to screen 
+        this._blit();
+    }
+}
 
 export class Renderer {
     public platform: Platform;

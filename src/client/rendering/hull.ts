@@ -30,7 +30,7 @@ export class Hull {
     public readonly textures: ITexture[];
     public readonly children: Hull[];
 
-    constructor(parent?: Hull, transform?: Transform, shader?: IShader,
+    constructor(parent: Hull, transform: Transform, shader?: IShader,
         buffers?: Map<string, IBuffer>, model?: IBuffer, properties?: IBuffer, textures?: ITexture[]) {
 
         // init
@@ -126,7 +126,7 @@ export class Hull {
         const graph = this.graph;
 
         // check if we are in the frustum
-        if (frustum.wbox(graph.position, graph.rotation, graph.scale)){
+        if (frustum.wbox(graph.position, graph.rotation, graph.scale)) {
 
             // render children
             this.children.forEach(child => child.render(frustum, renderer));
