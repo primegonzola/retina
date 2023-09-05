@@ -48,6 +48,10 @@ export abstract class Utils {
     //         pos.y * target.height / target.clientHeight);
     // }
 
+    public static pad(data: number[], wrap: number = 16, value: number = 0): number[] {
+        return [].concat(data, Array((data.length % wrap) === 0 ? 0 : wrap - (data.length % wrap)).fill(value));
+    }
+
     public static wrap(next: number, total: number): number {
         return (total + next) % total;
     }

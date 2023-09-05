@@ -76,6 +76,8 @@ export type ShaderData = {
     readonly name: string;
     readonly value: unknown;
     readonly kind: ShaderGroupBindingKindOptions;
+    readonly offset?: number;
+    readonly size?: number;
 }
 
 export interface IShader {
@@ -487,6 +489,8 @@ export class Shader implements IShader {
                                 binding: binding.index,
                                 resource: {
                                     buffer: (bd.value as IBuffer).handle as GPUBuffer,
+                                    offset: bd.offset,
+                                    size: bd.size,
                                 }
                             });
                             break;

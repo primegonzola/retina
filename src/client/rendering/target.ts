@@ -211,13 +211,15 @@ export class RenderTarget {
         }
     }
 
-    public bindUniform(shader: IShader, group: string, name: string, uniform: IBuffer) {
+    public bindUniform(shader: IShader, group: string, name: string, uniform: IBuffer, offset?: number, size?: number) {
         // bind buffer
         shader.bindData(
             this._renderPass, group, [{
                 name: name,
                 kind: ShaderGroupBindingKindOptions.Uniform,
                 value: uniform,
+                offset: offset,
+                size: size,
             }]);
     }
 

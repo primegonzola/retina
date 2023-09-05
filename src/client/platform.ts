@@ -1,5 +1,6 @@
 import {
     BufferKindOptions,
+    BufferLocation,
     Camera,
     CameraController,
     CameraKindOptions,
@@ -98,15 +99,19 @@ export class Platform {
 
         // create model
         const model = this.graphics.createF32Buffer(BufferKindOptions.Uniform,
-            [].concat(transform.model.values, transform.model.inverse.transpose.values));
+            Utils.pad(transform.extract()));
+
+        // get properties
+        const properties = this.graphics.createF32Buffer(BufferKindOptions.Uniform,
+            Utils.pad(material.extract()));
 
         // create a hull
         const hull = new Hull(null,
             transform,
-            model,
+            new BufferLocation(model, model.count, 0, model.size),
             mesh.buffers,
             material.shader,
-            material.groups.get("material").get("properties").value as IBuffer);
+            new BufferLocation(properties, properties.count, 0, properties.size));
 
         // add 
         this.hulls.push(hull);

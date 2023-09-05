@@ -15,7 +15,7 @@ export interface IBuffer {
     get device(): GraphicsDevice;
     get handle(): unknown;
     get count(): number;
-    get _stride(): number;
+    get size(): number;
     write(data: number[]): void;
     destroy(): void;
 }
@@ -27,16 +27,16 @@ export class Buffer<T> implements IBuffer {
     public readonly kind: BufferKindOptions;
     public readonly handle: T;
     public readonly count: number;
-    public readonly _stride: number;
+    public readonly size: number;
 
-    constructor(device: GraphicsDevice, kind: BufferKindOptions, count: number, stride: number, handle: T) {
+    constructor(device: GraphicsDevice, kind: BufferKindOptions, count: number, size: number, handle: T) {
         // init
         this.id = Utils.uuid();
         this.device = device;
         this.kind = kind;
         this.handle = handle;
         this.count = count;
-        this._stride = stride;
+        this.size = size;
     }
 
     public write(data: number[]): void {

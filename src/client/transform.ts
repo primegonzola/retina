@@ -52,6 +52,10 @@ export class Transform {
         );
     }
 
+    public extract(): number[] {
+        return [].concat(this.model.values, this.model.inverse.transpose.values);
+    }
+
     public static matrix(world: Matrix4): Transform {
         return new Transform(world.position, world.rotation, world.scale);
     }

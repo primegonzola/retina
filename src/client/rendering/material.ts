@@ -89,20 +89,7 @@ export class Material {
         this.synchronize();
     }
 
-    private synchronize(): void {
-        // check if we have properties
-        if (this.groups.has("material")) {
-            // loop and delete entries
-            this.groups.get("material").forEach((value, key) => {
-                if (value.kind === ShaderGroupBindingKindOptions.Uniform)
-                    (value.value as IBuffer).destroy();
-            });
-            this.groups.delete("material");
-        }
-
-        // create new 
-        this.groups.set("material", new Map<string, ShaderData>());
-
+    public extract(): number[] {
         // sort properties ascending
         const sorted = Array.from(this.properties.values()).sort((a, b) => a.index - b.index);
 
@@ -143,11 +130,29 @@ export class Material {
             }
         });
 
+        return source;
+    }
+
+    private synchronize(): void {
+        // check if we have properties
+        if (this.groups.has("material")) {
+            // loop and delete entries
+            this.groups.get("material").forEach((value, key) => {
+                if (value.kind === ShaderGroupBindingKindOptions.Uniform)
+                    (value.value as IBuffer).destroy();
+            });
+            this.groups.delete("material");
+        }
+
+        // create new 
+        this.groups.set("material", new Map<string, ShaderData>());
+
         // set properties buffer
         this.groups.get("material").set("properties", {
             name: "properties",
             kind: ShaderGroupBindingKindOptions.Uniform,
-            value: this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform, source)
+            value: this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform,
+                Utils.pad(this.extract()))
         });
 
         // loop over textures

@@ -87,6 +87,7 @@ export { Utils } from "./utils";
 // rendering
 export { Animation } from "./rendering/animation";
 export { AnimationController } from "./rendering/animation";
+export { BufferLocation } from "./rendering/hull";
 export { Camera } from "./rendering/camera";
 export { CameraKindOptions } from "./rendering/camera";
 export { Font } from "./rendering/font";

@@ -24,13 +24,15 @@ import {
 export class BufferLocation {
 
     public readonly buffer: IBuffer;
-    public readonly index: number
+    public readonly offset: number
+    public readonly count: number
     public readonly size: number;
 
-    constructor(buffer: IBuffer, index: number, size: number) {
+    constructor(buffer: IBuffer, count: number, offset?: number, size?: number) {
         // init
         this.buffer = buffer;
-        this.index = index;
+        this.count = count;
+        this.offset = offset;
         this.size = size;
     }
 }
@@ -41,14 +43,14 @@ export class Hull {
     public readonly transform: Transform;
     public readonly parent: Hull;
     public readonly shader: IShader;
-    public readonly model: IBuffer;
+    public readonly model: BufferLocation;
     public readonly buffers: Map<string, IBuffer>;
-    public readonly properties: IBuffer;
+    public readonly properties: BufferLocation;
     public readonly textures: ITexture[];
     public readonly children: Hull[];
 
     constructor(parent: Hull, transform: Transform,
-        model?: IBuffer, buffers?: Map<string, IBuffer>, shader?: IShader, properties?: IBuffer, textures?: ITexture[]) {
+        model?: BufferLocation, buffers?: Map<string, IBuffer>, shader?: IShader, properties?: BufferLocation, textures?: ITexture[]) {
 
         // init
         this.id = Utils.uuid();
