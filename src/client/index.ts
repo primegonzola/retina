@@ -89,6 +89,7 @@ export { AnimationController } from "./rendering/animation";
 export { Camera } from "./rendering/camera";
 export { CameraKindOptions } from "./rendering/camera";
 export { Font } from "./rendering/font";
+export { Hull } from "./rendering/hull";
 export { ModelMeshEntry } from "./rendering/cache";
 export { Material } from "./rendering/material";
 export { MaterialModeOptions } from "./rendering/material";
@@ -112,3 +113,5 @@ export { Polyhedron } from "./rendering/polyhedron";
 export { Maze } from "./algos/maze";
 export { MazeNode } from "./algos/maze";
 export { MazeNodeKindOptions } from "./algos/maze";
+
+export { CameraController } from "./controllers/camera";
