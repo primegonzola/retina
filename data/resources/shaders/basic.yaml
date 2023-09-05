@@ -39,7 +39,11 @@ groups:
         layout:
           - name: color
             kind: color
+          - name: components
+            kind: vector4
           - name: lighting
+            kind: vector4
+          - name: textures
             kind: vector4
   - name: lighting
     index: 3

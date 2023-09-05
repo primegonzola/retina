@@ -13,6 +13,7 @@ struct PropertiesUniform {
     color: vec4<f32>,
     components: vec4<f32>,
     lighting: vec4<f32>,
+    textures: vec4<f32>,
 };
 
 struct Light {

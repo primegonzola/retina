@@ -349,6 +349,9 @@ resources:
         - name: lighting
           kind: vector4
           value: [1, 1, 1, 1]
+        - name: textures
+          kind: vector4
+          value: [0, 0, 0, 0]
 
     - name: hull-concrete
       kind: material
