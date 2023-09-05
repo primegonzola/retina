@@ -33,6 +33,9 @@ resources:
       kind: color
       value: "#A9A9A9FF"
   shaders:
+    - name: basic
+      kind: shader
+      uri: resources/shaders/basic.yaml
     - name: standard
       kind: shader
       uri: resources/shaders/standard.yaml
@@ -74,6 +77,13 @@ resources:
         - resources/textures/metal-panel-albedo.png
         - resources/textures/metal-panel-metallic.png
         - resources/textures/metal-panel-normal.png
+  fonts:
+    - name: arial-16
+      kind: font
+      uri: resources/fonts/arial-16.fnt
+    - name: arial-32
+      kind: font
+      uri: resources/fonts/arial-32.fnt
   materials:
     - name: blit
       kind: material
@@ -289,7 +299,7 @@ resources:
         - name: color
           value: "#FFFFFFFF"
         - name: textures
-          value : [0, 1, 2, -1]
+          value: [0, 1, 2, -1]
       textures:
         - name: albedo
           key: tron-dark-gray
@@ -304,19 +314,6 @@ resources:
       textures:
         - name: albedo
           key: tron-gray
-
-    - name: test
-      kind: material
-      base: standard
-      mode: opaque
-      properties:
-        - name: color
-          value: "#FFFFFFFF"
-        - name: textures
-          value : [0, 1, 2, -1]
-      textures:
-        - name: albedo
-          key: panel
 
     - name: grid
       kind: material
@@ -337,23 +334,3 @@ resources:
       textures:
         - name: albedo
           key: tron-blue
-
-    - name: player
-      kind: material
-      base: standard
-      mode: transparent
-      properties:
-        - name: color
-          value: "#F79D1EFF"
-        - name: opacity
-          value: "0.75"
-      textures:
-        - name: albedo
-          key: tron-orange
-  fonts:
-    - name: arial-16
-      kind: font
-      uri: resources/fonts/arial-16.fnt
-    - name: arial-32
-      kind: font
-      uri: resources/fonts/arial-32.fnt

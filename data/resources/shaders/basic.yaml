@@ -1,0 +1,56 @@
+name: standard
+kind: shader
+base: base
+code: resources/shaders/standard.wgsl
+groups:
+  - name: camera
+    index: 0
+    visibility: both
+    bindings:
+      - name: camera
+        kind: uniform
+        index: 0
+        layout:
+          - name: position
+            kind: vector4
+          - name: view
+            kind: matrix4
+          - name: projection
+            kind: matrix4
+  - name: model
+    index: 1
+    visibility: vertex
+    bindings:
+      - name: model
+        kind: uniform
+        index: 0
+        layout:
+          - name: world
+            kind: matrix4
+          - name: normal
+            kind: matrix4
+  - name: material
+    index: 2
+    visibility: fragment
+    bindings:
+      - name: properties
+        kind: uniform
+        index: 0
+        layout:
+          - name: color
+            kind: color
+          - name: opacity
+            kind: float
+buffers:
+  - name: positions
+    kind: vector3
+    location: 0
+  - name: texels
+    kind: vector2
+    location: 1
+  - name: normals
+    kind: vector3
+    location: 2
+  - name: tangents
+    kind: vector4
+    location: 3
