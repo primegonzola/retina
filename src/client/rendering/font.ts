@@ -2,6 +2,7 @@ import {
     BufferKindOptions,
     Cache,
     Geometry,
+    GeometryTopology,
     Matrix4,
     Mesh,
     ModelMeshEntry,
@@ -375,6 +376,7 @@ export class Font {
 
         // create and return mesh
         return new Mesh(this.platform, new Geometry(
+            GeometryTopology.TriangleList,
             positions,
             indices,
             texels

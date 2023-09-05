@@ -7,6 +7,7 @@ export { Euler } from "./math/euler";
 export { EulerOrderOptions } from "./math/euler";
 export { Frustum } from "./math/frustum";
 export { Geometry } from "./math/geometry";
+export { GeometryTopology } from "./math/geometry";
 export { Matrix4 } from "./math/matrix4";
 export { Plane } from "./math/plane";
 export { Quaternion } from "./math/quaternion";
