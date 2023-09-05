@@ -14,6 +14,27 @@ struct PropertiesUniform {
     opacity: f32,
 };
 
+struct Light {
+    info: vec4<f32>,
+    color: vec4<f32>,
+    position: vec4<f32>,
+    direction: vec4<f32>,
+    view: mat4x4<f32>,
+    projection: mat4x4<f32>,
+    components: vec4<f32>,
+    lighting: vec4<f32>,
+    shadowing: vec4<f32>,
+    sampling: vec4<f32>,
+}
+
+struct LightingUniform {
+    lights: vec4<f32>,
+    shadows: vec4<f32>,
+    directionals: array<Light, RETINA_MAX_DIRECTIONAL_LIGHT_COUNT>,
+    spots: array<Light, RETINA_MAX_SPOT_LIGHT_COUNT>,
+    points: array<Light, RETINA_MAX_POINT_LIGHT_COUNT>,
+    areas: array<Light, RETINA_MAX_AREA_LIGHT_COUNT>,
+}
 
 // camera uniform
 @group(0) @binding(0)
@@ -26,6 +47,10 @@ var<uniform> model: ModelUniform;
 // material uniform
 @group(2) @binding(0)
 var<uniform> properties: PropertiesUniform;
+
+// lighting uniform
+@group(3) @binding(0)
+var<uniform> lighting: LightingUniform;
 
 
 struct VertexShaderInput {

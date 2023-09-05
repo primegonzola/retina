@@ -41,6 +41,34 @@ groups:
             kind: color
           - name: opacity
             kind: float
+  - name: lighting
+    index: 3
+    visibility: both
+    bindings:
+      - name: info
+        kind: uniform
+        index: 0
+        layout:
+          - name: info
+            kind: vector4
+          - name: color
+            kind: color
+          - name: position
+            kind: vector4
+          - name: direction
+            kind: vector4
+          - name: view
+            kind: matrix4
+          - name: projection
+            kind: matrix4
+          - name: components
+            kind: vector4
+          - name: lighting
+            kind: vector4
+          - name: shadowing
+            kind: vector4
+          - name: sampling
+            kind: vector4            
 buffers:
   - name: positions
     kind: vector3

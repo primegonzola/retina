@@ -352,6 +352,6 @@ resources:
       base: basic
       properties:
         - name: color
-          value: "#00FF00FF"
+          value: "#00FFFFFF"
         - name: opacity
           value: "1.0"

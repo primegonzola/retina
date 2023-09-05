@@ -243,30 +243,29 @@ export class Renderer {
         this._swap?.destroy();
     }
 
-    private _draw(hull: Hull) {
+    private _draw(target: RenderTarget, hull: Hull) {
 
         // check if buffers is there
-        if (hull?.buffers) {
+        if (target && hull?.buffers) {
 
             // see if indices are there
             if (hull.buffers.has("indices")) {
 
                 // set indices
-                this._target?.bindIndices(hull.buffers.get("indices"));
+                target?.bindIndices(hull.buffers.get("indices"));
 
                 // draw indexed
-                this._target?.drawIndexed(hull.buffers.get("indices").count);
+                target?.drawIndexed(hull.buffers.get("indices").count);
             }
             else if (hull.buffers.has("positions")) {
 
                 // draw non-indexed
-                this._target?.draw(hull.buffers.get("positions").count);
+                target?.draw(hull.buffers.get("positions").count);
             }
         }
     }
 
-    public render(frustum: Frustum, hulls: Iterable<Hull>): void {
-
+    private _render(target:RenderTarget, frustum: Frustum, hulls: Iterable<Hull>): void {
         // ensure initialized
         this._ensureInitialized();
 
@@ -285,32 +284,42 @@ export class Renderer {
                 // check if shader
                 if (shader) {
 
-                    // bind camera
-                    this._target?.bindCamera(shader);
-
                     // bind pipeline
-                    this._target?.bindPipeline(shader, true, true);
+                    target?.bindPipeline(shader, true, true);
 
-                    // check to bind buffers
+                    // bind camera
+                    target?.bindCamera(shader);
+
+                    // check to bind lights
+                    // if (hull?.properties)
+                    //     target?.bindUniform(shader, "material", "properties", hull.properties);
+
+                        // check to bind buffers
                     if (hull?.buffers)
-                        this._target?.bindBuffers(shader, hull.buffers);
+                        target?.bindBuffers(shader, hull.buffers);
 
                     // check to bind model
                     if (hull?.model)
-                        this._target?.bindUniform(shader, "model", "model", hull.model);
+                        target?.bindUniform(shader, "model", "model", hull.model);
 
                     // check to bind properties
                     if (hull?.properties)
-                        this._target?.bindUniform(shader, "material", "properties", hull.properties);
+                        target?.bindUniform(shader, "material", "properties", hull.properties);
 
                     // bind textures
                     if (hull?.textures)
-                        this._target?.bindTextures(shader, null, hull.textures);
+                        target?.bindTextures(shader, null, hull.textures);
 
-                    // // render the hull
-                    this._draw(hull);
+                    // render the hull
+                    this._draw(target, hull);
                 }
             }
         }
+    }
+
+
+    public render(frustum: Frustum, hulls: Iterable<Hull>): void {
+        // delegate
+        this._render(this._target, frustum, hulls);
     }
 }
