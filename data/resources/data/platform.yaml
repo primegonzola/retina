@@ -343,15 +343,10 @@ resources:
         - name: color
           kind: color
           value: "#FF00FFFF"
-        - name: opacity
-          kind: float
-          value: "1.0"
 
     - name: hull-concrete
       kind: material
       base: basic
       properties:
         - name: color
-          value: "#00FFFFFF"
-        - name: opacity
-          value: "1.0"
+          value: "#00FFFF7F"

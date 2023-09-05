@@ -11,7 +11,6 @@ struct ModelUniform {
 
 struct PropertiesUniform {
     color: vec4<f32>,
-    opacity: f32,
 };
 
 struct Light {
@@ -120,7 +119,7 @@ fn fragment_main(input: VertexShaderOutput) -> FragmentShaderOutput {
     // final output color
     output.color = vec4<f32>(
         light * properties.color.rgb,
-        properties.opacity
+        properties.color.a
     );
 
     // all done

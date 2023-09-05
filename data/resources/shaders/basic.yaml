@@ -39,8 +39,6 @@ groups:
         layout:
           - name: color
             kind: color
-          - name: opacity
-            kind: float
   - name: lighting
     index: 3
     visibility: both
