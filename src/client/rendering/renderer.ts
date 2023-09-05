@@ -926,30 +926,33 @@ export class Renderer {
             // check if intersecting
             if (frustum.wbox(graph.position, graph.rotation, graph.scale)) {
 
-                // check if shader
-                if (hull.shader) {
+                // get shader
+                const shader = hull.shader;
 
-                    // bind pipeline
-                    this._target?.bindPipeline(hull.shader, true, true);
+                // check if shader
+                if (shader) {
 
                     // bind camera
-                    this._target?.bindCamera(hull.shader);
+                    this._target?.bindCamera(shader);
+
+                    // bind pipeline
+                    this._target?.bindPipeline(shader, true, true);
 
                     // check to bind buffers
-                    if (hull.buffers)
-                        this._target?.bindBuffers(hull.shader, hull.buffers);
+                    if (hull?.buffers)
+                        this._target?.bindBuffers(shader, hull.buffers);
 
                     // check to bind model
-                    if (hull.model)
-                        this._target?.bindUniform(hull.shader, "model", "model", hull.model);
+                    if (hull?.model)
+                        this._target?.bindUniform(shader, "model", "model", hull.model);
 
                     // check to bind properties
-                    if (hull.properties)
-                        this._target?.bindUniform(hull.shader, "material", "properties", hull.properties);
+                    if (hull?.properties)
+                        this._target?.bindUniform(shader, "material", "properties", hull.properties);
 
-                    // // bind textures
-                    // // if (hull.textures)
-                    // //     this._target?.bindTextures(hull.shader, this.textures);
+                    // bind textures
+                    if (hull?.textures)
+                        this._target?.bindTextures(shader, null, hull.textures);
 
                     // // render the hull
                     this._draw(hull);
