@@ -17,6 +17,7 @@ import {
     Shape,
     Size,
     TextureDimensionOptions,
+    Utils,
     Vector3,
     Vector4,
 } from "../index";
@@ -93,7 +94,7 @@ export class Renderer {
 
             // init lighting buffer
             this._lighting = this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform,
-                this._collectLighting());
+                Utils.pad(this._collectLighting()));
 
             // create main target which is can be offline/online and stencil
             this._target = new RenderTarget(this.platform, this.offline ? this.offlineSize : this._size, this.offline,
