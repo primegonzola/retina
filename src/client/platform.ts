@@ -4,6 +4,7 @@ import {
     CameraKindOptions,
     Color,
     GraphicsDevice,
+    Hull,
     InputDevice,
     Range,
     Rectangle,
@@ -24,6 +25,7 @@ export class Platform {
     public readonly resources: Resources;
     public readonly timer: SimulationTimer;
     public readonly controller: CameraController;
+    public readonly hulls: Hull[];
 
     protected constructor(graphics: GraphicsDevice, input: InputDevice) {
         // init
@@ -31,6 +33,7 @@ export class Platform {
         this.graphics = graphics;
         this.timer = new SimulationTimer();
         this.resources = new Resources(this);
+        this.hulls = [];
 
         // main render
         this.renderer = new Renderer(this, Color.trBlack, 1.0);
@@ -48,6 +51,11 @@ export class Platform {
         this.reset();
     }
 
+    public createContent():void {
+
+
+    }
+
     public static async create(id: string): Promise<Platform> {
 
         // create the graphics device
@@ -62,6 +70,9 @@ export class Platform {
         // register world
         await platform.resources.loadResources(
             "platform", "resources/data/platform.yaml");
+
+        // load content
+        platform.createContent();
 
         // reset
         platform.reset();
