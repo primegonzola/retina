@@ -347,8 +347,4 @@ export class Resources {
         // all done
         return texture;
     }
-
-    public async loadTestByUri(uri: string): Promise<void> {
-        // console.log(YAML.load(await Utils.downloadText(uri)));
-    }
 }

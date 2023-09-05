@@ -623,10 +623,19 @@ export class Renderer {
         this._target.pipeline(true, true);
 
         // delegate to target
-        this._target?.capture(camera.view, camera.projection, 0, 1, action);
+        this._target?.capture(camera.view, camera.projection, 0, 1, () => {
+
+            // execute action
+            action();
+
+            // handle lines
+            this.lines();
+        });
+
 
         // blit to screen if required
         if (this.offline) this._blit();
+
     }
 
     public shapes(lights: Light[], shapes: Shape[]): void {

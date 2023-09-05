@@ -112,13 +112,3 @@ export { Polyhedron } from "./rendering/polyhedron";
 export { Maze } from "./algos/maze";
 export { MazeNode } from "./algos/maze";
 export { MazeNodeKindOptions } from "./algos/maze";
-
-export { Model } from "./modeling/model";
-export { ModelCollection } from "./modeling/model";
-export { ModelKindOptions } from "./modeling/model";
-export { Block } from "./modeling/models";
-export { Gate } from "./modeling/models";
-export { Sector } from "./modeling/sector";
-export { World } from "./modeling/world";
-export { Player } from "./modeling/player";
-

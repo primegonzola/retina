@@ -89,13 +89,13 @@ export class Hull {
         }
     }
 
-    public extract(frustum: Frustum, depth: number): Hull[] {
+    public extract(frustum: Frustum, depth?: number): Hull[] {
 
         // final result
         const found = Array<Hull>();
 
         // check if depth is reached
-        if (depth >= 0) {
+        if (depth === undefined || depth >= 0) {
 
             // cache graph
             const graph = this.graph;
@@ -110,7 +110,8 @@ export class Hull {
                 this.children.forEach(child => {
 
                     // continue with extraction
-                    found.push(...child.extract(frustum, depth - 1));
+                    found.push(...child.extract(frustum,
+                        depth === undefined ? undefined : depth - 1));
                 });
             }
         }
@@ -119,12 +120,19 @@ export class Hull {
         return found;
     }
 
-    public render(renderer: IHullRenderer): void {
+    public render(frustum: Frustum, renderer: IHullRenderer): void {
 
-        // render children first
-        this.children.forEach(child => child.render(renderer));
+        // cache graph
+        const graph = this.graph;
 
-        // draw current hull
-        this._draw(renderer);
+        // check if we are in the frustum
+        if (frustum.wbox(graph.position, graph.rotation, graph.scale)){
+
+            // render children
+            this.children.forEach(child => child.render(frustum, renderer));
+
+            // draw current hull
+            this._draw(renderer);
+        }
     }
 }
