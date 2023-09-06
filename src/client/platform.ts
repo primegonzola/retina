@@ -32,6 +32,7 @@ export class Platform {
     public readonly controller: CameraController;
     public readonly lights: Light[];
     public readonly hulls: Hull[];
+    private _statics: IBuffer;
 
     protected constructor(graphics: GraphicsDevice, input: InputDevice) {
         // init
@@ -92,22 +93,29 @@ export class Platform {
 
         // get material
         const material = this.resources.getMaterial("platform", "hull-concrete");
+        const dimensions = new Vector3(1, 1, 1).scale(8);
+        const outer = new Vector3(4, 4, 4);
+        const inner = new Vector3(2, 2, 2);
 
-        // create a hull
-        const hull1 = new Hull(null,
-            new Transform(Vector3.zero, Quaternion.identity, Vector3.one.scale(4)),
-            material.shader, mesh.buffers);
+        for (let z = 0; z < dimensions.z; z++) {
+            for (let y = 0; y < dimensions.y; y++) {
+                for (let x = 0; x < dimensions.x; x++) {
 
-        // add 
-        this.hulls.push(hull1);
+                    // calculate position
+                    const position = (outer.multiply(new Vector3(x, y, z)))
+                        .subtract((outer.multiply(dimensions)).scale(0.5))
+                        .add(outer.scale(0.5));
 
-        // create a hull
-        const hull2 = new Hull(null,
-            new Transform(new Vector3(6, 0, 0), Quaternion.identity, Vector3.one.scale(4)),
-            material.shader, mesh.buffers);
+                    // create hull
+                    const hull = new Hull(null,
+                        new Transform(position, Quaternion.identity, inner),
+                        material.shader, mesh.buffers);
 
-        // add 
-        this.hulls.push(hull2);
+                    // add 
+                    this.hulls.push(hull);
+                }
+            }
+        }
 
         // start with empty buffer
         let data: number[] = [];
@@ -117,6 +125,10 @@ export class Platform {
 
             // extract model
             const model = hull.transform.extract();
+
+            // override color
+            if (material?.properties?.has("color"))
+                material.properties.get("color").value = Color.random(Math.random());
 
             // extract properties
             const properties = material.extract();
@@ -142,6 +154,9 @@ export class Platform {
             hull.uniforms.set("properties", new BufferLocation(buffer, properties.length, (2 * index) + 1));
         });
 
+        // save buffer
+        this._statics = buffer;
+
         // add a directional lighht
         this.lights.push(Light.createDirectional(
             new Transform(Vector3.zero, Quaternion.degrees(-45, 45, 0), Vector3.one),
@@ -157,6 +172,9 @@ export class Platform {
         // wait to get rid of async warning
         await Utils.delay(0);
 
+        // destroy statics
+        this._statics?.destroy();
+
         // destroy renderer
         this.renderer?.destroy();
     }
@@ -164,7 +182,7 @@ export class Platform {
     public reset(): void {
 
         // reset controller
-        this.controller?.reset(Vector3.zero, new Vector3(-45, 0, 0), 32);
+        this.controller?.reset(Vector3.zero, new Vector3(-45, 0, 0), 24 * 3);
     }
 
     public async update(): Promise<void> {
@@ -193,15 +211,20 @@ export class Platform {
 
     private render(): void {
 
+        // filter hulls
+        const hulls = this.hulls.filter(hull =>
+            this.camera.frustum.wbox(hull.graph.position, hull.graph.rotation, hull.graph.scale));
+
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
 
             // render hulls
-            this.renderer?.render(this.camera.frustum, this.lights, this.hulls);
+            this.renderer?.render(this.camera.frustum, this.lights, hulls);
 
             // output diagnostics
             this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);
             this.renderer.writeLine(1, `Hulls: ${this.hulls.length} - Lights: ${this.lights.length}`);
+            this.renderer.writeLine(2, `VHulls: ${hulls.length}`);
         });
     }
 }
