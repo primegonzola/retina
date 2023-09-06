@@ -94,12 +94,20 @@ export class Platform {
         const material = this.resources.getMaterial("platform", "hull-concrete");
 
         // create a hull
-        const hull = new Hull(null,
+        const hull1 = new Hull(null,
             new Transform(Vector3.zero, Quaternion.identity, Vector3.one.scale(4)),
             material.shader, mesh.buffers);
 
         // add 
-        this.hulls.push(hull);
+        this.hulls.push(hull1);
+
+        // create a hull
+        const hull2 = new Hull(null,
+            new Transform(new Vector3(6, 0, 0), Quaternion.identity, Vector3.one.scale(4)),
+            material.shader, mesh.buffers);
+
+        // add 
+        this.hulls.push(hull2);
 
         // start with empty buffer
         let data: number[] = [];
@@ -121,7 +129,7 @@ export class Platform {
         const buffer = this.graphics.createF32Buffer(BufferKindOptions.Uniform, data);
 
         // loop over hulls 
-        this.hulls.forEach(hull => {
+        this.hulls.forEach((hull, index) => {
 
             // extract model
             const model = hull.transform.extract();
@@ -130,8 +138,8 @@ export class Platform {
             const properties = material.extract();
 
             // set uniforms
-            hull.uniforms.set("model", new BufferLocation(buffer, model.length, 0));
-            hull.uniforms.set("properties", new BufferLocation(buffer, properties.length, 256));
+            hull.uniforms.set("model", new BufferLocation(buffer, model.length, (2 * index) + 0));
+            hull.uniforms.set("properties", new BufferLocation(buffer, properties.length, (2 * index) + 1));
         });
 
         // add a directional lighht

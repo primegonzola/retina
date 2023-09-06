@@ -32,7 +32,7 @@ export class BufferLocation {
         // init
         this.buffer = buffer;
         this.count = count;
-        this.offset = offset * buffer.stride;
+        this.offset = 256 * offset * buffer.stride;
         this.size = count * buffer.stride;
     }
 }
