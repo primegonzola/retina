@@ -93,36 +93,46 @@ export class Platform {
         // get material
         const material = this.resources.getMaterial("platform", "hull-concrete");
 
-        // create transform
-        const transform = new Transform(
-            Vector3.zero, Quaternion.identity, Vector3.one.scale(4));
-
-        // create model
-        const model = transform.extract();
-
-        // get properties
-        const properties = material.extract();
-
-        // create buffer
-        const buffer = this.graphics.createF32Buffer(BufferKindOptions.Uniform,
-            [].concat(Utils.pad(model, 256), Utils.pad(properties, 256)));
-
-        // create uniforms
-        const uniforms = new Map<string, BufferLocation>();
-
-        // populate
-        uniforms.set("model", new BufferLocation(buffer, model.length, 0));
-        uniforms.set("properties", new BufferLocation(buffer, properties.length, 256));
-
         // create a hull
         const hull = new Hull(null,
-            transform,
-            material.shader,
-            mesh.buffers, 
-            uniforms);
+            new Transform(Vector3.zero, Quaternion.identity, Vector3.one.scale(4)),
+            material.shader, mesh.buffers);
 
         // add 
         this.hulls.push(hull);
+
+        // start with empty buffer
+        let data: number[] = [];
+
+        // loop over hulls 
+        this.hulls.forEach(hull => {
+
+            // extract model
+            const model = hull.transform.extract();
+
+            // extract properties
+            const properties = material.extract();
+
+            // add to buffer
+            data = data.concat(Utils.pad(model, 256), Utils.pad(properties, 256))
+        });
+
+        // create buffer
+        const buffer = this.graphics.createF32Buffer(BufferKindOptions.Uniform, data);
+
+        // loop over hulls 
+        this.hulls.forEach(hull => {
+
+            // extract model
+            const model = hull.transform.extract();
+
+            // extract properties
+            const properties = material.extract();
+
+            // set uniforms
+            hull.uniforms.set("model", new BufferLocation(buffer, model.length, 0));
+            hull.uniforms.set("properties", new BufferLocation(buffer, properties.length, 256));
+        });
 
         // add a directional lighht
         this.lights.push(Light.createDirectional(

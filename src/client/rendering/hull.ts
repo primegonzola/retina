@@ -43,10 +43,8 @@ export class Hull {
     public readonly transform: Transform;
     public readonly parent: Hull;
     public readonly shader: IShader;
-    public readonly model: BufferLocation;
     public readonly uniforms: Map<string, BufferLocation>;
     public readonly buffers: Map<string, IBuffer>;
-    public readonly properties: BufferLocation;
     public readonly textures: ITexture[];
     public readonly children: Hull[];
 
@@ -58,12 +56,18 @@ export class Hull {
         this.parent = parent;
         this.transform = transform || Transform.identity;
         this.shader = shader;
-        this.uniforms = uniforms;
-        this.model = uniforms.get("model");
+        this.uniforms = uniforms || new Map<string, BufferLocation>();
         this.buffers = buffers;
-        this.properties = uniforms.get("properties");
-        this.textures = textures;
+        this.textures = textures || [];
         this.children = [];
+    }
+
+    public get model(): BufferLocation {
+        return this.uniforms.get("model");
+    }
+
+    public get properties(): BufferLocation {
+        return this.uniforms.get("properties");
     }
 
     public get graph(): Matrix4 {
