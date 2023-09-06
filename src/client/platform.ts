@@ -222,19 +222,19 @@ export class Platform {
     private render(): void {
 
         // filter hulls
-        const hulls = this.hulls.filter(hull =>
+        const vhulls = this.hulls.filter(hull =>
             this.camera.frustum.wbox(hull.graph.position, hull.graph.rotation, hull.graph.scale));
 
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
 
             // render hulls
-            this.renderer?.render(this.camera.frustum, this.lights, hulls);
+            this.renderer?.render(this.camera.frustum, this.lights, vhulls);
 
             // output diagnostics
             this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);
             this.renderer.writeLine(1, `Hulls: ${this.hulls.length} - Lights: ${this.lights.length}`);
-            this.renderer.writeLine(2, `VHulls: ${hulls.length}`);
+            this.renderer.writeLine(2, `vHulls: ${vhulls.length} - vLights: ${this.lights.length}`);
         });
     }
 }
