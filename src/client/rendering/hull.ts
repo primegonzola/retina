@@ -59,7 +59,9 @@ export class Hull {
         this.transform = transform || Transform.identity;
         this.shader = shader;
         this.uniforms = uniforms;
+        this.model = uniforms.get("model");
         this.buffers = buffers;
+        this.properties = uniforms.get("properties");
         this.textures = textures;
         this.children = [];
     }

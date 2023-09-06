@@ -407,14 +407,14 @@ export class Renderer {
                         target?.bindBuffers(shader, hull.buffers);
 
                     // check to bind model
-                    if (hull?.model)
+                    if (hull?.uniforms?.has("model"))
                         target?.bindUniform(shader, "model", "model",
-                            hull.model.buffer, hull.model.offset, hull.model.size);
+                            hull.uniforms.get("model").buffer, hull.uniforms.get("model").offset, hull.uniforms.get("model").size);
 
                     // check to bind properties
-                    if (hull?.properties)
+                    if (hull?.uniforms?.has("properties"))
                         target?.bindUniform(shader, "material", "properties",
-                            hull.properties.buffer, hull.properties.offset, hull.properties.size);
+                            hull.uniforms.get("properties").buffer, hull.uniforms.get("properties").offset, hull.uniforms.get("model").size);
 
                     // bind textures
                     if (hull?.textures)
