@@ -87,9 +87,9 @@ export class Platform {
 
         // get material
         const material = this.resources.getMaterial("platform", "hull-concrete");
-        const dimensions = new Vector3(1, 1, 1).scale(8);
-        const outer = new Vector3(4, 4, 4);
-        const inner = new Vector3(2, 2, 2);
+        const dimensions = Vector3.one.scale(8);
+        const outer = Vector3.one.scale(4);
+        const inner = Vector3.one.scale(2);
 
         for (let z = 0; z < dimensions.z; z++) {
             for (let y = 0; y < dimensions.y; y++) {
