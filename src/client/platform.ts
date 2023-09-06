@@ -56,9 +56,6 @@ export class Platform {
 
         // init controller
         this.controller = new CameraController(this, this.camera);
-
-        // reset
-        this.reset();
     }
 
     public static async create(id: string): Promise<Platform> {
@@ -76,9 +73,6 @@ export class Platform {
         await platform.resources.loadResources(
             "platform", "resources/data/platform.yaml");
 
-        // load content
-        platform.createContent();
-
         // reset
         platform.reset();
 
@@ -86,7 +80,7 @@ export class Platform {
         return platform;
     }
 
-    public createContent(): void {
+    private _createContent(): void {
 
         // get mesh
         const mesh = this.resources.getMesh("platform", "cube");
@@ -167,13 +161,23 @@ export class Platform {
         ));
     }
 
+    private _destroyContent(): void {
+
+        // clean up statics
+        this._statics?.destroy();
+
+        // clean up hulls
+        this.hulls.length = 0;
+    }
+
+
     public async destroy(): Promise<void> {
 
         // wait to get rid of async warning
         await Utils.delay(0);
 
-        // destroy statics
-        this._statics?.destroy();
+        // destroy content
+        this._destroyContent();
 
         // destroy renderer
         this.renderer?.destroy();
@@ -183,6 +187,12 @@ export class Platform {
 
         // reset controller
         this.controller?.reset(Vector3.zero, new Vector3(-45, 0, 0), 24 * 3);
+
+        // destroy content
+        this._destroyContent();
+
+        // create content
+        this._createContent();
     }
 
     public async update(): Promise<void> {
