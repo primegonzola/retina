@@ -107,13 +107,19 @@ export class Platform {
         const buffer = this.graphics.createF32Buffer(BufferKindOptions.Uniform,
             [].concat(Utils.pad(model, 256), Utils.pad(properties, 256)));
 
+        // create uniforms
+        const uniforms = new Map<string, BufferLocation>();
+
+        // populate
+        uniforms.set("model", new BufferLocation(buffer, model.length, 0));
+        uniforms.set("properties", new BufferLocation(buffer, properties.length, 256));
+
         // create a hull
         const hull = new Hull(null,
             transform,
-            new BufferLocation(buffer, model.length, 0),
-            mesh.buffers,
             material.shader,
-            new BufferLocation(buffer, properties.length, 256));
+            mesh.buffers, 
+            uniforms);
 
         // add 
         this.hulls.push(hull);

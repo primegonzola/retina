@@ -44,22 +44,22 @@ export class Hull {
     public readonly parent: Hull;
     public readonly shader: IShader;
     public readonly model: BufferLocation;
+    public readonly uniforms: Map<string, BufferLocation>;
     public readonly buffers: Map<string, IBuffer>;
     public readonly properties: BufferLocation;
     public readonly textures: ITexture[];
     public readonly children: Hull[];
 
     constructor(parent: Hull, transform: Transform,
-        model?: BufferLocation, buffers?: Map<string, IBuffer>, shader?: IShader, properties?: BufferLocation, textures?: ITexture[]) {
+        shader?: IShader, buffers?: Map<string, IBuffer>, uniforms?: Map<string, BufferLocation>, textures?: ITexture[]) {
 
         // init
         this.id = Utils.uuid();
         this.parent = parent;
         this.transform = transform || Transform.identity;
         this.shader = shader;
-        this.model = model;
+        this.uniforms = uniforms;
         this.buffers = buffers;
-        this.properties = properties;
         this.textures = textures;
         this.children = [];
     }
