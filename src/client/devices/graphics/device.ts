@@ -110,7 +110,7 @@ export class GraphicsDevice extends Device<GPUDevice> implements IGraphicsDevice
         const size = length + ((length % wrap) === 0 ? 0 : wrap - (length % wrap));
 
         // create proper buffer
-        const buffer = new Buffer(this, kind, data.length, size,
+        const buffer = new Buffer(this, kind, data.length, stride, size,
             this.handle.createBuffer({
                 size: size,
                 usage: usage

@@ -48,7 +48,9 @@ export abstract class Utils {
     //         pos.y * target.height / target.clientHeight);
     // }
 
-    public static pad(data: number[], wrap: number = 16, value: number = 0): number[] {
+    public static pad(data: number[] | number, wrap: number = 16, value: number = 0): number[] {
+        if (typeof data === 'number')
+            return [data % wrap === 0 ? data : data + (wrap - (data % wrap))];
         return [].concat(data, Array((data.length % wrap) === 0 ? 0 : wrap - (data.length % wrap)).fill(value));
     }
 

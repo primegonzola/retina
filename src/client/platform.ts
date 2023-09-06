@@ -95,23 +95,25 @@ export class Platform {
 
         // create transform
         const transform = new Transform(
-            Vector3.zero, Quaternion.identity, Vector3.one.scale(8));
+            Vector3.zero, Quaternion.identity, Vector3.one.scale(4));
 
         // create model
-        const model = this.graphics.createF32Buffer(BufferKindOptions.Uniform,
-            Utils.pad(transform.extract()));
+        const model = transform.extract();
 
         // get properties
-        const properties = this.graphics.createF32Buffer(BufferKindOptions.Uniform,
-            Utils.pad(material.extract()));
+        const properties = material.extract();
+
+        // create buffer
+        const buffer = this.graphics.createF32Buffer(BufferKindOptions.Uniform,
+            [].concat(Utils.pad(model, 256), Utils.pad(properties, 256)));
 
         // create a hull
         const hull = new Hull(null,
             transform,
-            new BufferLocation(model, model.count, 0, model.size),
+            new BufferLocation(buffer, model.length, 0),
             mesh.buffers,
             material.shader,
-            new BufferLocation(properties, properties.count, 0, properties.size));
+            new BufferLocation(buffer, properties.length, 256));
 
         // add 
         this.hulls.push(hull);

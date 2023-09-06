@@ -28,12 +28,12 @@ export class BufferLocation {
     public readonly count: number
     public readonly size: number;
 
-    constructor(buffer: IBuffer, count: number, offset?: number, size?: number) {
+    constructor(buffer: IBuffer, count: number, offset?: number) {
         // init
         this.buffer = buffer;
         this.count = count;
-        this.offset = offset;
-        this.size = size;
+        this.offset = offset * buffer.stride;
+        this.size = count * buffer.stride;
     }
 }
 
