@@ -9,6 +9,7 @@ export { Frustum } from "./math/frustum";
 export { Geometry } from "./math/geometry";
 export { GeometryTopology } from "./math/geometry";
 export { Matrix4 } from "./math/matrix4";
+export { Octree } from "./math/octree";
 export { Plane } from "./math/plane";
 export { Quaternion } from "./math/quaternion";
 export { Range } from "./math/range";

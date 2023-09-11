@@ -46,7 +46,7 @@ export class Camera {
         // calculate main bounds of all visible sectors
         // in the end we will have a bounding box surrounding all visible sectors
         //
-        const wb = Bounds.default.concat(bounds);
+        const wb = Bounds.concat(bounds);
 
         //
         // create view with same scale but centered and rotated with directional

@@ -29,7 +29,7 @@ export class Bounds {
         return this.maximum.subtract(this.minimum);
     }
 
-    public concat(bs: Bounds[]): Bounds {
+    public static concat(bs: Bounds[]): Bounds {
         const result = Bounds.default;
         bs.forEach(b => {
             result.minimum.x = Math.min(result.minimum.x, b.minimum.x);

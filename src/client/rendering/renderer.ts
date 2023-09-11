@@ -372,7 +372,7 @@ export class Renderer {
         this._swap?.destroy();
     }
 
-    private _render(target: RenderTarget, frustum: Frustum, hulls: Iterable<Hull>): void {
+    private _render(target: RenderTarget, frustum: Frustum, hulls: Iterable<Hull>, clip = true): void {
 
         // ensure initialized
         this._ensureInitialized();
@@ -384,7 +384,7 @@ export class Renderer {
             const graph = hull.graph;
 
             // check if intersecting
-            if (frustum.wbox(graph.position, graph.rotation, graph.scale)) {
+            if (!clip || frustum.wbox(graph.position, graph.rotation, graph.scale)) {
 
                 // get shader
                 const shader = hull.shader;
@@ -428,13 +428,12 @@ export class Renderer {
         }
     }
 
-
-    public render(frustum: Frustum, lights: Light[], hulls: Iterable<Hull>): void {
+    public render(frustum: Frustum, lights: Light[], hulls: Iterable<Hull>, clip = true): void {
 
         // collect the lights
         this._lighting?.write(this._collectLighting(lights));
 
         // delegate
-        this._render(this._target, frustum, hulls);
+        this._render(this._target, frustum, hulls, clip);
     }
 }

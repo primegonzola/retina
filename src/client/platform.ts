@@ -1,4 +1,5 @@
 import {
+    Bounds,
     BufferKindOptions,
     BufferLocation,
     Camera,
@@ -10,6 +11,7 @@ import {
     IBuffer,
     InputDevice,
     Light,
+    Octree,
     Quaternion,
     Range,
     Rectangle,
@@ -32,6 +34,7 @@ export class Platform {
     public readonly controller: CameraController;
     public readonly lights: Light[];
     public readonly hulls: Hull[];
+    private _octree: Octree;
     private _statics: IBuffer;
 
     protected constructor(graphics: GraphicsDevice, input: InputDevice) {
@@ -78,6 +81,12 @@ export class Platform {
 
         // all done
         return platform;
+    }
+
+    private get vhulls(): Hull[] {
+        const vhulls = this.hulls.filter(hull =>
+            this.camera.frustum.wbox(hull.graph.position, hull.graph.rotation, hull.graph.scale));
+        return vhulls;
     }
 
     private _createContent(): void {
@@ -159,6 +168,12 @@ export class Platform {
             this.camera.area,
             this.camera.range,
         ));
+
+        // // init octree
+        // this._octree = new Octree(this.hulls.map(hull => new Bounds(
+        //     hull.transform.position,
+        //     hull.transform.s,
+        // )), 4
     }
 
     private _destroyContent(): void {
@@ -222,14 +237,13 @@ export class Platform {
     private render(): void {
 
         // filter hulls
-        const vhulls = this.hulls.filter(hull =>
-            this.camera.frustum.wbox(hull.graph.position, hull.graph.rotation, hull.graph.scale));
+        const vhulls = this.vhulls;
 
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
 
             // render hulls
-            this.renderer?.render(this.camera.frustum, this.lights, vhulls);
+            this.renderer?.render(this.camera.frustum, this.lights, vhulls, false);
 
             // output diagnostics
             this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);
