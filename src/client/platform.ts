@@ -1,11 +1,13 @@
 import {
     Bounds,
+    Box,
     BufferKindOptions,
     BufferLocation,
     Camera,
     CameraController,
     CameraKindOptions,
     Color,
+    Frustum,
     GraphicsDevice,
     Hull,
     IBuffer,
@@ -83,12 +85,6 @@ export class Platform {
         return platform;
     }
 
-    private get vhulls(): Hull[] {
-        const vhulls = this.hulls.filter(hull =>
-            this.camera.frustum.wbox(hull.graph.position, hull.graph.rotation, hull.graph.scale));
-        return vhulls;
-    }
-
     private _createContent(): void {
 
         // get mesh
@@ -96,7 +92,7 @@ export class Platform {
 
         // get material
         const material = this.resources.getMaterial("platform", "hull-concrete");
-        const dimensions = Vector3.one.scale(8);
+        const dimensions = Vector3.one.scale(12);
         const outer = Vector3.one.scale(4);
         const inner = Vector3.one.scale(2);
 
@@ -131,7 +127,7 @@ export class Platform {
 
             // override color
             if (material?.properties?.has("color"))
-                material.properties.get("color").value = Color.random(Math.random());
+                material.properties.get("color").value = Color.cyan;// Color.random(Math.random());
 
             // extract properties
             const properties = material.extract();
@@ -169,11 +165,15 @@ export class Platform {
             this.camera.range,
         ));
 
-        // // init octree
-        // this._octree = new Octree(this.hulls.map(hull => new Bounds(
-        //     hull.transform.position,
-        //     hull.transform.s,
-        // )), 4
+        // init octree
+        this._octree = new Octree(this.hulls.map(hull =>
+            new Box(hull.graph.position, hull.graph.rotation, hull.graph.scale).bounds
+        ), 3);
+
+        // optimize octree
+        this._octree.optimize();
+
+        console.log(this._octree);
     }
 
     private _destroyContent(): void {
@@ -184,7 +184,6 @@ export class Platform {
         // clean up hulls
         this.hulls.length = 0;
     }
-
 
     public async destroy(): Promise<void> {
 
@@ -208,6 +207,16 @@ export class Platform {
 
         // create content
         this._createContent();
+    }
+
+    private _vhulls(frustum: Frustum): Hull[] {
+        // check if octree is valid
+        // if (this._octree) {
+        //     this._octree?.collect(frustum).map(index => this.hulls[index]);
+        // }
+        const vhulls = this.hulls.filter(hull =>
+            frustum.wbox(hull.graph.position, hull.graph.rotation, hull.graph.scale));
+        return vhulls;
     }
 
     public async update(): Promise<void> {
@@ -237,8 +246,13 @@ export class Platform {
     private render(): void {
 
         // filter hulls
-        const vhulls = this.vhulls;
-
+        const vh1 = window.performance.now();
+        const vhulls = this._vhulls(this.camera.frustum);
+        const vh2 = window.performance.now();
+        const oh1 = window.performance.now();
+        const ohulls = [...new Set(this._octree?.collect(this.camera.frustum)).entries()]
+            .map(e => this.hulls[e[1]]);
+        const oh2 = window.performance.now();
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
 
@@ -248,7 +262,8 @@ export class Platform {
             // output diagnostics
             this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);
             this.renderer.writeLine(1, `Hulls: ${this.hulls.length} - Lights: ${this.lights.length}`);
-            this.renderer.writeLine(2, `vHulls: ${vhulls.length} - vLights: ${this.lights.length}`);
+            this.renderer.writeLine(2, `vHulls: ${vhulls.length} - oHulls: ${ohulls.length}`);
+            this.renderer.writeLine(3, `vms: ${(vh2 - vh1).toFixed(4)} - oms: ${(oh2 - oh1).toFixed(4)}`);
         });
     }
 }

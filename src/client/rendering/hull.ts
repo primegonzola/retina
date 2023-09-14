@@ -47,6 +47,7 @@ export class Hull {
     public readonly buffers: Map<string, IBuffer>;
     public readonly textures: ITexture[];
     public readonly children: Hull[];
+    public frameCounter = 0
 
     constructor(parent: Hull, transform: Transform,
         shader?: IShader, buffers?: Map<string, IBuffer>, uniforms?: Map<string, BufferLocation>, textures?: ITexture[]) {

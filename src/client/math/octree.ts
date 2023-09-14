@@ -36,17 +36,15 @@ export class Octree {
 
         // clean current
         this.root.nodes.length = 0;
+        this.root.indices.length = 0;
 
         // subdivide
         this._subdivide(this.root);
     }
 
-    private _subdivide(node: OctreeNode) {
-        // init node
-        node.nodes = [];
-        node.indices = [];
+    private _subdivide(root: OctreeNode) {
         // cache unit
-        const unit = node.bounds.delta.scale(0.5);
+        const unit = root.bounds.delta.scale(0.5);
         // divide
         for (let z = 0; z < 2; z++) {
             for (let y = 0; y < 2; y++) {
@@ -55,23 +53,17 @@ export class Octree {
                     // calculate bounds of current node
                     const nb = new Bounds(
                         new Vector3(
-                            node.bounds.minimum.x + unit.x * x,
-                            node.bounds.minimum.y + unit.y * y,
-                            node.bounds.minimum.z + unit.z * z),
+                            root.bounds.minimum.x + unit.x * x,
+                            root.bounds.minimum.y + unit.y * y,
+                            root.bounds.minimum.z + unit.z * z),
                         new Vector3(
-                            node.bounds.minimum.x + unit.x * (x + 1),
-                            node.bounds.minimum.y + unit.y * (y + 1),
-                            node.bounds.minimum.z + unit.z * (z + 1))
+                            root.bounds.minimum.x + unit.x * (x + 1),
+                            root.bounds.minimum.y + unit.y * (y + 1),
+                            root.bounds.minimum.z + unit.z * (z + 1))
                     );
 
-                    // add node
-                    node.nodes.push({
-                        parent: node,
-                        depth: node.depth + 1,
-                        bounds: nb,
-                        indices: [],
-                        nodes: []
-                    });
+                    // start with no indices
+                    let indices: number[] = [];
 
                     // loop over bounds
                     this.bounds.forEach((b, i) => {
@@ -81,22 +73,71 @@ export class Octree {
                             new Box(nb.center, Quaternion.identity, nb.delta),
                         )) {
                             // add index
-                            node.nodes[node.nodes.length - 1].indices.push(i);
+                            indices.push(i);
                         }
                     });
 
-                    // check if anything left to do
-                    if (node.depth < this.depth) {
+                    // check if anything found
+                    if (indices.length > 0) {
 
-                        // subdivide node
-                        this._subdivide(node.nodes[node.nodes.length - 1]);
+                        // create node
+                        const node: OctreeNode = {
+                            parent: root,
+                            depth: root.depth + 1,
+                            bounds: nb,
+                            indices: [],
+                            nodes: []
+                        };
+
+                        // push node
+                        root.nodes.push(node);
+
+                        // check if anything left to do
+                        if (node.depth < this.depth) {
+                            
+                            // subdivide node
+                            this._subdivide(node);
+                        }
+                        else {
+                            
+                            // update indices
+                            node.indices = indices;
+                        }
                     }
                 }
             }
         }
     }
 
+    private _collect(root: OctreeNode, frustum: Frustum): number[] {
+        // check if any childrent
+        if (root.nodes.length === 0) {
+            // return indices
+            return root.indices;
+        }
+        // loop over nodes and collect indices
+        let indices: number[] = [];
+
+        // loop
+        root.nodes.forEach(node => {
+            // check if intersect and if so collect and add
+            if (frustum.wbox(node.bounds.center, Quaternion.identity, node.bounds.delta))
+                indices = indices.concat(this._collect(node, frustum));
+        });
+
+        // return indices
+        return indices;
+    }
+
+
     public collect(frustum: Frustum): number[] {
+        // check if intersection and collect
+        if (frustum.wbox(
+            this.root.bounds.center, Quaternion.identity, this.root.bounds.delta)) {
+            // collect
+            return this._collect(this.root, frustum);
+        }
+        // nothing found
         return [];
     }
 }
