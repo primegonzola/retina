@@ -13,6 +13,8 @@ import {
     IBuffer,
     InputDevice,
     Light,
+    Material,
+    MaterialModeOptions,
     Maze,
     MazeNode,
     MazeNodeKindOptions,
@@ -115,61 +117,68 @@ export class Platform {
         // }
     }
 
+    private _materialFromNode(node: MazeNode): Material {
+        // default
+        let material = this.resources.getMaterial("platform", "hull-concrete");
+
+        // check kind
+        switch (node.kind) {
+            case MazeNodeKindOptions.Base:
+                material = this.resources.getMaterial("platform", "hull-base");
+                break;
+            case MazeNodeKindOptions.Solid:
+                material = this.resources.getMaterial("platform", "hull-solid");
+                break;
+            case MazeNodeKindOptions.Transparent:
+                material = this.resources.getMaterial("platform", "hull-transparent");
+                break;
+        }
+
+        // done
+        return material;
+    }
+
     private _createContent(): void {
 
         // get mesh
         const mesh = this.resources.getMesh("platform", "cube");
-        const material = this.resources.getMaterial("platform", "hull-concrete");
 
         // generate maze
         const maze = Maze.generate();
 
-        const collectHulls: (node: MazeNode, hull: Hull) => void = (node: MazeNode, hull: Hull) => {
-            // add current hull
+        // loop over nodes and get transforms
+        maze.children.forEach(node => {
+
+            // create hull
+            const hull = new Hull(null, node.transform);
+
+            // add
             this.hulls.push(hull);
 
+            // resolve material 
+            const material = this._materialFromNode(node);
+
+            // add as attribute
+            hull.attributes.set("material", material.clone());
+
             // loop over children
-            node.children.forEach(child => {
-                // check type
-                switch (child.kind) {
-                    case MazeNodeKindOptions.Solid: {
-                        // create the hull
-                        const ch = new Hull(hull,
-                            child.transform, material.shader, mesh.buffers);
+            node.children.forEach(cn => {
 
-                        // collect children
-                        collectHulls(child, ch);
-                        
-                        // done
-                        break;
-                    }
-                    default: {
-                        // create the hull
-                        const ch = new Hull(hull, child.transform);
+                // resolve material 
+                const cm = this._materialFromNode(cn);
 
-                        // collect children
-                        collectHulls(child, ch);
-                        
-                        // done
-                        break;
-                    }
-                };
+                // create hull
+                const ch = new Hull(hull, cn.transform,
+                    cm.mode === MaterialModeOptions.Opaque,
+                    cm.shader, mesh.buffers);
+
+                // add as attribute
+                ch.attributes.set("material", cm.clone());
+
+                // add
+                this.hulls.push(ch);
             });
-        };
-
-        // collect the nodes
-        collectHulls(maze, new Hull(null, Transform.identity));
-
-        // // loop over nodes and get transforms
-        // maze.children.forEach(child => {
-
-        //     // create hull
-        //     const hull = new Hull(null,
-        //         child.transform, material.shader, mesh.buffers);
-
-        //     // add
-        //     this.hulls.push(hull);
-        // });
+        });
 
         // start with empty buffer
         let data: number[] = [];
@@ -177,27 +186,23 @@ export class Platform {
         // loop over hulls 
         this.hulls.forEach(hull => {
 
-            // check if valid hull
-            if (hull.shader && hull.uniforms.size > 0
-                && hull.uniforms.has("model") && hull.uniforms.has("properties")) {
+            // extract model
+            const model = Transform.matrix(hull.graph).extract();
 
-                // extract model
-                const model = hull.transform.extract();
+            // get the attached material
+            const material = hull.attributes.get("material") as Material;
 
-                // // override color
-                // if (material?.properties?.has("color"))
-                //     material.properties.get("color").value = Color.random(Math.random());
+            // override color
+            // if (material?.properties?.has("color"))
+            //     material.properties.get("color").value = Color.random(1.0);
 
-                // extract properties
-                const properties = material.extract();
+            // extract properties
+            const properties = material.extract();
 
-                // add to buffer
-                data = data.concat(Utils.pad(model, 256), Utils.pad(properties, 256))
-            }
-            else {
-                // add to buffer
-                data = data.concat(Utils.pad(hull.transform.extract(), 256), Utils.pad(material.extract(), 256))
-            }
+            // set data
+            data = data.concat(
+                Utils.pad(model, 256),
+                Utils.pad(properties, 256))
         });
 
         // create buffer
@@ -207,7 +212,10 @@ export class Platform {
         this.hulls.forEach((hull, index) => {
 
             // extract model
-            const model = hull.transform.extract();
+            const model = Transform.matrix(hull.graph).extract();
+
+            // clone the attached material
+            const material = hull.attributes.get("material") as Material;
 
             // extract properties
             const properties = material.extract();

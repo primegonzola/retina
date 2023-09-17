@@ -399,7 +399,7 @@ export class Renderer {
                     if (shader) {
 
                         // bind pipeline
-                        target?.bindPipeline(shader);
+                        target?.bindPipeline(shader, hull.transparent, true);
 
                         // bind camera
                         target?.bindCamera(shader);

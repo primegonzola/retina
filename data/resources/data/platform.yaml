@@ -356,6 +356,31 @@ resources:
     - name: hull-concrete
       kind: material
       base: basic
+      mode: opaque
       properties:
         - name: color
-          value: "#00FFFF7F"
+          value: "#A9A9A9FF"
+
+    - name: hull-base
+      kind: material
+      base: basic
+      mode: opaque
+      properties:
+        - name: color
+          value: "#0C141FFF"
+
+    - name: hull-solid
+      kind: material
+      base: basic
+      mode: opaque
+      properties:
+        - name: color
+          value: "#748AA6FF"
+
+    - name: hull-transparent
+      kind: material
+      base: basic
+      mode: opaque
+      properties:
+        - name: color
+          value: "#A844FFFF"

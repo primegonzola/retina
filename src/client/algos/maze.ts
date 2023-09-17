@@ -10,21 +10,21 @@ import {
 } from "../index";
 
 export enum MazeNodeKindOptions {
-    Base,
-    Challenge,
-    Concrete,
-    Corridor,
-    Gate,
-    Maze,
-    None,
-    Room,
-    Root,
-    Round,
-    Shadow,
-    Solid,
-    Test,
-    Transparent,
-    Wedge
+    Base = "base",
+    Challenge = "challenge",
+    Concrete = "concrete",
+    Corridor = "corridor",
+    Gate = "gate",
+    Maze = "maze",
+    None = "none",
+    Room = "room",
+    Root = "root",
+    Round = "round",
+    Shadow = "shadow",
+    Solid = "solid",
+    Test = "test",
+    Transparent = "transparent",
+    Wedge = "wedge",
 }
 
 export class MazeNode {

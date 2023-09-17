@@ -44,21 +44,25 @@ export class Hull {
     public readonly parent: Hull;
     public readonly shader: IShader;
     public readonly uniforms: Map<string, BufferLocation>;
+    public readonly attributes: Map<string, unknown>;
     public readonly buffers: Map<string, IBuffer>;
     public readonly textures: ITexture[];
     public readonly children: Hull[];
+    public readonly transparent: boolean = false;
     public frameCounter = 0
 
-    constructor(parent: Hull, transform: Transform,
+    constructor(parent: Hull, transform: Transform, transparent: boolean = false,
         shader?: IShader, buffers?: Map<string, IBuffer>, uniforms?: Map<string, BufferLocation>, textures?: ITexture[]) {
 
         // init
         this.id = Utils.uuid();
         this.parent = parent;
+        this.transparent = transparent;
         this.transform = transform || Transform.identity;
         this.shader = shader;
         this.uniforms = uniforms || new Map<string, BufferLocation>();
-        this.buffers = buffers;
+        this.buffers = buffers || new Map<string, IBuffer>();
+        this.attributes = new Map<string, unknown>();
         this.textures = textures || [];
         this.children = [];
     }

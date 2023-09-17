@@ -263,8 +263,8 @@ export class RenderTarget {
     public bindPipeline(shader: IShader, transparent?: boolean, depth?: boolean) {
 
         // override if needed
-        this._transparent = transparent || this._transparent;
-        this._depth = depth || this._depth;
+        this._transparent = transparent !== undefined ? transparent : this._transparent;
+        this._depth = depth !== undefined ? depth : this._depth;
 
         // bind pipeline
         shader.bindPipeline(this._renderPass,
