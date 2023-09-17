@@ -42,6 +42,17 @@ export class SimulationTimer {
         return this._fps;
     }
 
+    public static measure(action: () => void): number {
+        // start
+        const start = performance.now();
+
+        // run
+        action();
+
+        // done
+        return performance.now() - start;
+    }
+
     public update(): void {
         // get current time
         const now = performance.now();

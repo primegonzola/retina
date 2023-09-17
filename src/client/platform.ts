@@ -246,18 +246,23 @@ export class Platform {
     private render(): void {
 
         // filter hulls
-        const vh1 = window.performance.now();
-        const vhulls = this._vhulls(this.camera.frustum);
-        const vh2 = window.performance.now();
-        const oh1 = window.performance.now();
-        const ohulls = [...new Set(this._octree?.collect(this.camera.frustum)).entries()]
-            .map(e => this.hulls[e[1]]);
-        const oh2 = window.performance.now();
-        // start rendering with background color and depth
-        this.renderer.capture(this.camera, Color.black, 1.0, () => {
 
+        const vh1 = performance.now();
+        const vhulls = this._vhulls(this.camera.frustum);
+        const vh2 = performance.now();
+
+        const oh1 = performance.now();
+        const ohulls2 = [...new Set(this._octree?.collect(this.camera.frustum)).entries()]
+            .map(e => this.hulls[e[1]]);
+        const ohulls = ohulls2.filter(hull =>
+            this.camera.frustum.wbox(hull.graph.position, hull.graph.rotation, hull.graph.scale));
+        const oh2 = performance.now();
+
+        // start rendering with background color and depth
+        this.renderer.capture(this.camera, Color.black, 1.0, () => 
+        {
             // render hulls
-            this.renderer?.render(this.camera.frustum, this.lights, vhulls, false);
+            this.renderer?.render(this.camera.frustum, this.lights, ohulls, false);
 
             // output diagnostics
             this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);
