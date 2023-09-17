@@ -13,6 +13,9 @@ import {
     IBuffer,
     InputDevice,
     Light,
+    Maze,
+    MazeNode,
+    MazeNodeKindOptions,
     Octree,
     Quaternion,
     Range,
@@ -57,7 +60,7 @@ export class Platform {
         this.camera = new Camera(
             CameraKindOptions.Perspective,
             Transform.identity,
-            Rectangle.screen, new Range(1.0, 256));
+            Rectangle.screen, new Range(1.0, 4 * 256));
 
         // init controller
         this.controller = new CameraController(this, this.camera);
@@ -85,36 +88,88 @@ export class Platform {
         return platform;
     }
 
+    private _createTestContent(): void {
+        // // get material
+        // const dimensions = Vector3.one.scale(12);
+        // const outer = Vector3.one.scale(4);
+        // const inner = Vector3.one.scale(2);
+
+        // for (let z = 0; z < dimensions.z; z++) {
+        //     for (let y = 0; y < dimensions.y; y++) {
+        //         for (let x = 0; x < dimensions.x; x++) {
+
+        //             // calculate position
+        //             const position = (outer.multiply(new Vector3(x, y, z)))
+        //                 .subtract((outer.multiply(dimensions)).scale(0.5))
+        //                 .add(outer.scale(0.5));
+
+        //             // create hull
+        //             const hull = new Hull(null,
+        //                 new Transform(position, Quaternion.identity, inner),
+        //                 material.shader, mesh.buffers);
+
+        //             // add 
+        //             this.hulls.push(hull);
+        //         }
+        //     }
+        // }
+    }
+
     private _createContent(): void {
 
         // get mesh
         const mesh = this.resources.getMesh("platform", "cube");
-
-        // get material
         const material = this.resources.getMaterial("platform", "hull-concrete");
-        const dimensions = Vector3.one.scale(12);
-        const outer = Vector3.one.scale(4);
-        const inner = Vector3.one.scale(2);
 
-        for (let z = 0; z < dimensions.z; z++) {
-            for (let y = 0; y < dimensions.y; y++) {
-                for (let x = 0; x < dimensions.x; x++) {
+        // generate maze
+        const maze = Maze.generate();
 
-                    // calculate position
-                    const position = (outer.multiply(new Vector3(x, y, z)))
-                        .subtract((outer.multiply(dimensions)).scale(0.5))
-                        .add(outer.scale(0.5));
+        const collectHulls: (node: MazeNode, hull: Hull) => void = (node: MazeNode, hull: Hull) => {
+            // add current hull
+            this.hulls.push(hull);
 
-                    // create hull
-                    const hull = new Hull(null,
-                        new Transform(position, Quaternion.identity, inner),
-                        material.shader, mesh.buffers);
+            // loop over children
+            node.children.forEach(child => {
+                // check type
+                switch (child.kind) {
+                    case MazeNodeKindOptions.Solid: {
+                        // create the hull
+                        const ch = new Hull(hull,
+                            child.transform, material.shader, mesh.buffers);
 
-                    // add 
-                    this.hulls.push(hull);
-                }
-            }
-        }
+                        // collect children
+                        collectHulls(child, ch);
+                        
+                        // done
+                        break;
+                    }
+                    default: {
+                        // create the hull
+                        const ch = new Hull(hull, child.transform);
+
+                        // collect children
+                        collectHulls(child, ch);
+                        
+                        // done
+                        break;
+                    }
+                };
+            });
+        };
+
+        // collect the nodes
+        collectHulls(maze, new Hull(null, Transform.identity));
+
+        // // loop over nodes and get transforms
+        // maze.children.forEach(child => {
+
+        //     // create hull
+        //     const hull = new Hull(null,
+        //         child.transform, material.shader, mesh.buffers);
+
+        //     // add
+        //     this.hulls.push(hull);
+        // });
 
         // start with empty buffer
         let data: number[] = [];
@@ -122,18 +177,27 @@ export class Platform {
         // loop over hulls 
         this.hulls.forEach(hull => {
 
-            // extract model
-            const model = hull.transform.extract();
+            // check if valid hull
+            if (hull.shader && hull.uniforms.size > 0
+                && hull.uniforms.has("model") && hull.uniforms.has("properties")) {
 
-            // override color
-            if (material?.properties?.has("color"))
-                material.properties.get("color").value = Color.cyan;// Color.random(Math.random());
+                // extract model
+                const model = hull.transform.extract();
 
-            // extract properties
-            const properties = material.extract();
+                // // override color
+                // if (material?.properties?.has("color"))
+                //     material.properties.get("color").value = Color.random(Math.random());
 
-            // add to buffer
-            data = data.concat(Utils.pad(model, 256), Utils.pad(properties, 256))
+                // extract properties
+                const properties = material.extract();
+
+                // add to buffer
+                data = data.concat(Utils.pad(model, 256), Utils.pad(properties, 256))
+            }
+            else {
+                // add to buffer
+                data = data.concat(Utils.pad(hull.transform.extract(), 256), Utils.pad(material.extract(), 256))
+            }
         });
 
         // create buffer
@@ -172,8 +236,6 @@ export class Platform {
 
         // optimize octree
         this._octree.optimize();
-
-        console.log(this._octree);
     }
 
     private _destroyContent(): void {
@@ -200,7 +262,7 @@ export class Platform {
     public reset(): void {
 
         // reset controller
-        this.controller?.reset(Vector3.zero, new Vector3(-45, 0, 0), 24 * 3);
+        this.controller?.reset(Vector3.zero, new Vector3(-45, 0, 0), 24 * 8);
 
         // destroy content
         this._destroyContent();
@@ -259,10 +321,9 @@ export class Platform {
         const oh2 = performance.now();
 
         // start rendering with background color and depth
-        this.renderer.capture(this.camera, Color.black, 1.0, () => 
-        {
+        this.renderer.capture(this.camera, Color.black, 1.0, () => {
             // render hulls
-            this.renderer?.render(this.camera.frustum, this.lights, ohulls, false);
+            this.renderer?.render(this.camera.frustum, this.lights, vhulls, false);
 
             // output diagnostics
             this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);

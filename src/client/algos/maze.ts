@@ -48,7 +48,7 @@ export class MazeNode {
             Utils.even(Utils.random(Maze.NODE_MAXIMUM_SIZE.x, Maze.NODE_MAXIMUM_SIZE.x, false)),
             Utils.even(Utils.random(Maze.NODE_MAXIMUM_SIZE.y, Maze.NODE_MAXIMUM_SIZE.y, false)),
             Utils.even(Utils.random(Maze.NODE_MAXIMUM_SIZE.z, Maze.NODE_MAXIMUM_SIZE.z, false)),
-        ).scale(2);
+        ).multiply(new Vector3(2, 1, 2));
     }
 
     public static get randomSize(): Vector3 {
@@ -498,7 +498,7 @@ export class Maze extends MazeNode {
 
         // start at depth 0
         let depth = 0;
-        const max = 9; // 32; //128 / 4;
+        const max = 32; // 32; //128 / 4;
         let current = 0;
         const debug = true;
         // generate nodes

@@ -118,3 +118,6 @@ export { MazeNode } from "./algos/maze";
 export { MazeNodeKindOptions } from "./algos/maze";
 
 export { CameraController } from "./controllers/camera";
+
+export {Model} from "./modeling/model";
+export {Node} from "./modeling/model";

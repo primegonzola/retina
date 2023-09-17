@@ -380,49 +380,56 @@ export class Renderer {
         // loop over hulls
         for (const hull of hulls) {
 
-            // cache graph
-            const graph = hull.graph;
+            // check if valid hull
+            if (hull.shader &&
+                hull.buffers && hull.buffers.size &&
+                hull.uniforms && hull.uniforms.size &&
+                hull.uniforms.has("model") && hull.uniforms.has("properties")) {
 
-            // check if intersecting
-            if (!clip || frustum.wbox(graph.position, graph.rotation, graph.scale)) {
+                // cache graph
+                const graph = hull.graph;
 
-                // get shader
-                const shader = hull.shader;
+                // check if intersecting
+                if (!clip || frustum.wbox(graph.position, graph.rotation, graph.scale)) {
 
-                // check if shader
-                if (shader) {
+                    // get shader
+                    const shader = hull.shader;
 
-                    // bind pipeline
-                    target?.bindPipeline(shader);
+                    // check if shader
+                    if (shader) {
 
-                    // bind camera
-                    target?.bindCamera(shader);
+                        // bind pipeline
+                        target?.bindPipeline(shader);
 
-                    // check to bind lights
-                    if (this?._lighting)
-                        target?.bindUniform(shader, "lighting", "lighting", this._lighting);
+                        // bind camera
+                        target?.bindCamera(shader);
 
-                    // check to bind buffers
-                    if (hull?.buffers)
-                        target?.bindBuffers(shader, hull.buffers);
+                        // check to bind lights
+                        if (this?._lighting)
+                            target?.bindUniform(shader, "lighting", "lighting", this._lighting);
 
-                    // check to bind model
-                    if (hull?.uniforms?.has("model"))
-                        target?.bindUniform(shader, "model", "model",
-                            hull.uniforms.get("model").buffer, hull.uniforms.get("model").offset, hull.uniforms.get("model").size);
+                        // check to bind buffers
+                        if (hull?.buffers)
+                            target?.bindBuffers(shader, hull.buffers);
 
-                    // check to bind properties
-                    if (hull?.uniforms?.has("properties"))
-                        target?.bindUniform(shader, "material", "properties",
-                            hull.uniforms.get("properties").buffer, hull.uniforms.get("properties").offset, hull.uniforms.get("model").size);
+                        // check to bind model
+                        if (hull?.uniforms?.has("model"))
+                            target?.bindUniform(shader, "model", "model",
+                                hull.uniforms.get("model").buffer, hull.uniforms.get("model").offset, hull.uniforms.get("model").size);
 
-                    // bind textures
-                    if (hull?.textures)
-                        target?.bindTextures(shader, null, hull.textures);
+                        // check to bind properties
+                        if (hull?.uniforms?.has("properties"))
+                            target?.bindUniform(shader, "material", "properties",
+                                hull.uniforms.get("properties").buffer, hull.uniforms.get("properties").offset, hull.uniforms.get("model").size);
 
-                    // draw hull
-                    if (hull?.buffers)
-                        target?.draw(hull?.buffers);
+                        // bind textures
+                        if (hull?.textures)
+                            target?.bindTextures(shader, null, hull.textures);
+
+                        // draw hull
+                        if (hull?.buffers)
+                            target?.draw(hull?.buffers);
+                    }
                 }
             }
         }
