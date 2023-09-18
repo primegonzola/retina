@@ -448,11 +448,11 @@ export class Renderer {
                 return pva.z - pvb.z;
             });
 
-        // render transparents first
-        transparents.forEach(hull => this._hull(target, frustum, hull, clip));
-
-        // render opaques next
+        // render opaques
         opaques.forEach(hull => this._hull(target, frustum, hull, clip));
+
+        // render transparents
+        transparents.forEach(hull => this._hull(target, frustum, hull, clip));
     }
 
     public render(frustum: Frustum, lights: Light[], hulls: Hull[], clip = true): void {

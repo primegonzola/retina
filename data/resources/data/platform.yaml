@@ -452,10 +452,10 @@ resources:
     - name: hull-galaxy
       kind: material
       base: basic
-      mode: opaque
+      mode: transparent
       properties:
         - name: color
-          value: "#0C141FFF"
+          value: "#FFFFFF3F"
 
     - name: hull-star
       kind: material

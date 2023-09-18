@@ -176,13 +176,19 @@ export class Platform {
                     const galaxies = this.universe.galaxies.filter<Galaxy>(galaxy =>
                         this.camera.frustum.wbox(galaxy.graph.position, galaxy.graph.rotation, galaxy.graph.scale));
 
-                    // loop over galaxies and collect star
-                    const hulls = galaxies.map<Hull[]>(galaxy =>
+                    // collect galaxy hulls
+                    const ghulls = galaxies.map(galaxy => galaxy.hull);
+
+                    // loop over galaxies and collect star hulls
+                    const shulls = galaxies.map<Hull[]>(galaxy =>
                         (galaxy as Galaxy).stars.map(star => star.hull)).flat();
+
+                    // combine
+                    const hulls = [].concat(ghulls, shulls);
 
                     // render
                     this.renderer?.render(this.camera.frustum, this.world.lights, hulls, false);
-                    
+
                     break;
                 }
             }
