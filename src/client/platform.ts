@@ -127,6 +127,9 @@ export class Platform {
             case MazeNodeKindOptions.Base:
                 material = this.resources.getMaterial("platform", "hull-base");
                 break;
+            case MazeNodeKindOptions.Ceiling:
+                material = this.resources.getMaterial("platform", "hull-base");
+                break;
             case MazeNodeKindOptions.Solid:
                 material = this.resources.getMaterial("platform", "hull-solid");
                 break;
@@ -286,7 +289,7 @@ export class Platform {
     public reset(): void {
 
         // reset controller
-        this.controller?.reset(Vector3.zero, new Vector3(-45, 0, 0), 24 * 2);
+        this.controller?.reset(Vector3.zero, new Vector3(-45, 0, 0), 24 * 4);
 
         // destroy content
         this._destroyContent();

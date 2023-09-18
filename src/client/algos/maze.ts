@@ -12,6 +12,7 @@ import {
 export enum MazeNodeKindOptions {
     Base = "base",
     Challenge = "challenge",
+    Ceiling = "ceiling",
     Concrete = "concrete",
     Corridor = "corridor",
     Maze = "maze",
@@ -192,14 +193,6 @@ export class MazeNode {
 
     private populateRoundNode(kinds: MazeNodeKindOptions[]): void {
 
-        // // create base 
-        // this.addBase(
-        //     this.transform.position,
-        //     this.transform.rotation.multiply(Quaternion.degrees(-180, 0, 0)),
-        //     new Vector3(this.transform.scale.x, Maze.BASE_SIZE.y, this.transform.scale.z),
-        //     false
-        // )
-
         // loop over kinds
         for (let i = 0; i < kinds.length; i++) {
 
@@ -343,6 +336,16 @@ export class MazeNode {
             new Vector3(this.transform.scale.x, Maze.BASE_SIZE.y, this.transform.scale.z),
             false
         )
+
+        // add ceiling
+        if (Math.random() > 0.5) {
+            this.addNode(MazeNodeKindOptions.Ceiling,
+                this.transform.position.add(new Vector3(0, Maze.SOLID_SIZE.y + Maze.BASE_SIZE.y, 0)),
+                this.transform.rotation.multiply(Quaternion.degrees(0, 0, 0)),
+                new Vector3(this.transform.scale.x, Maze.BASE_SIZE.y, this.transform.scale.z),
+                true);
+        }
+
         // loop over kinds
         for (let i = 0; i < kinds.length; i++) {
 
