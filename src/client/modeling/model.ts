@@ -1,6 +1,7 @@
 import {
     Hull,
     Material,
+    Matrix4,
     Mesh,
     Platform,
     Transform,
@@ -16,21 +17,45 @@ export class Model {
         this.transform = transform;
         this.platform = platform;
     }
+
+    public update(): void {
+
+    }
+
+    public destroy(): void {
+
+    }
 }
 
-export class Node extends Model {
+export enum ModelNodeKindOptions {
+    Block,
+    Chunk,
+    Door,
+}
+
+export class ModelNode extends Model {
 
     public readonly mesh: Mesh;
     public readonly material: Material;
-    public readonly nodes: Model[];
+    public readonly nodes: ModelNode[];
     public readonly hull: Hull;
+    public readonly kind: ModelNodeKindOptions;
+    public readonly parent: ModelNode;
 
-    constructor(platform: Platform, transform: Transform, mesh?: Mesh, material?: Material, hull?: Hull) {
+    constructor(platform: Platform, parent: ModelNode, kind: ModelNodeKindOptions,
+        transform: Transform, mesh?: Mesh, material?: Material, hull?: Hull) {
         super(platform, transform);
         // init
         this.mesh = mesh;
         this.material = material;
         this.nodes = [];
         this.hull = hull;
+        this.parent = parent;
+    }
+
+    public get graph(): Matrix4 {
+        return this.parent ?
+            this.parent.graph.multiply(this.transform.model) :
+            Matrix4.identity.multiply(this.transform.model);
     }
 }

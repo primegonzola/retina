@@ -1,21 +1,12 @@
 import {
-    Bounds,
-    Box,
-    BufferKindOptions,
-    BufferLocation,
     Camera,
     CameraController,
     CameraKindOptions,
     Color,
-    Frustum,
     GraphicsDevice,
-    Hull,
-    IBuffer,
     InputDevice,
     Light,
     Material,
-    MaterialModeOptions,
-    Maze,
     MazeNode,
     MazeNodeKindOptions,
     Octree,
@@ -28,6 +19,7 @@ import {
     Transform,
     Utils,
     Vector3,
+    World,
 } from "./index";
 
 export class Platform {
@@ -39,10 +31,8 @@ export class Platform {
     public readonly resources: Resources;
     public readonly timer: SimulationTimer;
     public readonly controller: CameraController;
-    public readonly lights: Light[];
-    public readonly hulls: Hull[];
+    public readonly world: World;
     private _octree: Octree;
-    private _statics: IBuffer;
 
     protected constructor(graphics: GraphicsDevice, input: InputDevice) {
         // init
@@ -50,10 +40,7 @@ export class Platform {
         this.graphics = graphics;
         this.timer = new SimulationTimer();
         this.resources = new Resources(this);
-
-        // to start with
-        this.hulls = [];
-        this.lights = [];
+        this.world = new World(this, Transform.identity);
 
         // main render
         this.renderer = new Renderer(this, Color.trBlack, 1.0);
@@ -89,195 +76,26 @@ export class Platform {
         // all done
         return platform;
     }
-
-    private _createTestContent(): void {
-        // // get material
-        // const dimensions = Vector3.one.scale(12);
-        // const outer = Vector3.one.scale(4);
-        // const inner = Vector3.one.scale(2);
-
-        // for (let z = 0; z < dimensions.z; z++) {
-        //     for (let y = 0; y < dimensions.y; y++) {
-        //         for (let x = 0; x < dimensions.x; x++) {
-
-        //             // calculate position
-        //             const position = (outer.multiply(new Vector3(x, y, z)))
-        //                 .subtract((outer.multiply(dimensions)).scale(0.5))
-        //                 .add(outer.scale(0.5));
-
-        //             // create hull
-        //             const hull = new Hull(null,
-        //                 new Transform(position, Quaternion.identity, inner),
-        //                 material.shader, mesh.buffers);
-
-        //             // add 
-        //             this.hulls.push(hull);
-        //         }
-        //     }
-        // }
-    }
-
-    private _materialFromNode(node: MazeNode): Material {
-        // default
-        let material = this.resources.getMaterial("platform", "hull-concrete");
-        let dms = ["hull-red-door", "hull-green-door", "hull-blue-door"];
-
-        // check kind
-        switch (node.kind) {
-            case MazeNodeKindOptions.Foundation:
-                material = this.resources.getMaterial("platform", "hull-foundation");
-                break;
-            case MazeNodeKindOptions.Floor:
-                material = this.resources.getMaterial("platform", "hull-floor");
-                break;
-            case MazeNodeKindOptions.Wall:
-                material = this.resources.getMaterial("platform", "hull-wall");
-                break;
-            case MazeNodeKindOptions.Ceiling:
-                material = this.resources.getMaterial("platform", "hull-ceiling");
-                break;
-            case MazeNodeKindOptions.Building:
-                material = this.resources.getMaterial("platform", "hull-building");
-                break;
-            case MazeNodeKindOptions.Transparent:
-                // check 
-                if (Math.random() > 0.5) {
-                    // add transparent
-                    material = this.resources.getMaterial("platform", "hull-transparent");
-                }
-                else {
-                    material = this.resources.getMaterial("platform", dms[Utils.random(0, dms.length - 1, true)]);
-                }
-                break;
-        }
-
-        // done
-        return material;
-    }
-
+    
     private _createContent(): void {
 
-        // get mesh
-        const mesh = this.resources.getMesh("platform", "cube");
-
-        // generate maze
-        const maze = Maze.generate();
-
-        // loop over nodes and get transforms
-        maze.children.forEach(node => {
-
-            // create hull
-            const hull = new Hull(null, node.transform);
-
-            // add
-            this.hulls.push(hull);
-
-            // resolve material 
-            const material = this._materialFromNode(node);
-
-            // add as attribute
-            hull.attributes.set("material", material.clone());
-
-            // loop over children
-            node.children.forEach(cn => {
-
-                // resolve material 
-                const cm = this._materialFromNode(cn);
-
-                // check if transparent
-                const transparent = cm.mode === MaterialModeOptions.Transparent;
-
-                // nudge the scale a bit in case of transparency
-                const ctf = new Transform(
-                    cn.transform.position,
-                    cn.transform.rotation,
-                    cn.transform.scale.scale(transparent ? 0.9999 : 1.0));
-
-                // create hull
-                const ch = new Hull(hull, ctf,
-                    transparent, cm.shader, mesh.buffers);
-
-                // add as attribute
-                ch.attributes.set("material", cm.clone());
-
-                // add
-                this.hulls.push(ch);
-            });
-        });
-
-        // start with empty buffer
-        let data: number[] = [];
-
-        // loop over hulls 
-        this.hulls.forEach(hull => {
-
-            // extract model
-            const model = Transform.matrix(hull.graph).extract();
-
-            // get the attached material
-            const material = hull.attributes.get("material") as Material;
-
-            // override color
-            // if (material?.properties?.has("color"))
-            //     material.properties.get("color").value = Color.random(1.0);
-
-            // extract properties
-            const properties = material.extract();
-
-            // set data
-            data = data.concat(
-                Utils.pad(model, 256),
-                Utils.pad(properties, 256))
-        });
-
-        // create buffer
-        const buffer = this.graphics.createF32Buffer(BufferKindOptions.Uniform, data);
-
-        // loop over hulls 
-        this.hulls.forEach((hull, index) => {
-
-            // extract model
-            const model = Transform.matrix(hull.graph).extract();
-
-            // clone the attached material
-            const material = hull.attributes.get("material") as Material;
-
-            // extract properties
-            const properties = material.extract();
-
-            // set uniforms
-            hull.uniforms.set("model", new BufferLocation(buffer, model.length, (2 * index) + 0));
-            hull.uniforms.set("properties", new BufferLocation(buffer, properties.length, (2 * index) + 1));
-        });
-
-        // save buffer
-        this._statics = buffer;
+        // generate the world
+        this.world.create();
 
         // add a directional lighht
-        this.lights.push(Light.createDirectional(
+        this.world.lights.push(Light.createDirectional(
             new Transform(Vector3.zero, Quaternion.degrees(-45, 45, 0), Vector3.one),
             Color.white,
             1.0,
             this.camera.area,
             this.camera.range,
         ));
-
-        // init octree
-        this._octree = new Octree(this.hulls.map(hull =>
-            new Box(hull.graph.position, hull.graph.rotation, hull.graph.scale).bounds
-        ), 3);
-
-        // optimize octree
-        this._octree.optimize();
     }
 
     private _destroyContent(): void {
 
         // clean up statics
-        this._statics?.destroy();
-
-        // clean up hulls
-        this.hulls.length = 0;
+        this.world?.destroy();
     }
 
     public async destroy(): Promise<void> {
@@ -304,16 +122,6 @@ export class Platform {
         this._createContent();
     }
 
-    private _vhulls(frustum: Frustum): Hull[] {
-        // check if octree is valid
-        // if (this._octree) {
-        //     this._octree?.collect(frustum).map(index => this.hulls[index]);
-        // }
-        const vhulls = this.hulls.filter(hull =>
-            frustum.wbox(hull.graph.position, hull.graph.rotation, hull.graph.scale));
-        return vhulls;
-    }
-
     public async update(): Promise<void> {
 
         // wait to get rid of async warning
@@ -322,11 +130,14 @@ export class Platform {
         // update timer
         this.timer?.update();
 
-        // update controller
-        this.controller?.update();
-
         // update input
         this.input?.update();
+
+        // update world
+        this.world?.update();
+        
+        // update controller
+        this.controller?.update();
 
         // update graphics
         this.graphics?.update();
@@ -340,29 +151,23 @@ export class Platform {
 
     private render(): void {
 
-        // filter hulls
+        // get all visible nodes
+        const vchunks = this.world.chunks.filter(node =>
+            this.camera.frustum.wbox(node.graph.position, node.graph.rotation, node.graph.scale));
 
-        const vh1 = performance.now();
-        const vhulls = this._vhulls(this.camera.frustum);
-        const vh2 = performance.now();
-
-        // const oh1 = performance.now();
-        // const ohulls2 = [...new Set(this._octree?.collect(this.camera.frustum)).entries()]
-        //     .map(e => this.hulls[e[1]]);
-        // const ohulls = ohulls2.filter(hull =>
-        //     this.camera.frustum.wbox(hull.graph.position, hull.graph.rotation, hull.graph.scale));
-        // const oh2 = performance.now();
+        // collect each of the child hulls
+        let vhulls = vchunks.map(vchunk =>
+            vchunk.nodes.map(n => n.hull)).flat();
 
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
+
             // render hulls
-            this.renderer?.render(this.camera.frustum, this.lights, vhulls, false);
+            this.renderer?.render(this.camera.frustum, this.world.lights, vhulls, false);
 
             // output diagnostics
             this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);
-            this.renderer.writeLine(1, `Hulls: ${this.hulls.length} - Lights: ${this.lights.length}`);
-            // this.renderer.writeLine(2, `vHulls: ${vhulls.length} - oHulls: ${ohulls.length}`);
-            // this.renderer.writeLine(3, `vms: ${(vh2 - vh1).toFixed(4)} - oms: ${(oh2 - oh1).toFixed(4)}`);
+            this.renderer.writeLine(1, `Hulls: ${vhulls.length} - Lights: ${this.world.lights.length}`);
         });
     }
 }
