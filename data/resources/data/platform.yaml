@@ -361,13 +361,45 @@ resources:
         - name: color
           value: "#A9A9A9FF"
 
-    - name: hull-base
+    - name: hull-foundation
       kind: material
       base: basic
       mode: opaque
       properties:
         - name: color
           value: "#0C141FFF"
+
+    - name: hull-floor
+      kind: material
+      base: basic
+      mode: opaque
+      properties:
+        - name: color
+          value: "#A9A9A9FF"
+
+    - name: hull-wall
+      kind: material
+      base: basic
+      mode: opaque
+      properties:
+        - name: color
+          value: "#748AA6FF"
+
+    - name: hull-ceiling
+      kind: material
+      base: basic
+      mode: opaque
+      properties:
+        - name: color
+          value: "#0C141FFF"
+
+    - name: hull-building
+      kind: material
+      base: basic
+      mode: opaque
+      properties:
+        - name: color
+          value: "#2C343FFF"
 
     - name: hull-solid
       kind: material
@@ -407,4 +439,4 @@ resources:
       mode: opaque
       properties:
         - name: color
-          value: "#0000FFFF"
+          value: "#0C141FFF"

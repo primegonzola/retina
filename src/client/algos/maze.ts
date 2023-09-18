@@ -10,19 +10,21 @@ import {
 } from "../index";
 
 export enum MazeNodeKindOptions {
-    Base = "base",
+    Building = "building",
+    Foundation = "foundation",
     Challenge = "challenge",
     Ceiling = "ceiling",
-    Concrete = "concrete",
     Corridor = "corridor",
+    Floor = "floor",
     Maze = "maze",
     None = "none",
     Room = "room",
     Root = "root",
     Round = "round",
     Shadow = "shadow",
-    Solid = "solid",
+    _Solid = "solid",
     Transparent = "transparent",
+    Wall = "wall",
     Wedge = "wedge",
 }
 
@@ -118,18 +120,18 @@ export class MazeNode {
         switch (node.kind) {
             case MazeNodeKindOptions.Challenge: {
                 node.populateDynamicNode([
-                    MazeNodeKindOptions.Solid,
+                    MazeNodeKindOptions.Wall,
                     MazeNodeKindOptions.Transparent,
-                    MazeNodeKindOptions.Solid,
+                    MazeNodeKindOptions.Wall,
                     MazeNodeKindOptions.Transparent
                 ]);
                 break;
             }
             case MazeNodeKindOptions.Corridor: {
                 node.populateDynamicNode([
-                    MazeNodeKindOptions.Solid,
+                    MazeNodeKindOptions.Wall,
                     MazeNodeKindOptions.Transparent,
-                    MazeNodeKindOptions.Solid,
+                    MazeNodeKindOptions.Wall,
                     MazeNodeKindOptions.Transparent
                 ]);
                 break;
@@ -175,7 +177,7 @@ export class MazeNode {
 
         // add floor
         this.addNode(
-            wedged ? MazeNodeKindOptions.Wedge : MazeNodeKindOptions.Concrete, position, rotation, scale, true);
+            wedged ? MazeNodeKindOptions.Wedge : MazeNodeKindOptions.Floor, position, rotation, scale, true);
 
         // calculate size
         const size = (0.5 * this.transform.scale.y) - (this.transform.position.y - position.y);
@@ -183,7 +185,7 @@ export class MazeNode {
         // see if anything left
         if (size > 0 && !wedged) {
             // add solid to down
-            this.addNode(MazeNodeKindOptions.Base,
+            this.addNode(MazeNodeKindOptions.Foundation,
                 position
                     .subtract(new Vector3(0, 0.5 * scale.y, 0))
                     .subtract(new Vector3(0, 0.5 * size, 0)),
@@ -291,7 +293,7 @@ export class MazeNode {
 
                 // create node
                 this.addNode(
-                    MazeNodeKindOptions.Solid,
+                    MazeNodeKindOptions.Wall,
                     wsp1, world_rotation, ws1, true);
 
                 // calculate scale
@@ -307,7 +309,7 @@ export class MazeNode {
 
                 // add node
                 this.addNode(
-                    MazeNodeKindOptions.Solid,
+                    MazeNodeKindOptions.Wall,
                     wsp2, world_rotation, ws2, true);
             }
             else {
@@ -321,7 +323,7 @@ export class MazeNode {
                     world_scale, Maze.SOLID_SIZE.y, Maze.SOLID_SIZE.z);
 
                 // add 
-                this.addNode(MazeNodeKindOptions.Solid,
+                this.addNode(MazeNodeKindOptions.Wall,
                     wp, world_rotation, ws, true);
             }
         }
@@ -343,6 +345,12 @@ export class MazeNode {
                 this.transform.position.add(new Vector3(0, Maze.SOLID_SIZE.y + Maze.BASE_SIZE.y, 0)),
                 this.transform.rotation.multiply(Quaternion.degrees(0, 0, 0)),
                 new Vector3(this.transform.scale.x, Maze.BASE_SIZE.y, this.transform.scale.z),
+                true);
+            // add building
+            this.addNode(MazeNodeKindOptions.Building,
+                this.transform.position.add(new Vector3(0, Maze.SOLID_SIZE.y + Maze.BASE_SIZE.y + 2, 0)),
+                this.transform.rotation.multiply(Quaternion.degrees(0, 0, 0)),
+                new Vector3(this.transform.scale.x - 4, 2 * Maze.BASE_SIZE.y, this.transform.scale.z - 4),
                 true);
         }
 
@@ -384,7 +392,7 @@ export class MazeNode {
                 Maze.SOLID_BORDER_SIZE.x, Maze.SOLID_SIZE.y, Maze.SOLID_BORDER_SIZE.z);
 
             // add pillar
-            this.addNode(MazeNodeKindOptions.Solid,
+            this.addNode(MazeNodeKindOptions.Wall,
                 wpp, world_rotation, wsp, true);
 
             // check if door or portal
@@ -420,7 +428,7 @@ export class MazeNode {
 
                 // create node
                 this.addNode(
-                    MazeNodeKindOptions.Solid,
+                    MazeNodeKindOptions.Wall,
                     wsp1, world_rotation, ws1, true);
 
                 // calculate scale
@@ -436,10 +444,10 @@ export class MazeNode {
 
                 // add node
                 this.addNode(
-                    MazeNodeKindOptions.Solid,
+                    MazeNodeKindOptions.Wall,
                     wsp2, world_rotation, ws2, true);
 
-            } else if (kind === MazeNodeKindOptions.Solid) {
+            } else if (kind === MazeNodeKindOptions.Wall) {
 
                 // calculate position
                 const wp = new Vector3(0, py, 0)
@@ -450,7 +458,7 @@ export class MazeNode {
                     world_scale, Maze.SOLID_SIZE.y, Maze.SOLID_SIZE.z);
 
                 // add 
-                this.addNode(MazeNodeKindOptions.Solid,
+                this.addNode(MazeNodeKindOptions.Wall,
                     wp, world_rotation, ws, true);
             }
         }
@@ -662,7 +670,7 @@ export class Maze extends MazeNode {
                             transparent.properties.set("is-available", false);
 
                             // change type to solid
-                            transparent.changeKind(MazeNodeKindOptions.Solid);
+                            transparent.changeKind(MazeNodeKindOptions.Wall);
                         }
                     }
                 }
@@ -684,7 +692,7 @@ export class Maze extends MazeNode {
                     // check if available
                     if (!child.properties.has("target-link")) {
                         // change to solid
-                        child.changeKind(MazeNodeKindOptions.Solid);
+                        child.changeKind(MazeNodeKindOptions.Wall);
                     }
                 }
             }

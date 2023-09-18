@@ -124,14 +124,20 @@ export class Platform {
 
         // check kind
         switch (node.kind) {
-            case MazeNodeKindOptions.Base:
-                material = this.resources.getMaterial("platform", "hull-base");
+            case MazeNodeKindOptions.Foundation:
+                material = this.resources.getMaterial("platform", "hull-foundation");
+                break;
+            case MazeNodeKindOptions.Floor:
+                material = this.resources.getMaterial("platform", "hull-floor");
+                break;
+            case MazeNodeKindOptions.Wall:
+                material = this.resources.getMaterial("platform", "hull-wall");
                 break;
             case MazeNodeKindOptions.Ceiling:
-                material = this.resources.getMaterial("platform", "hull-base");
+                material = this.resources.getMaterial("platform", "hull-ceiling");
                 break;
-            case MazeNodeKindOptions.Solid:
-                material = this.resources.getMaterial("platform", "hull-solid");
+            case MazeNodeKindOptions.Building:
+                material = this.resources.getMaterial("platform", "hull-building");
                 break;
             case MazeNodeKindOptions.Transparent:
                 // check 
