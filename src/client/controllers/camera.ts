@@ -1,9 +1,9 @@
 import {
     Camera,
     ModelNode,
-    ModelNodeKindOptions,
     Platform,
     Quaternion,
+    Range,
     Transform,
     Utils,
     Vector2,
@@ -17,13 +17,15 @@ export class CameraController {
     public readonly leftAxis: Vector2;
     public readonly rightAxis: Vector2;
     public readonly camera: Camera;
+    public readonly range: Range;
+    public level: number;
 
     public distance: number = 24;
     public degrees: Vector3 = Vector3.zero;
     public target: ModelNode;
     public editing: boolean;
 
-    constructor(platform: Platform, camera: Camera) {
+    constructor(platform: Platform, camera: Camera, range: Range, level: number) {
 
         // init
         this.platform = platform;
@@ -31,6 +33,8 @@ export class CameraController {
         this.rightAxis = Vector2.zero;
         this.camera = camera;
         this.editing = true;
+        this.range = range;
+        this.level = level;
         this.target = ModelNode.none(this.platform);
     }
 
@@ -75,8 +79,20 @@ export class CameraController {
         if (this.platform.input.isKey("ArrowDown")) {
             this.rightAxis.y = -1;
         }
-        if (this.platform.input.isKey("F2")) {
+        if (this.platform.input.isKeyDown("F2")) {
             this.editing = !this.editing;
+        }
+
+        if (this.platform.input.isKeyDown("F3")) {
+            this.editing = !this.editing;
+        }
+
+        if (this.platform.input.isKeyDown("F9")) {
+            this.level = Math.max(Math.min(this.level + 1, this.range.maximum), this.range.minimum);
+        }
+
+        if (this.platform.input.isKeyDown("F10")) {
+            this.level = Math.min(Math.max(this.level - 1, this.range.minimum), this.range.maximum);
         }
 
         // speed to use

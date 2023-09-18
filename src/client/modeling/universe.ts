@@ -13,6 +13,7 @@ import {
     Utils,
     MaterialModeOptions,
     BufferKindOptions,
+    BufferLocation,
 } from "../index";
 
 export class Moon extends ModelNode {
@@ -88,6 +89,31 @@ export class Galaxy extends ModelNode {
                 }
             }
         }
+
+        // start with empty buffer
+        let data: number[] = [];
+
+        // loop over stars
+        this.stars.forEach<Star>(star => {
+            // add  model and properties
+            data = data.concat(
+                Utils.pad(star.transform.extract(), 256),
+                Utils.pad((star.hull.attributes.get("material") as Material).extract(), 256))
+        });
+
+        // create buffer
+        const buffer = this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform, data);
+
+        // loop over galaxies
+        this.stars.forEach<Star>(star => {
+            // set uniforms
+            star.hull.uniforms.set("model", new BufferLocation(buffer, hull.transform.extract().length, 0));
+            star.hull.uniforms.set("properties", new BufferLocation(buffer, (star.hull.attributes.get("material") as Material).extract().length, 1));
+        });
+
+        // save
+        this._uniforms = buffer;
+
     }
 
     public get uniforms(): IBuffer {
@@ -131,14 +157,14 @@ export class Universe extends ModelNode {
 
         // add galaxy
         this.galaxies.add(new Galaxy(this.platform, this.galaxies,
-            new Transform(Vector3.zero, Quaternion.identity, Vector3.one.scale(16)),
+            new Transform(Vector3.zero, Quaternion.identity, Vector3.one.scale(4)),
             mesh, material, hull));
 
         // start with empty buffer
         let data: number[] = [];
 
         // loop over galaxies
-        this.galaxies.forEach(galaxy => {
+        this.galaxies.forEach<Galaxy>(galaxy => {
             // add  model and properties
             data = data.concat(
                 Utils.pad(galaxy.transform.extract(), 256),
@@ -146,6 +172,16 @@ export class Universe extends ModelNode {
         });
 
         // create buffer
-        this._uniforms = this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform, data);
+        const buffer = this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform, data);
+
+        // loop over galaxies
+        this.galaxies.forEach<Galaxy>(galaxy => {
+            // set uniforms
+            galaxy.hull.uniforms.set("model", new BufferLocation(buffer, hull.transform.extract().length, 0));
+            galaxy.hull.uniforms.set("properties", new BufferLocation(buffer, (galaxy.hull.attributes.get("material") as Material).extract().length, 1));
+        });
+
+        // save
+        this._uniforms = buffer;
     }
 }

@@ -3,7 +3,9 @@ import {
     CameraController,
     CameraKindOptions,
     Color,
+    Galaxy,
     GraphicsDevice,
+    Hull,
     InputDevice,
     Light,
     ModelNode,
@@ -51,7 +53,7 @@ export class Platform {
             Rectangle.screen, new Range(1.0, 4 * 256));
 
         // init controller
-        this.controller = new CameraController(this, this.camera);
+        this.controller = new CameraController(this, this.camera, new Range(0, 4), 0);
     }
 
     public static async create(id: string): Promise<Platform> {
@@ -132,14 +134,14 @@ export class Platform {
         // update timer
         this.timer?.update();
 
+        // update controller
+        this.controller?.update();
+
         // update input
         this.input?.update();
 
         // update world
         this.world?.update();
-
-        // update controller
-        this.controller?.update();
 
         // update graphics
         this.graphics?.update();
@@ -164,19 +166,33 @@ export class Platform {
         // add player
         vhulls.push(this.world.player.hull);
 
-        // get all galaxies
-        const galaxies = this.universe.galaxies.filter(galaxy =>
-            this.camera.frustum.wbox(galaxy.graph.position, galaxy.graph.rotation, galaxy.graph.scale));
-
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
-            
-            // render hulls
-            this.renderer?.render(this.camera.frustum, this.world.lights, vhulls, false);
+            // check level
+            switch (this.controller.level) {
+                case 0: {
+
+                    // get all visible galaxies
+                    const galaxies = this.universe.galaxies.filter<Galaxy>(galaxy =>
+                        this.camera.frustum.wbox(galaxy.graph.position, galaxy.graph.rotation, galaxy.graph.scale));
+
+                    // loop over galaxies and collect star
+                    const hulls = galaxies.map<Hull[]>(galaxy =>
+                        (galaxy as Galaxy).stars.map(star => star.hull)).flat();
+
+                    // render
+                    this.renderer?.render(this.camera.frustum, this.world.lights, hulls, false);
+                    
+                    break;
+                }
+            }
+            // // render hulls
+            // this.renderer?.render(this.camera.frustum, this.world.lights, vhulls, false);
 
             // output diagnostics
             this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);
-            this.renderer.writeLine(1, `Hulls: ${vhulls.length} - Lights: ${this.world.lights.length}`);
+            this.renderer.writeLine(1, `Level: ${this.controller.level}`);
+            this.renderer.writeLine(2, `Hulls: ${vhulls.length} - Lights: ${this.world.lights.length}`);
         });
     }
 }

@@ -81,12 +81,16 @@ export class ModelNodeCollection extends ModelNode {
         super(platform, parent, ModelNodeKindOptions.Collection, Transform.identity);
     }
 
-    public forEach(action: (node: ModelNode, index: number) => void): void {
-        this.nodes.forEach(action);
+    public forEach<T>(action: (node: T, index: number) => void): void {
+        this.nodes.forEach((node, index) => action(node as T, index));
     }
 
-    public filter(action: (node: ModelNode, index: number) => unknown): ModelNode[] {
-        return this.nodes.filter(action);
+    public filter<T>(action: (node: ModelNode, index: number) => unknown): T[] {
+        return this.nodes.filter(action) as T[];
+    }
+
+    public map<T>(action: (node: ModelNode, index: number) => unknown): T[] {
+        return this.nodes.map(action) as T[];
     }
 
     public add(node: ModelNode): void {
