@@ -25,7 +25,7 @@ export class Node extends Model {
     public readonly nodes: Model[];
     public readonly hull: Hull;
 
-    constructor(platform: Platform, transform: Transform, mesh: Mesh, material: Material, hull: Hull) {
+    constructor(platform: Platform, transform: Transform, mesh?: Mesh, material?: Material, hull?: Hull) {
         super(platform, transform);
         // init
         this.mesh = mesh;
