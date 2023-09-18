@@ -4,11 +4,9 @@ import {
     CameraKindOptions,
     Color,
     GraphicsDevice,
-    Hull,
     InputDevice,
     Light,
     ModelNode,
-    Octree,
     Quaternion,
     Range,
     Rectangle,
@@ -33,7 +31,6 @@ export class Platform {
     public readonly controller: CameraController;
     public readonly world: World;
     public readonly universe: Universe;
-    private _octree: Octree;
 
     protected constructor(graphics: GraphicsDevice, input: InputDevice) {
         // init
