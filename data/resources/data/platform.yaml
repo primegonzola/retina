@@ -409,6 +409,14 @@ resources:
         - name: color
           value: "#748AA6FF"
 
+    - name: hull-player
+      kind: material
+      base: basic
+      mode: opaque
+      properties:
+        - name: color
+          value: "#6EE2FFFF"
+
     - name: hull-transparent
       kind: material
       base: basic

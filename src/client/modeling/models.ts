@@ -10,6 +10,7 @@ import {
     IBuffer,
     MazeNodeKindOptions,
     MazeNode,
+    ModelNodeKindOptions,
     Utils,
     MaterialModeOptions,
     BufferKindOptions,
@@ -17,16 +18,26 @@ import {
     Octree,
     Box,
     Light,
+    Vector3,
+    Quaternion,
 } from "../index";
-import { ModelNodeKindOptions } from "./model";
+
+export class Player extends ModelNode {
+
+    constructor(platform: Platform, parent: ModelNode, transform: Transform, mesh: Mesh, material: Material, hull: Hull) {
+        // call super
+        super(platform, parent, ModelNodeKindOptions.Player, transform, mesh, material, hull);
+    }
+}
 
 export class World extends Model {
 
     public readonly chunks: ModelNode[];
     public readonly lights: Light[];
-    private _octree: Octree;
 
+    private _octree: Octree;
     private _uniforms: IBuffer;
+    private _player: Player;
 
     constructor(platform: Platform, transform: Transform) {
         super(platform, transform);
@@ -182,8 +193,29 @@ export class World extends Model {
             });
         });
 
+        // get player material
+        const pm = this.platform.resources.getMaterial("platform", "hull-player").clone();
+
+        // create player hull
+        const ph = new Hull(null, new Transform(
+            new Vector3(0, 2, 0),
+            Quaternion.identity,
+            Vector3.one.scale(2)), false, pm.shader, mesh.buffers);
+
+        // add as attribute
+        ph.attributes.set("material", pm);
+
+        // create player
+        this._player = new Player(this.platform, null,
+            ph.transform, mesh, pm, ph);
+
         // start with empty buffer
         let data: number[] = [];
+
+        // add  player
+        data = data.concat(
+            Utils.pad(Transform.matrix(this._player.graph).extract(), 256),
+            Utils.pad(pm.extract(), 256))
 
         // get all hulls
         let hulls = chulls.map(hull => hull.children).flat();

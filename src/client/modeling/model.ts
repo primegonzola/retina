@@ -31,6 +31,7 @@ export enum ModelNodeKindOptions {
     Block,
     Chunk,
     Door,
+    Player
 }
 
 export class ModelNode extends Model {

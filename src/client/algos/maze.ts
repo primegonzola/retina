@@ -340,7 +340,7 @@ export class MazeNode {
         )
 
         // add ceiling
-        if (Math.random() > 0.5) {
+        if (Math.random() > 1.0) {
             this.addNode(MazeNodeKindOptions.Ceiling,
                 this.transform.position.add(new Vector3(0, Maze.SOLID_SIZE.y + Maze.BASE_SIZE.y, 0)),
                 this.transform.rotation.multiply(Quaternion.degrees(0, 0, 0)),

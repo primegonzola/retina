@@ -120,5 +120,7 @@ export { MazeNodeKindOptions } from "./algos/maze";
 export { CameraController } from "./controllers/camera";
 
 export { Model } from "./modeling/model";
+export { ModelNodeKindOptions } from "./modeling/model";
 export { ModelNode } from "./modeling/model";
-export { World } from "./modeling/world";
+export { Player } from "./modeling/models";
+export { World } from "./modeling/models";
