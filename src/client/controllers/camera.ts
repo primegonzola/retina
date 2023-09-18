@@ -1,7 +1,10 @@
 import {
     Camera,
+    ModelNode,
+    ModelNodeKindOptions,
     Platform,
     Quaternion,
+    Transform,
     Utils,
     Vector2,
     Vector3
@@ -17,7 +20,7 @@ export class CameraController {
 
     public distance: number = 24;
     public degrees: Vector3 = Vector3.zero;
-    public target: Vector3 = Vector3.zero;
+    public target: ModelNode;
     public editing: boolean;
 
     constructor(platform: Platform, camera: Camera) {
@@ -27,10 +30,11 @@ export class CameraController {
         this.leftAxis = Vector2.zero;
         this.rightAxis = Vector2.zero;
         this.camera = camera;
-        this.editing = false;
+        this.editing = true;
+        this.target = ModelNode.none(this.platform);
     }
 
-    public reset(target: Vector3, degrees: Vector3, distance: number): void {
+    public reset(target: ModelNode, degrees: Vector3, distance: number): void {
         this.target = target;
         this.distance = distance;
         this.degrees = degrees;
@@ -71,40 +75,89 @@ export class CameraController {
         if (this.platform.input.isKey("ArrowDown")) {
             this.rightAxis.y = -1;
         }
-        if (this.platform.input.isKeyDown("F2")) {
+        if (this.platform.input.isKey("F2")) {
             this.editing = !this.editing;
-            this.reset();
         }
 
         // speed to use
         const sd = this.platform.timer.delta;
 
-        const speed = 100.0 / 120;
+        // check if editing
+        if (this.editing) {
 
-        // allow camera distance update if modifier is active
-        if (modifierOne) {
-            this.distance = this.distance - (0.5 * 1 * speed * this.rightAxis.y);
-            this.distance = Math.max(Math.min(this.distance, 2 * 128.0), 4.0)
+            const speed = 100.0 / 120;
+
+            // allow camera distance update if modifier is active
+            if (modifierOne) {
+                this.distance = this.distance - (0.5 * 1 * speed * this.rightAxis.y);
+                this.distance = Math.max(Math.min(this.distance, 2 * 128.0), 4.0)
+            }
+            else {
+                // update
+                this.degrees.x = Utils.wrap(this.degrees.x - (speed * this.rightAxis.y), 360);
+                this.degrees.y = Utils.wrap(this.degrees.y + (speed * this.rightAxis.x), 360);
+            }
+
+            // get position
+            let position = this.target.transform.position;
+
+            // position properly
+            position = position.add(
+                Quaternion.degrees(0, this.degrees.y, 0).rotateVector(Vector3.forward).scale(0.5 * speed * this.leftAxis.y));
+            position = position.add(
+                Quaternion.degrees(0, this.degrees.y, 0).rotateVector(Vector3.right).scale(0.5 * speed * this.leftAxis.x));
+
+            // update rotation
+            const rotation = Quaternion.degrees(
+                this.degrees.x, this.degrees.y, this.degrees.z).normalize();
+
+            // update position
+            const cposition = position.subtract(
+                rotation.direction.scale(this.distance));
+
+            // update camera with final position and rotation
+            this.camera.transform.update(cposition, rotation, Vector3.one);
+
+            // update target
+            this.target.transform.update(position,
+                this.target.transform.rotation,
+                this.target.transform.scale);
         }
         else {
-            // update
-            this.degrees.x = Utils.wrap(this.degrees.x - (speed * this.rightAxis.y), 360);
-            this.degrees.y = Utils.wrap(this.degrees.y + (speed * this.rightAxis.x), 360);
+
+            const speed = 1.0 / 8;
+
+            // get target transform
+            const ptf = Transform.matrix(this.target.graph);
+
+            // get current position & rotation
+            let position = ptf.position;
+            let rotation = ptf.rotation;
+
+            // get normalized move direction
+            const npos = new Vector3(this.leftAxis.x, 0, this.leftAxis.y).normalize();
+
+            // update position
+            position = ptf.position.add(
+                new Vector3(speed * npos.x, 0, -speed * npos.z));
+
+            // create normalized target otation
+            const direction = new Vector3(this.leftAxis.x, 0, this.leftAxis.y).normalize();
+
+            // rotate into move drection if any rotation
+            if (!Vector3.zero.equals(direction)) {
+                // update rotation
+                rotation = rotation.slerp(
+                    Quaternion.lookRotation(direction),
+                    2 * speed);
+            }
+
+            // slerp etc
+            position = position.lerp(position, 2 * sd);
+
+            // update 
+            this.target.transform.update(position, rotation, ptf.scale);
         }
-
-        this.target = this.target.add(
-            Quaternion.degrees(0, this.degrees.y, 0).rotateVector(Vector3.forward).scale(0.5 * speed * this.leftAxis.y));
-        this.target = this.target.add(
-            Quaternion.degrees(0, this.degrees.y, 0).rotateVector(Vector3.right).scale(0.5 * speed * this.leftAxis.x));
-
-        const rotation = Quaternion.degrees(
-            this.degrees.x, this.degrees.y, this.degrees.z).normalize();
-
-        const position = this.target.subtract(
-            rotation.direction.scale(this.distance));
-
-        // update camera with final position and rotation
-        this.camera.transform.update(position, rotation, Vector3.one);
     }
 }
 

@@ -6,6 +6,8 @@ import {
     GraphicsDevice,
     InputDevice,
     Light,
+    ModelNode,
+    ModelNodeKindOptions,
     Octree,
     Quaternion,
     Range,
@@ -73,7 +75,7 @@ export class Platform {
         // all done
         return platform;
     }
-    
+
     private _createContent(): void {
 
         // generate the world
@@ -110,7 +112,7 @@ export class Platform {
     public reset(): void {
 
         // reset controller
-        this.controller?.reset(Vector3.zero, new Vector3(-45, 0, 0), 24 * 4);
+        this.controller?.reset(ModelNode.none(this), new Vector3(-45, 0, 0), 24 * 4);
 
         // destroy content
         this._destroyContent();
@@ -132,7 +134,7 @@ export class Platform {
 
         // update world
         this.world?.update();
-        
+
         // update controller
         this.controller?.update();
 

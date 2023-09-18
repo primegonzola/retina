@@ -28,6 +28,7 @@ export class Model {
 }
 
 export enum ModelNodeKindOptions {
+    None,
     Block,
     Chunk,
     Door,
@@ -52,6 +53,10 @@ export class ModelNode extends Model {
         this.nodes = [];
         this.hull = hull;
         this.parent = parent;
+    }
+
+    public static none(platform: Platform, parent?: ModelNode): ModelNode {
+        return new ModelNode(platform, parent, ModelNodeKindOptions.None, Transform.identity);
     }
 
     public get graph(): Matrix4 {
