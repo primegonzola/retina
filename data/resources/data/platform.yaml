@@ -448,3 +448,19 @@ resources:
       properties:
         - name: color
           value: "#0C141FFF"
+
+    - name: hull-galaxy
+      kind: material
+      base: basic
+      mode: opaque
+      properties:
+        - name: color
+          value: "#0C141FFF"
+
+    - name: hull-star
+      kind: material
+      base: basic
+      mode: opaque
+      properties:
+        - name: color
+          value: "#FF141FFF"

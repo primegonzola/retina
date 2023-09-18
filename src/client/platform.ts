@@ -4,10 +4,10 @@ import {
     CameraKindOptions,
     Color,
     GraphicsDevice,
+    Hull,
     InputDevice,
     Light,
     ModelNode,
-    ModelNodeKindOptions,
     Octree,
     Quaternion,
     Range,
@@ -16,6 +16,7 @@ import {
     Resources,
     SimulationTimer,
     Transform,
+    Universe,
     Utils,
     Vector3,
     World,
@@ -31,6 +32,7 @@ export class Platform {
     public readonly timer: SimulationTimer;
     public readonly controller: CameraController;
     public readonly world: World;
+    public readonly universe: Universe;
     private _octree: Octree;
 
     protected constructor(graphics: GraphicsDevice, input: InputDevice) {
@@ -40,6 +42,7 @@ export class Platform {
         this.timer = new SimulationTimer();
         this.resources = new Resources(this);
         this.world = new World(this, Transform.identity);
+        this.universe = new Universe(this);
 
         // main render
         this.renderer = new Renderer(this, Color.trBlack, 1.0);
@@ -77,6 +80,9 @@ export class Platform {
     }
 
     private _createContent(): void {
+
+        // generate universe
+        this.universe.generate();
 
         // generate the world
         this.world.create();
@@ -160,10 +166,14 @@ export class Platform {
 
         // add player
         vhulls.push(this.world.player.hull);
-        
+
+        // get all galaxies
+        const galaxies = this.universe.galaxies.filter(galaxy =>
+            this.camera.frustum.wbox(galaxy.graph.position, galaxy.graph.rotation, galaxy.graph.scale));
+
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
-
+            
             // render hulls
             this.renderer?.render(this.camera.frustum, this.world.lights, vhulls, false);
 

@@ -32,11 +32,17 @@ export class Model {
 }
 
 export enum ModelNodeKindOptions {
+    Collection,
     None,
     Block,
     Chunk,
     Door,
-    Player
+    Player,
+    Universe,
+    Galaxy,
+    Star,
+    Planet,
+    Moon
 }
 
 export class ModelNode extends Model {
@@ -67,5 +73,27 @@ export class ModelNode extends Model {
         return this.parent ?
             this.parent.graph.multiply(this.transform.model) :
             Matrix4.identity.multiply(this.transform.model);
+    }
+}
+
+export class ModelNodeCollection extends ModelNode {
+    constructor(platform: Platform, parent: ModelNode) {
+        super(platform, parent, ModelNodeKindOptions.Collection, Transform.identity);
+    }
+
+    public forEach(action: (node: ModelNode, index: number) => void): void {
+        this.nodes.forEach(action);
+    }
+
+    public filter(action: (node: ModelNode, index: number) => unknown): ModelNode[] {
+        return this.nodes.filter(action);
+    }
+
+    public add(node: ModelNode): void {
+        this.nodes.push(node);
+    }
+
+    public clear(): void {
+        this.nodes.length = 0;
     }
 }

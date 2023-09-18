@@ -122,5 +122,12 @@ export { CameraController } from "./controllers/camera";
 export { Model } from "./modeling/model";
 export { ModelNodeKindOptions } from "./modeling/model";
 export { ModelNode } from "./modeling/model";
+export { ModelNodeCollection } from "./modeling/model";
 export { Player } from "./modeling/models";
 export { World } from "./modeling/models";
+
+export {Universe} from "./modeling/universe";
+export {Galaxy} from "./modeling/universe";
+export {Star} from "./modeling/universe";
+export {Planet} from "./modeling/universe";
+export {Moon} from "./modeling/universe";
