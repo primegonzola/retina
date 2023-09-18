@@ -167,10 +167,18 @@ export class Platform {
                 // resolve material 
                 const cm = this._materialFromNode(cn);
 
+                // check if transparent
+                const transparent = cm.mode === MaterialModeOptions.Transparent;
+
+                // nudge the scale a bit in case of transparency
+                const ctf = new Transform(
+                    cn.transform.position, 
+                    cn.transform.rotation, 
+                    cn.transform.scale.scale(transparent ? 0.9999 : 1.0));
+
                 // create hull
-                const ch = new Hull(hull, cn.transform,
-                    cm.mode === MaterialModeOptions.Opaque,
-                    cm.shader, mesh.buffers);
+                const ch = new Hull(hull, ctf,
+                    transparent, cm.shader, mesh.buffers);
 
                 // add as attribute
                 ch.attributes.set("material", cm.clone());
@@ -270,7 +278,7 @@ export class Platform {
     public reset(): void {
 
         // reset controller
-        this.controller?.reset(Vector3.zero, new Vector3(-45, 0, 0), 24 * 8);
+        this.controller?.reset(Vector3.zero, new Vector3(-45, 0, 0), 24 * 2);
 
         // destroy content
         this._destroyContent();

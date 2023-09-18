@@ -378,6 +378,8 @@ export class Shader implements IShader {
             }
         };
 
+        // console.log(pd);
+
         // create pipeline
         return this.device.handle.createRenderPipeline(pd);
     }

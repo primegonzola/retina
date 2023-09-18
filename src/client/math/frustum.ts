@@ -17,20 +17,26 @@ enum FrustumPlaneOptions {
     Far = 5
 }
 
+export enum FrustumKindOptions {
+    Orthographic = "orthographic",
+    Perspective = "perspective"
+}
 export class Frustum {
     public readonly planes: Plane[];
     public readonly view: Matrix4;
+    public readonly kind: FrustumKindOptions;
 
-    constructor(view: Matrix4) {
+    constructor(kind: FrustumKindOptions, view: Matrix4) {
         // setup planes
         this.view = view;
         this.planes = new Array<Plane>(6);
+        this.kind = kind;
     }
 
     public static perspective(view: Matrix4, area: Rectangle, range: Range): Frustum {
 
         // create frustum
-        const frustum = new Frustum(view);
+        const frustum = new Frustum(FrustumKindOptions.Perspective, view);
 
         // calculate deltas
         const dw = area.size.width / 2.0;
@@ -75,7 +81,7 @@ export class Frustum {
     public static orthographic(view: Matrix4, area: Rectangle, range: Range): Frustum {
 
         // create frustum
-        const frustum = new Frustum(view);
+        const frustum = new Frustum(FrustumKindOptions.Orthographic, view);
 
         // create near plane
         frustum.planes[FrustumPlaneOptions.Near] = new Plane(Vector3.backward,
@@ -105,31 +111,55 @@ export class Frustum {
         return frustum;
     }
 
-    public wp(position: Vector3): boolean {
-        //
-        // we first check if given point is inside or on all planes
-        // if so it means we have a point inside the frustum
-        //
-
-        // convert to view space
-        const vp = this.view.transform(Vector4.xyz(position, 1.0)).xyz;
-
-        // assume not inside
-        let count = 0;
-
-        // loop over each plane
-        for (let pi = 0; pi < this.planes.length; pi++) {
-
-            // get plane
-            const plane = this.planes[pi];
-
-            // calculate distance an if smaller then inside
-            count = count + (plane.distanceToPoint(vp) <= 0 ? 1 : 0);
+    public get projection(): Matrix4 {
+        // check kind
+        switch (this.kind) {
+            case FrustumKindOptions.Orthographic:
+                return Matrix4.orthographic(
+                    this.planes[FrustumPlaneOptions.Left].distanceToPoint(Vector3.zero),
+                    this.planes[FrustumPlaneOptions.Right].distanceToPoint(Vector3.zero),
+                    this.planes[FrustumPlaneOptions.Top].distanceToPoint(Vector3.zero),
+                    this.planes[FrustumPlaneOptions.Bottom].distanceToPoint(Vector3.zero),
+                    this.planes[FrustumPlaneOptions.Near].distanceToPoint(Vector3.zero),
+                    this.planes[FrustumPlaneOptions.Far].distanceToPoint(Vector3.zero));
+            case FrustumKindOptions.Perspective:
+                return Matrix4.perspective(
+                    this.planes[FrustumPlaneOptions.Left].distanceToPoint(Vector3.zero),
+                    this.planes[FrustumPlaneOptions.Right].distanceToPoint(Vector3.zero),
+                    this.planes[FrustumPlaneOptions.Top].distanceToPoint(Vector3.zero),
+                    this.planes[FrustumPlaneOptions.Bottom].distanceToPoint(Vector3.zero),
+                    this.planes[FrustumPlaneOptions.Near].distanceToPoint(Vector3.zero),
+                    this.planes[FrustumPlaneOptions.Far].distanceToPoint(Vector3.zero));
+            default:
+                throw new Error("Invalid-frustum-kind");
         }
-
-        // see if fully inside if so bail out early
-        return count === this.planes.length;
     }
+
+    // public wp(position: Vector3): boolean {
+    //     //
+    //     // we first check if given point is inside or on all planes
+    //     // if so it means we have a point inside the frustum
+    //     //
+
+    //     // convert to view space
+    //     const vp = this.view.transform(Vector4.xyz(position, 1.0)).xyz;
+
+    //     // assume not inside
+    //     let count = 0;
+
+    //     // loop over each plane
+    //     for (let pi = 0; pi < this.planes.length; pi++) {
+
+    //         // get plane
+    //         const plane = this.planes[pi];
+
+    //         // calculate distance an if smaller then inside
+    //         count = count + (plane.distanceToPoint(vp) <= 0 ? 1 : 0);
+    //     }
+
+    //     // see if fully inside if so bail out early
+    //     return count === this.planes.length;
+    // }
 
     public wbox(position: Vector3, rotation: Quaternion, scale: Vector3): boolean {
         // turn the incoming into a box of 8 points

@@ -48,7 +48,7 @@ export class Hull {
     public readonly buffers: Map<string, IBuffer>;
     public readonly textures: ITexture[];
     public readonly children: Hull[];
-    public readonly transparent: boolean = false;
+    public readonly transparent: boolean;
     public frameCounter = 0
 
     constructor(parent: Hull, transform: Transform, transparent: boolean = false,

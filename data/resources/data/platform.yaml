@@ -383,4 +383,4 @@ resources:
       mode: transparent
       properties:
         - name: color
-          value: "#A844FFFF"
+          value: "#A844FF7F"

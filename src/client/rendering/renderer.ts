@@ -17,6 +17,7 @@ import {
     Shape,
     Size,
     TextureDimensionOptions,
+    Transform,
     Utils,
     Vector3,
     Vector4,
@@ -118,7 +119,7 @@ export class Renderer {
             // create swap target with screen size which is always online and no stencil
             this._swap = new RenderTarget(this.platform, this._size, false,
                 [{
-                    color: Color.yellow,
+                    color: Color.black,
                     texture: {
                         dimension: TextureDimensionOptions.Two,
                         layers: 1,
@@ -435,13 +436,22 @@ export class Renderer {
 
         // split into opaque and transparent
         const opaques = hulls.filter(hull => !hull.transparent);
-        const trasparents = hulls.filter(hull => hull.transparent)
-            .sort((a, b) => a.graph.position.z - b.graph.position.z);
 
-        // render transparents
-        trasparents.forEach(hull => this._hull(target, frustum, hull, clip));
+        // get view and projection
+        const pvm = frustum.projection.multiply(frustum.view);
 
-        // render opaques
+        // get transparents using projected z value to sort
+        const transparents = hulls.filter(hull => hull.transparent)
+            .sort((a, b) => {
+                const pva = pvm.multiplyVector(Vector4.xyz(a.graph.position, 1.0));
+                const pvb = pvm.multiplyVector(Vector4.xyz(a.graph.position, 1.0));
+                return pva.z - pvb.z;
+            });
+
+        // render transparents first
+        transparents.forEach(hull => this._hull(target, frustum, hull, clip));
+
+        // render opaques next
         opaques.forEach(hull => this._hull(target, frustum, hull, clip));
     }
 
