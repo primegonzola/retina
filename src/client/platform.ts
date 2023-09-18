@@ -321,12 +321,12 @@ export class Platform {
         const vhulls = this._vhulls(this.camera.frustum);
         const vh2 = performance.now();
 
-        const oh1 = performance.now();
-        const ohulls2 = [...new Set(this._octree?.collect(this.camera.frustum)).entries()]
-            .map(e => this.hulls[e[1]]);
-        const ohulls = ohulls2.filter(hull =>
-            this.camera.frustum.wbox(hull.graph.position, hull.graph.rotation, hull.graph.scale));
-        const oh2 = performance.now();
+        // const oh1 = performance.now();
+        // const ohulls2 = [...new Set(this._octree?.collect(this.camera.frustum)).entries()]
+        //     .map(e => this.hulls[e[1]]);
+        // const ohulls = ohulls2.filter(hull =>
+        //     this.camera.frustum.wbox(hull.graph.position, hull.graph.rotation, hull.graph.scale));
+        // const oh2 = performance.now();
 
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
@@ -336,8 +336,8 @@ export class Platform {
             // output diagnostics
             this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);
             this.renderer.writeLine(1, `Hulls: ${this.hulls.length} - Lights: ${this.lights.length}`);
-            this.renderer.writeLine(2, `vHulls: ${vhulls.length} - oHulls: ${ohulls.length}`);
-            this.renderer.writeLine(3, `vms: ${(vh2 - vh1).toFixed(4)} - oms: ${(oh2 - oh1).toFixed(4)}`);
+            // this.renderer.writeLine(2, `vHulls: ${vhulls.length} - oHulls: ${ohulls.length}`);
+            // this.renderer.writeLine(3, `vms: ${(vh2 - vh1).toFixed(4)} - oms: ${(oh2 - oh1).toFixed(4)}`);
         });
     }
 }

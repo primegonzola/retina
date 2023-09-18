@@ -380,7 +380,7 @@ resources:
     - name: hull-transparent
       kind: material
       base: basic
-      mode: opaque
+      mode: transparent
       properties:
         - name: color
           value: "#A844FFFF"

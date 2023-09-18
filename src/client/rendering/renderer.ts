@@ -372,70 +372,80 @@ export class Renderer {
         this._swap?.destroy();
     }
 
-    private _render(target: RenderTarget, frustum: Frustum, hulls: Iterable<Hull>, clip = true): void {
+    private _hull(target: RenderTarget, frustum: Frustum, hull: Hull, clip = true) {
 
-        // ensure initialized
-        this._ensureInitialized();
+        // check if valid
+        if (hull.shader &&
+            hull.buffers && hull.buffers.size &&
+            hull.uniforms && hull.uniforms.size &&
+            hull.uniforms.has("model") && hull.uniforms.has("properties")) {
 
-        // loop over hulls
-        for (const hull of hulls) {
+            // cache graph
+            const graph = hull.graph;
 
-            // check if valid hull
-            if (hull.shader &&
-                hull.buffers && hull.buffers.size &&
-                hull.uniforms && hull.uniforms.size &&
-                hull.uniforms.has("model") && hull.uniforms.has("properties")) {
+            // check if intersecting
+            if (!clip || frustum.wbox(graph.position, graph.rotation, graph.scale)) {
 
-                // cache graph
-                const graph = hull.graph;
+                // get shader
+                const shader = hull.shader;
 
-                // check if intersecting
-                if (!clip || frustum.wbox(graph.position, graph.rotation, graph.scale)) {
+                // check if shader
+                if (shader) {
 
-                    // get shader
-                    const shader = hull.shader;
+                    // bind pipeline
+                    target?.bindPipeline(shader, hull.transparent, true);
 
-                    // check if shader
-                    if (shader) {
+                    // bind camera
+                    target?.bindCamera(shader);
 
-                        // bind pipeline
-                        target?.bindPipeline(shader, hull.transparent, true);
+                    // check to bind lights
+                    if (this?._lighting)
+                        target?.bindUniform(shader, "lighting", "lighting", this._lighting);
 
-                        // bind camera
-                        target?.bindCamera(shader);
+                    // check to bind buffers
+                    if (hull?.buffers)
+                        target?.bindBuffers(shader, hull.buffers);
 
-                        // check to bind lights
-                        if (this?._lighting)
-                            target?.bindUniform(shader, "lighting", "lighting", this._lighting);
+                    // check to bind model
+                    if (hull?.uniforms?.has("model"))
+                        target?.bindUniform(shader, "model", "model",
+                            hull.uniforms.get("model").buffer, hull.uniforms.get("model").offset, hull.uniforms.get("model").size);
 
-                        // check to bind buffers
-                        if (hull?.buffers)
-                            target?.bindBuffers(shader, hull.buffers);
+                    // check to bind properties
+                    if (hull?.uniforms?.has("properties"))
+                        target?.bindUniform(shader, "material", "properties",
+                            hull.uniforms.get("properties").buffer, hull.uniforms.get("properties").offset, hull.uniforms.get("model").size);
 
-                        // check to bind model
-                        if (hull?.uniforms?.has("model"))
-                            target?.bindUniform(shader, "model", "model",
-                                hull.uniforms.get("model").buffer, hull.uniforms.get("model").offset, hull.uniforms.get("model").size);
+                    // bind textures
+                    if (hull?.textures)
+                        target?.bindTextures(shader, null, hull.textures);
 
-                        // check to bind properties
-                        if (hull?.uniforms?.has("properties"))
-                            target?.bindUniform(shader, "material", "properties",
-                                hull.uniforms.get("properties").buffer, hull.uniforms.get("properties").offset, hull.uniforms.get("model").size);
-
-                        // bind textures
-                        if (hull?.textures)
-                            target?.bindTextures(shader, null, hull.textures);
-
-                        // draw hull
-                        if (hull?.buffers)
-                            target?.draw(hull?.buffers);
-                    }
+                    // draw hull
+                    if (hull?.buffers)
+                        target?.draw(hull?.buffers);
                 }
             }
         }
     }
 
-    public render(frustum: Frustum, lights: Light[], hulls: Iterable<Hull>, clip = true): void {
+    private _render(target: RenderTarget, frustum: Frustum, hulls: Hull[], clip = true): void {
+
+        // ensure initialized
+        this._ensureInitialized();
+
+        // split into opaque and transparent
+        const opaques = hulls.filter(hull => !hull.transparent);
+        const trasparents = hulls.filter(hull => hull.transparent)
+            .sort((a, b) => a.graph.position.z - b.graph.position.z);
+
+        // render transparents
+        trasparents.forEach(hull => this._hull(target, frustum, hull, clip));
+
+        // render opaques
+        opaques.forEach(hull => this._hull(target, frustum, hull, clip));
+    }
+
+    public render(frustum: Frustum, lights: Light[], hulls: Hull[], clip = true): void {
 
         // collect the lights
         this._lighting?.write(this._collectLighting(lights));
