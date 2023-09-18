@@ -55,6 +55,10 @@ export class World extends Model {
         return this._uniforms;
     }
 
+    public get player(): Player {
+        return this._player;
+    }
+
     private _materialFromNode(node: MazeNode): Material {
         // default
         let material = this.platform.resources.getMaterial("platform", "hull-concrete");
