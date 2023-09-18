@@ -14,7 +14,6 @@ export enum MazeNodeKindOptions {
     Challenge = "challenge",
     Concrete = "concrete",
     Corridor = "corridor",
-    Gate = "gate",
     Maze = "maze",
     None = "none",
     Room = "room",
@@ -22,7 +21,6 @@ export enum MazeNodeKindOptions {
     Round = "round",
     Shadow = "shadow",
     Solid = "solid",
-    Test = "test",
     Transparent = "transparent",
     Wedge = "wedge",
 }

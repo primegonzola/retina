@@ -120,6 +120,7 @@ export class Platform {
     private _materialFromNode(node: MazeNode): Material {
         // default
         let material = this.resources.getMaterial("platform", "hull-concrete");
+        let dms = ["hull-red-door", "hull-green-door", "hull-blue-door"];
 
         // check kind
         switch (node.kind) {
@@ -130,7 +131,14 @@ export class Platform {
                 material = this.resources.getMaterial("platform", "hull-solid");
                 break;
             case MazeNodeKindOptions.Transparent:
-                material = this.resources.getMaterial("platform", "hull-transparent");
+                // check 
+                if (Math.random() > 0.5) {
+                    // add transparent
+                    material = this.resources.getMaterial("platform", "hull-transparent");
+                }
+                else {
+                    material = this.resources.getMaterial("platform", dms[Utils.random(0, dms.length - 1, true)]);
+                }
                 break;
         }
 
@@ -172,8 +180,8 @@ export class Platform {
 
                 // nudge the scale a bit in case of transparency
                 const ctf = new Transform(
-                    cn.transform.position, 
-                    cn.transform.rotation, 
+                    cn.transform.position,
+                    cn.transform.rotation,
                     cn.transform.scale.scale(transparent ? 0.9999 : 1.0));
 
                 // create hull
