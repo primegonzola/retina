@@ -158,6 +158,9 @@ export class Platform {
         let vhulls = vchunks.map(vchunk =>
             vchunk.nodes.map(n => n.hull)).flat();
 
+        // add player
+        vhulls.push(this.world.player.hull);
+        
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
 

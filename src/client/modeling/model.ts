@@ -18,6 +18,10 @@ export class Model {
         this.platform = platform;
     }
 
+    public create(): void {
+
+    }
+
     public update(): void {
 
     }

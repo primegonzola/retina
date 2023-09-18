@@ -507,7 +507,7 @@ export class Maze extends MazeNode {
 
         // start at depth 0
         let depth = 0;
-        const max = 4; // 32; //128 / 4;
+        const max = 16; // 32; //128 / 4;
         let current = 0;
         const debug = true;
         // generate nodes

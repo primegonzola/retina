@@ -36,7 +36,8 @@ export class World extends Model {
     public readonly lights: Light[];
 
     private _octree: Octree;
-    private _uniforms: IBuffer;
+    private _hulls: IBuffer;
+    private _players: IBuffer;
     private _player: Player;
 
     constructor(platform: Platform, transform: Transform) {
@@ -51,8 +52,8 @@ export class World extends Model {
         return this._octree;
     }
 
-    public get uniforms(): IBuffer {
-        return this._uniforms;
+    public get hulls(): IBuffer {
+        return this._hulls;
     }
 
     public get player(): Player {
@@ -124,10 +125,48 @@ export class World extends Model {
         // }
     }
 
-    public create(): void {
+    private _createPlayer(): void {
 
+        // destroy existing
+        this._players?.destroy();
+
+        // get mesh
+        const mesh = this.platform.resources.getMesh("platform", "cube");
+
+        // get material
+        const material = this.platform.resources.getMaterial("platform", "hull-player").clone();
+
+        // create hull
+        const hull = new Hull(null, new Transform(
+            new Vector3(0, 2, 0),
+            Quaternion.identity,
+            Vector3.one.scale(2)), false, material.shader, mesh.buffers);
+
+        // add as attribute
+        hull.attributes.set("material", material);
+
+        // start with empty buffer
+        let data: number[] = [];
+
+        // add player data, model and properties
+        data = data.concat(
+            Utils.pad(hull.transform.extract(), 256),
+            Utils.pad(material.extract(), 256))
+
+        // create buffer
+        const buffer = this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform, data);
+
+        // create player
+        this._player = new Player(this.platform, null, hull.transform, mesh, material, hull);
+
+        // set uniforms
+        hull.uniforms.set("model", new BufferLocation(buffer, hull.transform.extract().length, 0));
+        hull.uniforms.set("properties", new BufferLocation(buffer, material.extract().length, 1));
+    }
+
+    private _generateChunks(): void {
         // clear existing
-        this._uniforms?.destroy();
+        this._hulls?.destroy();
 
         // clear existing
         this.chunks.length = 0;
@@ -197,29 +236,8 @@ export class World extends Model {
             });
         });
 
-        // get player material
-        const pm = this.platform.resources.getMaterial("platform", "hull-player").clone();
-
-        // create player hull
-        const ph = new Hull(null, new Transform(
-            new Vector3(0, 2, 0),
-            Quaternion.identity,
-            Vector3.one.scale(2)), false, pm.shader, mesh.buffers);
-
-        // add as attribute
-        ph.attributes.set("material", pm);
-
-        // create player
-        this._player = new Player(this.platform, null,
-            ph.transform, mesh, pm, ph);
-
         // start with empty buffer
         let data: number[] = [];
-
-        // add  player
-        data = data.concat(
-            Utils.pad(Transform.matrix(this._player.graph).extract(), 256),
-            Utils.pad(pm.extract(), 256))
 
         // get all hulls
         let hulls = chulls.map(hull => hull.children).flat();
@@ -263,7 +281,7 @@ export class World extends Model {
         });
 
         // save buffer
-        this._uniforms = buffer;
+        this._hulls = buffer;
 
         // init octree
         this._octree = new Octree(hulls.map(hull =>
@@ -273,4 +291,29 @@ export class World extends Model {
         // optimize octree
         this._octree.optimize();
     }
+
+    public override create(): void {
+
+        // base first
+        super.create();
+
+        // generate chunks
+        this._generateChunks();
+
+        // create player
+        this._createPlayer();
+    }
+
+    public override destroy(): void {
+
+        // base first
+        super.destroy();
+
+        // destroy existing
+        this._hulls?.destroy();
+
+        // destroy existing
+        this._players?.destroy();
+    }
 }
+
