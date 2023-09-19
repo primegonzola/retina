@@ -155,16 +155,15 @@ export class Platform {
 
     private render(): void {
 
-        // get all visible nodes
-        const vchunks = this.world.chunks.filter(node =>
-            this.camera.frustum.wbox(node.graph.position, node.graph.rotation, node.graph.scale));
+        // // get all visible nodes
+        // const vchunks = this.world.chunks.filter(node =>
+        //     this.camera.frustum.wbox(node.graph.position, node.graph.rotation, node.graph.scale));
 
-        // collect each of the child hulls
-        let vhulls = vchunks.map(vchunk =>
-            vchunk.nodes.map(n => n.hull)).flat();
+        // // collect each of the child hulls
+        // let vhulls = vchunks.map(vchunk => vchunk.nodes.map(n => n.hull)).flat();
 
-        // add player
-        vhulls.push(this.world.player.hull);
+        // // add player
+        // vhulls.push(this.world.player.hull);
 
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
@@ -198,7 +197,7 @@ export class Platform {
             // output diagnostics
             this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);
             this.renderer.writeLine(1, `Level: ${this.controller.level}`);
-            this.renderer.writeLine(2, `Hulls: ${vhulls.length} - Lights: ${this.world.lights.length}`);
+            // this.renderer.writeLine(2, `Chunks: ${vchunks.length} - Hulls: ${vhulls.length}`);
         });
     }
 }

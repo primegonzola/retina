@@ -112,6 +112,12 @@ export class Resources {
         // register grid mesh
         await this.registerMesh("platform",
             "grid", new Mesh(this.platform, Geometry.grid(1, 1)));
+
+        // add spheres
+        for (let i = 1; i <= 8; i++) {
+            await this.registerMesh("platform",
+                `sphere-${i}`, new Mesh(this.platform, Geometry.octahedron(1, i)));
+        }
     }
 
     public getShader(domain: string, name: string): Shader {

@@ -70,6 +70,10 @@ export class Color {
         return new Color(1, 1, 1, 1);
     }
 
+    public static get orange(): Color {
+        return Color.hex(0xFFA500FF);
+    }
+
     public static get yellow(): Color {
         return new Color(1, 0.92, 0.016, 1);
     }

@@ -11,6 +11,9 @@ export { GeometryTopology } from "./math/geometry";
 export { Matrix4 } from "./math/matrix4";
 export { Octree } from "./math/octree";
 export { Plane } from "./math/plane";
+export { Icosahedron } from "./math/polyhedron";
+export { Polyhedron } from "./math/polyhedron";
+
 export { Quaternion } from "./math/quaternion";
 export { Range } from "./math/range";
 export { Rectangle } from "./math/rectangle";
@@ -110,8 +113,6 @@ export { Light } from "./rendering/light";
 export { LightRenderData } from "./rendering/light";
 export { LightKindOptions } from "./rendering/light";
 
-export { Icosahedron } from "./rendering/polyhedron";
-export { Polyhedron } from "./rendering/polyhedron";
 
 export { Maze } from "./algos/maze";
 export { MazeNode } from "./algos/maze";
@@ -126,8 +127,8 @@ export { ModelNodeCollection } from "./modeling/model";
 export { Player } from "./modeling/models";
 export { World } from "./modeling/models";
 
-export {Universe} from "./modeling/universe";
-export {Galaxy} from "./modeling/universe";
-export {Star} from "./modeling/universe";
-export {Planet} from "./modeling/universe";
-export {Moon} from "./modeling/universe";
+export { Universe } from "./modeling/universe";
+export { Galaxy } from "./modeling/universe";
+export { Star } from "./modeling/universe";
+export { Planet } from "./modeling/universe";
+export { Moon } from "./modeling/universe";

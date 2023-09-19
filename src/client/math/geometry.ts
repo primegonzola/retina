@@ -1,5 +1,6 @@
 import {
     Bounds,
+    Icosahedron,
     Vector2,
     Vector3
 } from "../index";
@@ -329,5 +330,19 @@ export class Geometry {
             Vector2.fromNumbers(texels),
             Geometry.calculateNormals(Vector3.fromNumbers(positions), indices),
             Geometry.calculateTangents(Vector3.fromNumbers(positions), Vector2.fromNumbers(texels), indices));
+    }
+
+    public static octahedron(radius: number = 1.0, subdivisions: number = 32): Geometry {
+
+        // create the primitive
+        let ico = new Icosahedron(radius, subdivisions);
+
+        return new Geometry(
+            GeometryTopology.TriangleList,
+            Vector3.fromNumbers(ico.data.vertices),
+            ico.data.indices,
+            Vector2.fromNumbers(ico.data.texels),
+            Geometry.calculateNormals(Vector3.fromNumbers(ico.data.vertices), ico.data.indices),
+            Geometry.calculateTangents(Vector3.fromNumbers(ico.data.vertices), Vector2.fromNumbers(ico.data.texels), ico.data.indices));
     }
 }

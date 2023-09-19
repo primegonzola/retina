@@ -14,6 +14,7 @@ import {
     MaterialModeOptions,
     BufferKindOptions,
     BufferLocation,
+    Color,
 } from "../index";
 
 export class Moon extends ModelNode {
@@ -63,26 +64,35 @@ export class Galaxy extends ModelNode {
 
         // precalculate delta
         const delta = scale.scale(0.5);
+        const colors = [Color.red, Color.green,Color.blue,  Color.yellow, Color.orange];
 
         // loop over galaxy and add stars
         for (let z = 0; z < scale.z; z++) {
             for (let y = 0; y < scale.y; y++) {
                 for (let x = 0; x < scale.x; x++) {
 
+                    if (Math.random() > 0.2) continue;
+
                     // get mesh
-                    const mesh = this.platform.resources.getMesh("platform", "cube");
+                    const mesh = this.platform.resources.getMesh("platform", "sphere-4");
 
                     // get material
                     const material = this.platform.resources.getMaterial("platform", "hull-star").clone();
 
+                    // override color
+                    material.properties.get("color").value = 
+                        colors[Math.floor(Math.random() * colors.length)];
+
                     // calculate transform
                     const stf = new Transform(
                         new Vector3(x, y, z).subtract(delta).add(Vector3.one.scale(0.5)).divide(scale),
-                        Quaternion.identity, Vector3.one.scale(0.5).divide(scale));
+                        Quaternion.identity, Vector3.one.scale(1 / 16).divide(scale));
 
                     // add to root
                     const shull = hull.add(new Hull(hull, stf, material.mode === MaterialModeOptions.Transparent,
                         material.shader, mesh.buffers));
+
+                    // override color
 
                     // save material
                     shull.attributes.set("material", material.clone());
