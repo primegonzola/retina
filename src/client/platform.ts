@@ -117,7 +117,7 @@ export class Platform {
     public reset(): void {
 
         // reset controller
-        this.controller?.reset(ModelNode.none(this), new Vector3(-45, 0, 0), 24 * 4);
+        this.controller?.reset(ModelNode.none(this), new Vector3(-45, 0, 0), 12 * 1);
 
         // destroy content
         this._destroyContent();

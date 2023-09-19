@@ -132,14 +132,21 @@ fn fragment_main(input: VertexShaderOutput) -> FragmentShaderOutput {
         0.0
     );
 
-    // calculate directional component
-    var directional_component = max(dot(surface_normal, -light_direction), 0.0);
+    // check fi diffudse ligthing is enabled
 
+        // calculate directional component
+    var directional_component = 1.0;
+
+    if properties.lighting.y != 0.0 {
+        directional_component =  max(dot(surface_normal, -light_direction), 0.0);
+    }
+    
     // update contribution
     contribution.ambient = light_color * properties.components.x;
     contribution.diffuse = light_color * properties.components.y * directional_component;
     contribution.specular = light_color * 0.0;
 
+    
     // surface color is the sum of all contributions
     var surface_color = contribution.ambient + contribution.diffuse + contribution.specular;
 

@@ -457,10 +457,12 @@ resources:
         - name: color
           value: "#FFFFFF3F"
 
-    - name: hull-star
+    - name: hull-galaxy-star
       kind: material
       base: basic
       mode: opaque
       properties:
         - name: color
           value: "#FF141FFF"
+        - name: lighting
+          value: [1, 0, 1, 1]

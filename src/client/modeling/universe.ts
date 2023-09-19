@@ -77,7 +77,7 @@ export class Galaxy extends ModelNode {
                     const mesh = this.platform.resources.getMesh("platform", "sphere-4");
 
                     // get material
-                    const material = this.platform.resources.getMaterial("platform", "hull-star").clone();
+                    const material = this.platform.resources.getMaterial("platform", "hull-galaxy-star").clone();
 
                     // override color
                     material.properties.get("color").value = 
@@ -86,7 +86,7 @@ export class Galaxy extends ModelNode {
                     // calculate transform
                     const stf = new Transform(
                         new Vector3(x, y, z).subtract(delta).add(Vector3.one.scale(0.5)).divide(scale),
-                        Quaternion.identity, Vector3.one.scale(1 / 16).divide(scale));
+                        Quaternion.identity, Vector3.one.scale(1 / 256).divide(scale));
 
                     // add to root
                     const shull = hull.add(new Hull(hull, stf, material.mode === MaterialModeOptions.Transparent,
