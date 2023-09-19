@@ -217,15 +217,12 @@ export class World extends Model {
                     cn.transform.rotation,
                     cn.transform.scale.scale(transparent ? 0.9999 : 1.0));
 
-                // create hull
-                const ch = new Hull(hull, ctf,
-                    transparent, cm.shader, mesh.buffers);
+                // add
+                const ch = hull.add(new Hull(hull, ctf,
+                    transparent, cm.shader, mesh.buffers));
 
                 // add as attribute
                 ch.attributes.set("material", cm);
-
-                // add
-                hull.children.push(ch);
 
                 // create block node
                 const bn = new ModelNode(this.platform, chunk, ModelNodeKindOptions.Block,

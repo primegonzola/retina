@@ -64,58 +64,56 @@ export class Galaxy extends ModelNode {
         // precalculate delta
         const delta = scale.scale(0.5);
 
-        // get mesh
-        const smesh = this.platform.resources.getMesh("platform", "cube");
-
-        // get material
-        const smaterial = this.platform.resources.getMaterial("platform", "hull-star");
-
         // loop over galaxy and add stars
         for (let z = 0; z < scale.z; z++) {
             for (let y = 0; y < scale.y; y++) {
                 for (let x = 0; x < scale.x; x++) {
 
-                    // calculate transform
-                    const tf = new Transform(
-                        new Vector3(x, y, z).subtract(delta).add(Vector3.one.scale(0.5)).divide(scale),
-                        Quaternion.identity, Vector3.one.scale(0.25).divide(scale));
+                    // get mesh
+                    const mesh = this.platform.resources.getMesh("platform", "cube");
 
-                    // create the hull
-                    const shull = new Hull(hull, tf, smaterial.mode === MaterialModeOptions.Transparent,
-                        smaterial.shader, smesh.buffers);
+                    // get material
+                    const material = this.platform.resources.getMaterial("platform", "hull-star").clone();
+
+                    // calculate transform
+                    const stf = new Transform(
+                        new Vector3(x, y, z).subtract(delta).add(Vector3.one.scale(0.5)).divide(scale),
+                        Quaternion.identity, Vector3.one.scale(0.5).divide(scale));
 
                     // add to root
-                    hull.children.push(shull);
+                    const shull = hull.add(new Hull(hull, stf, material.mode === MaterialModeOptions.Transparent,
+                        material.shader, mesh.buffers));
 
                     // save material
-                    shull.attributes.set("material", smaterial.clone());
+                    shull.attributes.set("material", material.clone());
 
                     // add star
-                    this.stars.add(new Star(this.platform, this, shull.transform,
-                        smesh, smaterial, shull));
+                    this.stars.add(new Star(this.platform, this.stars, stf,
+                        mesh, material, shull));
                 }
             }
         }
 
+        // get hulls
+        const hulls = this.stars.map<Hull>(star => star.hull);
+
         // start with empty buffer
         let data: number[] = [];
 
-        // loop over stars
-        this.stars.forEach<Star>(star => {
-            // add  model and properties
+        // loop over stars and append data buffer
+        hulls.forEach(hull => {
             data = data.concat(
-                Utils.pad(star.transform.extract(), 256),
-                Utils.pad((star.hull.attributes.get("material") as Material).extract(), 256))
+                Utils.pad(Transform.matrix(hull.graph).extract(), 256),
+                Utils.pad((hull.attributes.get("material") as Material).extract(), 256))
         });
 
         // create buffer
         const buffer = this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform, data);
 
-        // loop over galaxies
-        this.stars.forEach<Star>(star => {
-            // set uniforms
-            star.hull.uniforms.set("model", new BufferLocation(buffer, hull.transform.extract().length, 0));
-            star.hull.uniforms.set("properties", new BufferLocation(buffer, (star.hull.attributes.get("material") as Material).extract().length, 1));
+        // loop over galaxies and set uniforms
+        hulls.forEach((hull, index) => {
+            hull.uniforms.set("model", new BufferLocation(buffer, Transform.matrix(hull.graph).extract().length, (2 * index) + 0));
+            hull.uniforms.set("properties", new BufferLocation(buffer, (hull.attributes.get("material") as Material).extract().length, (2 * index) + 1));
         });
 
         // save

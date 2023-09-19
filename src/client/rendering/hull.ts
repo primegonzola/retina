@@ -81,6 +81,11 @@ export class Hull {
             Matrix4.identity.multiply(this.transform.model);
     }
 
+    public add(hull: Hull): Hull {
+        this.children.push(hull);
+        return hull;
+    }
+
     public extract(frustum: Frustum, depth?: number): Hull[] {
 
         // final result
