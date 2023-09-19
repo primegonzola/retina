@@ -2,6 +2,7 @@ import {
     BufferKindOptions,
     Cache,
     Camera,
+    CameraKindOptions,
     Color,
     Frustum,
     Hull,
@@ -12,6 +13,8 @@ import {
     ModelMeshEntry,
     Platform,
     Quaternion,
+    Range,
+    Rectangle,
     RenderTarget,
     Settings,
     Shape,
@@ -48,12 +51,16 @@ export class Renderer {
     // render targets 
     private _target?: RenderTarget;
     private _swap?: RenderTarget;
+    private _cube?: RenderTarget;
+
 
     // buffers
     private _screen?: IBuffer;
     private _lighting?: IBuffer;
 
     private _screenLines?: string[];
+    private _cubeSize = new Size(1024, 1024);
+
     private static readonly SCREEN_LINES_COUNT = 20;
 
     public get aspect(): number {
@@ -80,6 +87,9 @@ export class Renderer {
 
             // destroy screen buffer
             this._screen?.destroy();
+
+            // destroy cube target 
+            this._cube?.destroy();
 
             // destroy main target 
             this._target?.destroy();
@@ -131,6 +141,25 @@ export class Renderer {
                     texture: {
                         dimension: TextureDimensionOptions.Two,
                         layers: 1,
+                    }
+                });
+
+            // create shadow point atlas which is always offline and no stencil
+            this._cube = new RenderTarget(this.platform,
+                this._cubeSize, true,
+                [{
+                    color: Color.black,
+                    texture: {
+                        dimension: TextureDimensionOptions.Two,
+                        layers: 6,
+                    }
+                }],
+                {
+                    value: 1.0,
+                    stencil: false,
+                    texture: {
+                        dimension: TextureDimensionOptions.Two,
+                        layers: 6,
                     }
                 });
         }
@@ -366,6 +395,9 @@ export class Renderer {
         // destroy screen buffer
         this._screen?.destroy();
 
+        // destroy cube target
+        this._cube?.destroy();
+
         // destroy main target
         this._target?.destroy();
 
@@ -462,5 +494,37 @@ export class Renderer {
 
         // delegate
         this._render(this._target, frustum, hulls, clip);
+    }
+
+    public cube(position: Vector3, range: Range, lights: Light[], hulls: Hull[], clip = true): void {
+
+        // angles to use
+        const angles: Vector3[] = [
+            new Vector3(0, -90, 0),
+            new Vector3(0, 90, 0),
+            new Vector3(90, 0, 0),
+            new Vector3(-90, 0, 0),
+            new Vector3(0, 180, 0),
+            new Vector3(0, 0, 0),
+        ];
+
+        // collect the lights
+        this._lighting?.write(this._collectLighting(lights));
+
+        // loop over angles
+        for (let i = 0; i < angles.length; i++) {
+
+            // create directional camera 
+            const camera = new Camera(
+                CameraKindOptions.Perspective,
+                new Transform(
+                    position, Quaternion.degrees(angles[i].x, angles[i].y, angles[i].z), Vector3.one),
+                Rectangle.screen, range,
+            );
+
+            // render all into cube
+            this._cube?.capture(camera.view, camera.projection, i, 1, () =>
+                this._render(this._cube, camera.frustum, hulls, clip));
+        }
     }
 }
