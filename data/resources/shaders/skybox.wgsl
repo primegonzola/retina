@@ -51,7 +51,7 @@ var<uniform> model: ModelUniform;
 var<uniform> properties: PropertiesUniform;
 
 @group(2) @binding(1)
-var albedo_atlas: texture_2d<f32>;
+var albedo_atlas: texture_cube_array<f32>;
 
 @group(2) @binding(2)
 var albedo_atlas_sampler: sampler;
@@ -106,7 +106,7 @@ fn fragment_main(input: VertexShaderOutput) -> FragmentShaderOutput {
     var output: FragmentShaderOutput;
 
     // get albedo
-    var albedo: vec4<f32> = textureSample(albedo_atlas, albedo_atlas_sampler, input.texel);
+    var albedo: vec4<f32> = textureSample(albedo_atlas, albedo_atlas_sampler, vec3(0.0, 0.0, 0.0), 0);
 
     // final output color
     output.color = vec4<f32>(

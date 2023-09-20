@@ -134,9 +134,6 @@ export class Platform {
         this._skyboxHull.uniforms.set("properties",
             new BufferLocation(buffer, (this._skyboxHull.attributes.get("material") as Material).extract().length, 1));
 
-        // set textures
-        this._skyboxHull.textures.set("atlas", this.resources.getTexture("platform", "smiley"));
-
         // save buffer
         this._skyboxBuffer = buffer;
     }
@@ -216,6 +213,9 @@ export class Platform {
 
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
+
+            // set textures
+            this._skyboxHull.textures.set("atlas", this.renderer.atlas);
 
             // check level
             // switch (this.controller.level) {

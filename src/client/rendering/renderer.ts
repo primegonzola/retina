@@ -8,6 +8,7 @@ import {
     Hull,
     HullCapabilityOptions,
     IBuffer,
+    ITexture,
     Light,
     LightKindOptions,
     Matrix4,
@@ -55,7 +56,6 @@ export class Renderer {
     private _target?: RenderTarget;
     private _swap?: RenderTarget;
     private _cube?: RenderTarget;
-
 
     // buffers
     private _screen?: IBuffer;
@@ -209,6 +209,10 @@ export class Renderer {
         // delegate to blit
         this._swap?.capture(Camera.screen().view, Camera.screen().projection, 0, 1,
             () => this._swap.single(bm.shader, [bm.groups], bs));
+    }
+
+    public get atlas(): ITexture {
+        return this._cube.buffers[0].attachments[0];
     }
 
     private _collectLighting(lights?: Light[]): number[] {
@@ -515,7 +519,7 @@ export class Renderer {
         this._render(this._target, frustum, hulls, clip);
     }
 
-    public cube(position: Vector3, range: Range, lights: Light[], hulls: Hull[], clip = true): void {
+    public skybox(position: Vector3, range: Range, lights: Light[], hulls: Hull[], clip = true): void {
 
         // angles to use
         const angles: Vector3[] = [
