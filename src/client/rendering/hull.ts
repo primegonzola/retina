@@ -37,26 +37,34 @@ export class BufferLocation {
     }
 }
 
+export enum HullCapabilityOptions {
+    None = 1 << 0,
+    Model = 1 << 1,
+    Properties = 1 << 2,
+    Texture = 1 << 3,
+    Transparent = 1 << 4,
+};
+
 export class Hull {
 
     public readonly id: string;
     public readonly transform: Transform;
     public readonly parent: Hull;
+    public readonly capabilities: HullCapabilityOptions;
     public readonly shader: IShader;
     public readonly uniforms: Map<string, BufferLocation>;
     public readonly textures: Map<string, ITexture>;
     public readonly attributes: Map<string, unknown>;
     public readonly buffers: Map<string, IBuffer>;
     public readonly children: Hull[];
-    public readonly transparent: boolean;
 
-    constructor(parent: Hull, transform: Transform, transparent: boolean = false,
+    constructor(parent: Hull, transform: Transform, capabilities: HullCapabilityOptions,
         shader?: IShader, buffers?: Map<string, IBuffer>) {
 
         // init
         this.id = Utils.uuid();
         this.parent = parent;
-        this.transparent = transparent;
+        this.capabilities = capabilities;
         this.transform = transform || Transform.identity;
         this.shader = shader;
         this.uniforms = new Map<string, BufferLocation>();

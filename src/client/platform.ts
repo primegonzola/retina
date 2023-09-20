@@ -8,6 +8,7 @@ import {
     Galaxy,
     GraphicsDevice,
     Hull,
+    HullCapabilityOptions,
     IBuffer,
     InputDevice,
     Light,
@@ -106,11 +107,13 @@ export class Platform {
 
         const mesh = this.resources.getMesh("platform", "skybox");
         const material = this.resources.getMaterial("platform", "hull-skybox").clone();
+        const capabilities = HullCapabilityOptions.Properties | HullCapabilityOptions.Texture |
+            (material.mode === MaterialModeOptions.Transparent ? HullCapabilityOptions.Transparent : HullCapabilityOptions.None);
 
         // create the skybox hull
         this._skyboxHull = new Hull(null,
             new Transform(Vector3.zero, Quaternion.identity, Vector3.one.scale(1024)),
-            material.mode === MaterialModeOptions.Transparent, material.shader, mesh.buffers);
+            capabilities, material.shader, mesh.buffers);
 
         // save material
         this._skyboxHull.attributes.set("material", material);

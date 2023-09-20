@@ -20,6 +20,7 @@ import {
     Light,
     Vector3,
     Quaternion,
+    HullCapabilityOptions,
 } from "../index";
 
 export class Player extends ModelNode {
@@ -136,11 +137,15 @@ export class World extends Model {
         // get material
         const material = this.platform.resources.getMaterial("platform", "hull-player").clone();
 
+        // get capabilities
+        const capabilities = HullCapabilityOptions.Properties | HullCapabilityOptions.Texture |
+            (material.mode === MaterialModeOptions.Transparent ? HullCapabilityOptions.Transparent : HullCapabilityOptions.None);
+
         // create hull
         const hull = new Hull(null, new Transform(
             new Vector3(0, 2, 0),
             Quaternion.identity,
-            Vector3.one.scale(2)), false, material.shader, mesh.buffers);
+            Vector3.one.scale(2)), capabilities, material.shader, mesh.buffers);
 
         // add as attribute
         hull.attributes.set("material", material);
@@ -183,11 +188,15 @@ export class World extends Model {
         // loop over generated nodes
         maze.children.forEach(node => {
 
-            // create hull
-            const hull = new Hull(null, node.transform);
-
             // resolve material 
             const material = this._materialFromNode(node).clone();
+
+            // create capabilities
+            const capabilities = HullCapabilityOptions.Properties | HullCapabilityOptions.Texture |
+                (material.mode === MaterialModeOptions.Transparent ? HullCapabilityOptions.Transparent : HullCapabilityOptions.None);
+
+            // create hull
+            const hull = new Hull(null, node.transform, capabilities);
 
             // add as attribute
             hull.attributes.set("material", material);
@@ -208,6 +217,9 @@ export class World extends Model {
                 // resolve material 
                 const cm = this._materialFromNode(cn).clone();
 
+                const cps = HullCapabilityOptions.Properties | HullCapabilityOptions.Texture |
+                    (cm.mode === MaterialModeOptions.Transparent ? HullCapabilityOptions.Transparent : HullCapabilityOptions.None);
+
                 // check if transparent
                 const transparent = cm.mode === MaterialModeOptions.Transparent;
 
@@ -219,7 +231,7 @@ export class World extends Model {
 
                 // add
                 const ch = hull.add(new Hull(hull, ctf,
-                    transparent, cm.shader, mesh.buffers));
+                    cps, cm.shader, mesh.buffers));
 
                 // add as attribute
                 ch.attributes.set("material", cm);

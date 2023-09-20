@@ -15,6 +15,7 @@ import {
     BufferKindOptions,
     BufferLocation,
     Color,
+    HullCapabilityOptions,
 } from "../index";
 
 export class Moon extends ModelNode {
@@ -64,7 +65,7 @@ export class Galaxy extends ModelNode {
 
         // precalculate delta
         const delta = scale.scale(0.5);
-        const colors = [Color.blue, Color.white,  Color.yellow, Color.orange];
+        const colors = [Color.blue, Color.white, Color.yellow, Color.orange];
 
         // loop over galaxy and add stars
         for (let z = 0; z < scale.z; z++) {
@@ -79,8 +80,11 @@ export class Galaxy extends ModelNode {
                     // get material
                     const material = this.platform.resources.getMaterial("platform", "hull-galaxy-star").clone();
 
+                    const capabilities = HullCapabilityOptions.Properties | HullCapabilityOptions.Texture |
+                        (material.mode === MaterialModeOptions.Transparent ? HullCapabilityOptions.Transparent : HullCapabilityOptions.None);
+
                     // override color
-                    material.properties.get("color").value = 
+                    material.properties.get("color").value =
                         colors[Math.floor(Math.random() * colors.length)];
 
                     // calculate transform
@@ -89,8 +93,8 @@ export class Galaxy extends ModelNode {
                         Quaternion.identity, Vector3.one.scale(1 / 64).divide(scale));
 
                     // add to root
-                    const shull = hull.add(new Hull(hull, stf, material.mode === MaterialModeOptions.Transparent,
-                        material.shader, mesh.buffers));
+                    const shull = hull.add(new Hull(hull, stf,
+                        capabilities, material.shader, mesh.buffers));
 
                     // override color
 
@@ -163,10 +167,14 @@ export class Universe extends ModelNode {
         // get material
         const material = this.platform.resources.getMaterial("platform", "hull-galaxy").clone();
 
+        // get capabilities
+        const capabilities = HullCapabilityOptions.Properties | HullCapabilityOptions.Texture |
+            (material.mode === MaterialModeOptions.Transparent ? HullCapabilityOptions.Transparent : HullCapabilityOptions.None);
+
         // create hull
         const hull = new Hull(null,
-            new Transform(Vector3.zero, Quaternion.identity, Vector3.one.scale(8)), material.mode === MaterialModeOptions.Transparent,
-            material.shader, mesh.buffers);
+            new Transform(Vector3.zero, Quaternion.identity, Vector3.one.scale(8)),
+            capabilities, material.shader, mesh.buffers);
 
         // save material
         hull.attributes.set("material", material);

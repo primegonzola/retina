@@ -6,6 +6,7 @@ import {
     Color,
     Frustum,
     Hull,
+    HullCapabilityOptions,
     IBuffer,
     Light,
     LightKindOptions,
@@ -428,7 +429,7 @@ export class Renderer {
                 if (shader) {
 
                     // bind pipeline
-                    target?.bindPipeline(shader, hull.transparent, true);
+                    target?.bindPipeline(shader, (hull.capabilities & HullCapabilityOptions.Transparent) !== 0, true);
 
                     // bind camera
                     target?.bindCamera(shader);
@@ -447,10 +448,14 @@ export class Renderer {
                             hull.uniforms.get("model").buffer, hull.uniforms.get("model").offset, hull.uniforms.get("model").size);
 
                     // check to bind properties only
-                    if (hull?.uniforms?.has("properties") && hull?.textures?.size > 10) {
+                    if ((hull.capabilities & HullCapabilityOptions.Properties) !== 0 &&
+                        (hull.capabilities & HullCapabilityOptions.Texture) === 0) {
                         target?.bindUniform(shader, "material", "properties",
                             hull.uniforms.get("properties").buffer, hull.uniforms.get("properties").offset, hull.uniforms.get("properties").size);
-                    } else {
+                    }
+                    if ((hull.capabilities & HullCapabilityOptions.Properties) !== 0 &&
+                        (hull.capabilities & HullCapabilityOptions.Texture) !== 0) {
+                        // bind 
                         target?.bindData(shader, "material", [{
                             name: "properties",
                             kind: ShaderGroupBindingKindOptions.Uniform,
@@ -481,13 +486,13 @@ export class Renderer {
         this._ensureInitialized();
 
         // split into opaque and transparent
-        const opaques = hulls.filter(hull => !hull.transparent);
+        const opaques = hulls.filter(hull => (hull.capabilities & HullCapabilityOptions.Transparent) === 0);
 
         // get view and projection
         const pvm = frustum.projection.multiply(frustum.view);
 
         // get transparents using projected z value to sort
-        const transparents = hulls.filter(hull => hull.transparent)
+        const transparents = hulls.filter(hull => (hull.capabilities & HullCapabilityOptions.Transparent) !== 0)
             .sort((a, b) => {
                 const pva = pvm.multiplyVector(Vector4.xyz(a.graph.position, 1.0));
                 const pvb = pvm.multiplyVector(Vector4.xyz(a.graph.position, 1.0));
