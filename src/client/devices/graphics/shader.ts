@@ -50,6 +50,7 @@ export enum ShaderUniformKindOptions {
 export enum ShaderGroupBindingKindOptions {
     AlbedoSampler = "albedo-sampler",
     AlbedoTexture = "albedo-texture",
+    AlbedoTextureCube = "albedo-texture-cube",
     AlbedoTextureArray = "albedo-texture-array",
     AlbedoTextureCubeArray = "albedo-texture-cube-array",
     DepthSampler = "depth-sampler",
@@ -223,6 +224,17 @@ export class ShaderGroup {
                             multisampled: false,
                             sampleType: "float",
                             viewDimension: "2d"
+                        }
+                    });
+                    break;
+                case ShaderGroupBindingKindOptions.AlbedoTextureCube:
+                    entries.push({
+                        binding: binding.index,
+                        visibility: fvis,
+                        texture: {
+                            multisampled: false,
+                            sampleType: "float",
+                            viewDimension: "cube"
                         }
                     });
                     break;
@@ -491,6 +503,17 @@ export class Shader implements IShader {
                                 binding: binding.index,
                                 resource: ((bd.value as ITexture).handle as GPUTexture).createView({
                                     dimension: "2d-array",
+                                    baseArrayLayer: 0,
+                                    arrayLayerCount: ((bd.value as ITexture).handle as GPUTexture).depthOrArrayLayers,
+                                })
+                            });
+                            break;
+                        }
+                        case ShaderGroupBindingKindOptions.AlbedoTextureCube: {
+                            entries.push({
+                                binding: binding.index,
+                                resource: ((bd.value as ITexture).handle as GPUTexture).createView({
+                                    dimension: "cube",
                                     baseArrayLayer: 0,
                                     arrayLayerCount: ((bd.value as ITexture).handle as GPUTexture).depthOrArrayLayers,
                                 })

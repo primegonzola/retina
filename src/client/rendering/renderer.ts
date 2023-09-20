@@ -211,7 +211,7 @@ export class Renderer {
             () => this._swap.single(bm.shader, [bm.groups], bs));
     }
 
-    public get atlas(): ITexture {
+    public get skyboxTexture(): ITexture {
         return this._cube.buffers[0].attachments[0];
     }
 

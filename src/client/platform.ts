@@ -197,25 +197,27 @@ export class Platform {
 
     private render(): void {
 
-        // // get all visible nodes
-        // const vchunks = this.world.chunks.filter(node =>
-        //     this.camera.frustum.wbox(node.graph.position, node.graph.rotation, node.graph.scale));
+        // get all visible nodes
+        const vchunks = this.world.chunks.filter(node =>
+            this.camera.frustum.wbox(node.graph.position, node.graph.rotation, node.graph.scale));
 
-        // // collect each of the child hulls
-        // let vhulls = vchunks.map(vchunk => vchunk.nodes.map(n => n.hull)).flat();
+        // collect each of the child hulls
+        let vhulls = vchunks.map(vchunk => vchunk.nodes.map(n => n.hull)).flat();
 
         // // add player
         // vhulls.push(this.world.player.hull);
 
-        // create the skybox
+        // generate 
+        this.renderer.skybox(Vector3.zero, new Range(1, 1024), this.world.lights, vhulls);
 
-        const vhulls = [this._skyboxHull];
+        // add the skybox hull
+        vhulls = [this._skyboxHull];
 
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
 
             // set textures
-            this._skyboxHull.textures.set("atlas", this.renderer.atlas);
+            this._skyboxHull.textures.set("atlas", this.renderer.skyboxTexture);
 
             // check level
             // switch (this.controller.level) {
