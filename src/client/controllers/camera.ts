@@ -106,7 +106,7 @@ export class CameraController {
             // allow camera distance update if modifier is active
             if (modifierOne) {
                 this.distance = this.distance - (0.5 * 1 * speed * this.rightAxis.y);
-                this.distance = Math.max(Math.min(this.distance, 2 * 128.0), 4.0)
+                this.distance = Math.max(Math.min(this.distance, 1024.0), 4.0)
             }
             else {
                 // update

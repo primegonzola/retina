@@ -16,7 +16,9 @@ import {
     Range,
     Rectangle,
     RenderTarget,
+    SamplerKindOptions,
     Settings,
+    ShaderGroupBindingKindOptions,
     Shape,
     Size,
     TextureDimensionOptions,
@@ -444,15 +446,27 @@ export class Renderer {
                         target?.bindUniform(shader, "model", "model",
                             hull.uniforms.get("model").buffer, hull.uniforms.get("model").offset, hull.uniforms.get("model").size);
 
-                    // check to bind properties
-                    if (hull?.uniforms?.has("properties"))
+                    // check to bind properties only
+                    if (hull?.uniforms?.has("properties") && hull?.textures?.size > 10) {
                         target?.bindUniform(shader, "material", "properties",
-                            hull.uniforms.get("properties").buffer, hull.uniforms.get("properties").offset, hull.uniforms.get("model").size);
-
-                    // bind textures
-                    if (hull?.textures)
-                        target?.bindTextures(shader, null, hull.textures);
-
+                            hull.uniforms.get("properties").buffer, hull.uniforms.get("properties").offset, hull.uniforms.get("properties").size);
+                    } else {
+                        target?.bindData(shader, "material", [{
+                            name: "properties",
+                            kind: ShaderGroupBindingKindOptions.Uniform,
+                            value: hull.uniforms.get("properties").buffer,
+                            offset: hull.uniforms.get("properties").offset,
+                            size: hull.uniforms.get("properties").size,
+                        }, {
+                            name: "albedo-atlas",
+                            kind: ShaderGroupBindingKindOptions.AlbedoTexture,
+                            value: hull.textures.get("atlas"),
+                        }, {
+                            name: "albedo-atlas-sampler",
+                            kind: ShaderGroupBindingKindOptions.AlbedoSampler,
+                            value: this.platform.graphics.createSampler(SamplerKindOptions.Albedo),
+                        }]);
+                    }
                     // draw hull
                     if (hull?.buffers)
                         target?.draw(hull?.buffers);

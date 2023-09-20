@@ -1,0 +1,94 @@
+name: skybox
+kind: shader
+base: base
+code: resources/shaders/skybox.wgsl
+groups:
+  - name: camera
+    index: 0
+    visibility: both
+    bindings:
+      - name: camera
+        kind: uniform
+        index: 0
+        layout:
+          - name: position
+            kind: vector4
+          - name: view
+            kind: matrix4
+          - name: projection
+            kind: matrix4
+  - name: model
+    index: 1
+    visibility: vertex
+    bindings:
+      - name: model
+        kind: uniform
+        index: 0
+        layout:
+          - name: world
+            kind: matrix4
+          - name: normal
+            kind: matrix4
+  - name: material
+    index: 2
+    visibility: fragment
+    bindings:
+      - name: properties
+        kind: uniform
+        index: 0
+        layout:
+          - name: color
+            kind: color
+          - name: components
+            kind: vector4
+          - name: lighting
+            kind: vector4
+          - name: textures
+            kind: vector4
+      - name: albedo-atlas
+        kind: albedo-texture
+        index: 1        
+      - name: albedo-atlas-sampler
+        kind: albedo-sampler
+        index: 2
+  - name: lighting
+    index: 3
+    visibility: both
+    bindings:
+      - name: lighting
+        kind: uniform
+        index: 0
+        layout:
+          - name: info
+            kind: vector4
+          - name: color
+            kind: color
+          - name: position
+            kind: vector4
+          - name: direction
+            kind: vector4
+          - name: view
+            kind: matrix4
+          - name: projection
+            kind: matrix4
+          - name: components
+            kind: vector4
+          - name: lighting
+            kind: vector4
+          - name: shadowing
+            kind: vector4
+          - name: sampling
+            kind: vector4            
+buffers:
+  - name: positions
+    kind: vector3
+    location: 0
+  - name: texels
+    kind: vector2
+    location: 1
+  - name: normals
+    kind: vector3
+    location: 2
+  - name: tangents
+    kind: vector4
+    location: 3

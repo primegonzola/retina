@@ -28,7 +28,7 @@ export class BufferLocation {
     public readonly count: number
     public readonly size: number;
 
-    constructor(buffer: IBuffer, count: number, offset?: number) {
+    constructor(buffer: IBuffer, count: number, offset: number) {
         // init
         this.buffer = buffer;
         this.count = count;
@@ -44,15 +44,14 @@ export class Hull {
     public readonly parent: Hull;
     public readonly shader: IShader;
     public readonly uniforms: Map<string, BufferLocation>;
+    public readonly textures: Map<string, ITexture>;
     public readonly attributes: Map<string, unknown>;
     public readonly buffers: Map<string, IBuffer>;
-    public readonly textures: ITexture[];
     public readonly children: Hull[];
     public readonly transparent: boolean;
-    public frameCounter = 0
 
     constructor(parent: Hull, transform: Transform, transparent: boolean = false,
-        shader?: IShader, buffers?: Map<string, IBuffer>, uniforms?: Map<string, BufferLocation>, textures?: ITexture[]) {
+        shader?: IShader, buffers?: Map<string, IBuffer>) {
 
         // init
         this.id = Utils.uuid();
@@ -60,10 +59,10 @@ export class Hull {
         this.transparent = transparent;
         this.transform = transform || Transform.identity;
         this.shader = shader;
-        this.uniforms = uniforms || new Map<string, BufferLocation>();
+        this.uniforms = new Map<string, BufferLocation>();
         this.buffers = buffers || new Map<string, IBuffer>();
         this.attributes = new Map<string, unknown>();
-        this.textures = textures || [];
+        this.textures = new Map<string, ITexture>();
         this.children = [];
     }
 

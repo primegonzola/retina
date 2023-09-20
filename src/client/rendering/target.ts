@@ -211,6 +211,11 @@ export class RenderTarget {
         }
     }
 
+    public bindData(shader: IShader, group: string, data: ShaderData[]) {
+        // bind buffer
+        shader.bindData(this._renderPass, group, data);
+    }
+
     public bindUniform(shader: IShader, group: string, name: string, uniform: IBuffer, offset?: number, size?: number) {
         // bind buffer
         shader.bindData(

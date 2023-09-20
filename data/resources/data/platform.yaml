@@ -48,6 +48,9 @@ resources:
     - name: shadow
       kind: shader
       uri: resources/shaders/shadow.yaml
+    - name: skybox
+      kind: shader
+      uri: resources/shaders/skybox.yaml
     - name: font
       kind: shader
       uri: resources/shaders/font.yaml
@@ -67,6 +70,9 @@ resources:
     - name: panel-normal
       kind: texture
       uri: resources/textures/panel-normal.png
+    - name: smiley
+      kind: texture
+      uri: resources/textures/smiley.png
     - name: panel
       uri:
         - resources/textures/panel-albedo.png
@@ -466,3 +472,25 @@ resources:
           value: "#FF141FFF"
         - name: lighting
           value: [1, 0, 1, 1]
+
+    - name: hull-skybox
+      kind: material
+      shader: skybox
+      mode: opaque
+      properties:
+        - name: color
+          kind: color
+          value: "#FFFFFFFF"
+        - name: components
+          kind: vector4
+          value: [0, 1, 1, 1]
+        - name: lighting
+          kind: vector4
+          value: [1, 1, 1, 1]
+        - name: textures
+          kind: vector4
+          value: [0, 0, 0, 0]
+      textures:
+        - name: albedo
+          key: tron-black
+ 

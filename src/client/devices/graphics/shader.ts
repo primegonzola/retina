@@ -51,6 +51,7 @@ export enum ShaderGroupBindingKindOptions {
     AlbedoSampler = "albedo-sampler",
     AlbedoTexture = "albedo-texture",
     AlbedoTextureArray = "albedo-texture-array",
+    AlbedoTextureCubeArray = "albedo-texture-cube-array",
     DepthSampler = "depth-sampler",
     DepthTexture = "depth-texture",
     DepthTextureArray = "depth-texture-array",
@@ -191,6 +192,17 @@ export class ShaderGroup {
                         texture: {
                             sampleType: "depth",
                             viewDimension: "cube-array",
+                        }
+                    });
+                    break;
+                case ShaderGroupBindingKindOptions.AlbedoTextureCubeArray:
+                    entries.push({
+                        binding: binding.index,
+                        visibility: fvis,
+                        texture: {
+                            multisampled: false,
+                            sampleType: "float",
+                            viewDimension: "cube-array"
                         }
                     });
                     break;
@@ -449,6 +461,16 @@ export class Shader implements IShader {
                             });
                             break;
                         case ShaderGroupBindingKindOptions.DepthTextureCubeArray:
+                            entries.push({
+                                binding: binding.index,
+                                resource: ((bd.value as ITexture).handle as GPUTexture).createView({
+                                    dimension: "cube-array",
+                                    baseArrayLayer: 0,
+                                    arrayLayerCount: ((bd.value as ITexture).handle as GPUTexture).depthOrArrayLayers,
+                                })
+                            });
+                            break;
+                        case ShaderGroupBindingKindOptions.AlbedoTextureCubeArray:
                             entries.push({
                                 binding: binding.index,
                                 resource: ((bd.value as ITexture).handle as GPUTexture).createView({

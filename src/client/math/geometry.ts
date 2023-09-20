@@ -190,6 +190,79 @@ export class Geometry {
             Geometry.calculateTangents(Vector3.fromNumbers(tps), Vector2.fromNumbers(texels), indices));
     }
 
+    public static skybox(): Geometry {
+        const positions = [
+            // front
+            -0.5, -0.5, -0.5,
+            0.5, -0.5, -0.5,
+            0.5, 0.5, -0.5,
+            -0.5, 0.5, -0.5,
+            // back
+            0.5, -0.5, 0.5,
+            -0.5, -0.5, 0.5,
+            -0.5, 0.5, 0.5,
+            0.5, 0.5, 0.5,
+            // top
+            -0.5, 0.5, -0.5,
+            0.5, 0.5, -0.5,
+            0.5, 0.5, 0.5,
+            -0.5, 0.5, 0.5,
+            // bottom
+            -0.5, -0.5, 0.5,
+            0.5, -0.5, 0.5,
+            0.5, -0.5, -0.5,
+            -0.5, -0.5, -0.5,
+            // left
+            -0.5, -0.5, 0.5,
+            -0.5, -0.5, -0.5,
+            -0.5, 0.5, -0.5,
+            -0.5, 0.5, 0.5,
+            // right
+            0.5, -0.5, -0.5,
+            0.5, -0.5, 0.5,
+            0.5, 0.5, 0.5,
+            0.5, 0.5, -0.5,
+        ];
+
+        const texels = [
+            // front
+            0, 0, 1, 0, 1, 1, 0, 1,
+            // back
+            0, 0, 1, 0, 1, 1, 0, 1,
+            // top
+            0, 0, 1, 0, 1, 1, 0, 1,
+            // bottom
+            0, 0, 1, 0, 1, 1, 0, 1,
+            // left
+            0, 0, 1, 0, 1, 1, 0, 1,
+            // right
+            0, 0, 1, 0, 1, 1, 0, 1
+        ];
+
+        const indices = [
+            // front
+            0, 1, 2, 2, 3, 0,
+            // back
+            4, 5, 6, 6, 7, 4,
+            // top
+            8, 9, 10, 10, 11, 8,
+            // bottom
+            12, 13, 14, 14, 15, 12,
+            // left
+            16, 17, 18, 18, 19, 16,
+            // right
+            20, 21, 22, 22, 23, 20
+        ];
+
+        return new Geometry(
+            GeometryTopology.TriangleList,
+            Vector3.fromNumbers(positions),
+            indices,
+            Vector2.fromNumbers(texels),
+            Geometry.calculateNormals(Vector3.fromNumbers(positions), indices),
+            Geometry.calculateTangents(Vector3.fromNumbers(positions), Vector2.fromNumbers(texels), indices));
+    }
+
     public static cube(): Geometry {
         const positions = [
             // front

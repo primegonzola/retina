@@ -64,7 +64,7 @@ export class Galaxy extends ModelNode {
 
         // precalculate delta
         const delta = scale.scale(0.5);
-        const colors = [Color.red, Color.green,Color.blue,  Color.yellow, Color.orange];
+        const colors = [Color.blue, Color.white,  Color.yellow, Color.orange];
 
         // loop over galaxy and add stars
         for (let z = 0; z < scale.z; z++) {
@@ -86,7 +86,7 @@ export class Galaxy extends ModelNode {
                     // calculate transform
                     const stf = new Transform(
                         new Vector3(x, y, z).subtract(delta).add(Vector3.one.scale(0.5)).divide(scale),
-                        Quaternion.identity, Vector3.one.scale(1 / 256).divide(scale));
+                        Quaternion.identity, Vector3.one.scale(1 / 64).divide(scale));
 
                     // add to root
                     const shull = hull.add(new Hull(hull, stf, material.mode === MaterialModeOptions.Transparent,
@@ -95,7 +95,7 @@ export class Galaxy extends ModelNode {
                     // override color
 
                     // save material
-                    shull.attributes.set("material", material.clone());
+                    shull.attributes.set("material", material);
 
                     // add star
                     this.stars.add(new Star(this.platform, this.stars, stf,

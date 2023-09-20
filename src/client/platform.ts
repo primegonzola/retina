@@ -1,4 +1,6 @@
 import {
+    BufferKindOptions,
+    BufferLocation,
     Camera,
     CameraController,
     CameraKindOptions,
@@ -6,8 +8,11 @@ import {
     Galaxy,
     GraphicsDevice,
     Hull,
+    IBuffer,
     InputDevice,
     Light,
+    Material,
+    MaterialModeOptions,
     ModelNode,
     Quaternion,
     Range,
@@ -15,6 +20,8 @@ import {
     Renderer,
     Resources,
     SimulationTimer,
+    TextureDimensionOptions,
+    TextureKindOptions,
     Transform,
     Universe,
     Utils,
@@ -33,6 +40,8 @@ export class Platform {
     public readonly controller: CameraController;
     public readonly world: World;
     public readonly universe: Universe;
+    private _skyboxBuffer: IBuffer;
+    private _skyboxHull: Hull;
 
     protected constructor(graphics: GraphicsDevice, input: InputDevice) {
         // init
@@ -94,6 +103,39 @@ export class Platform {
             this.camera.area,
             this.camera.range,
         ));
+
+        const mesh = this.resources.getMesh("platform", "skybox");
+        const material = this.resources.getMaterial("platform", "hull-skybox").clone();
+
+        // create the skybox hull
+        this._skyboxHull = new Hull(null,
+            new Transform(Vector3.zero, Quaternion.identity, Vector3.one.scale(1024)),
+            material.mode === MaterialModeOptions.Transparent, material.shader, mesh.buffers);
+
+        // save material
+        this._skyboxHull.attributes.set("material", material);
+
+        // start with empty buffer
+        let data: number[] = [];
+
+        data = data.concat(
+            Utils.pad(Transform.matrix(this._skyboxHull.graph).extract(), 256),
+            Utils.pad((this._skyboxHull.attributes.get("material") as Material).extract(), 256))
+
+        // create buffer
+        const buffer = this.graphics.createF32Buffer(BufferKindOptions.Uniform, data);
+
+        // set uniforms
+        this._skyboxHull.uniforms.set("model",
+            new BufferLocation(buffer, Transform.matrix(this._skyboxHull.graph).extract().length, 0));
+        this._skyboxHull.uniforms.set("properties",
+            new BufferLocation(buffer, (this._skyboxHull.attributes.get("material") as Material).extract().length, 1));
+
+        // set textures
+        this._skyboxHull.textures.set("atlas", this.resources.getTexture("platform", "smiley"));
+
+        // save buffer
+        this._skyboxBuffer = buffer;
     }
 
     private _destroyContent(): void {
@@ -165,34 +207,39 @@ export class Platform {
         // // add player
         // vhulls.push(this.world.player.hull);
 
+        // create the skybox
+
+        const vhulls = [this._skyboxHull];
+
         // start rendering with background color and depth
         this.renderer.capture(this.camera, Color.black, 1.0, () => {
+
             // check level
-            switch (this.controller.level) {
-                case 0: {
+            // switch (this.controller.level) {
+            //     case 0: {
 
-                    // get all visible galaxies
-                    const galaxies = this.universe.galaxies.filter<Galaxy>(galaxy =>
-                        this.camera.frustum.wbox(galaxy.graph.position, galaxy.graph.rotation, galaxy.graph.scale));
+            //         // get all visible galaxies
+            //         const galaxies = this.universe.galaxies.filter<Galaxy>(galaxy =>
+            //             this.camera.frustum.wbox(galaxy.graph.position, galaxy.graph.rotation, galaxy.graph.scale));
 
-                    // collect galaxy hulls
-                    const ghulls = galaxies.map(galaxy => galaxy.hull);
+            //         // collect galaxy hulls
+            //         const ghulls = galaxies.map(galaxy => galaxy.hull);
 
-                    // loop over galaxies and collect star hulls
-                    const shulls = galaxies.map<Hull[]>(galaxy =>
-                        (galaxy as Galaxy).stars.map(star => star.hull)).flat();
+            //         // loop over galaxies and collect star hulls
+            //         const shulls = galaxies.map<Hull[]>(galaxy =>
+            //             (galaxy as Galaxy).stars.map(star => star.hull)).flat();
 
-                    // combine
-                    const hulls = [].concat(ghulls, shulls);
+            //         // combine
+            //         const hulls = [].concat(shulls);
 
-                    // render
-                    this.renderer?.render(this.camera.frustum, this.world.lights, hulls, false);
+            //         // render
+            //         this.renderer?.render(this.camera.frustum, this.world.lights, hulls, false);
 
-                    break;
-                }
-            }
-            // // render hulls
-            // this.renderer?.render(this.camera.frustum, this.world.lights, vhulls, false);
+            //         break;
+            //     }
+            // }
+            // render hulls
+            this.renderer?.render(this.camera.frustum, this.world.lights, vhulls, false);
 
             // output diagnostics
             this.renderer.writeLine(0, `FPS: ${Math.round(this.timer.fps)} - APS: ${Math.round(this.timer.aps)}`);

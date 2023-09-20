@@ -113,6 +113,10 @@ export class Resources {
         await this.registerMesh("platform",
             "grid", new Mesh(this.platform, Geometry.grid(1, 1)));
 
+        // register grid mesh
+        await this.registerMesh("platform",
+            "skybox", new Mesh(this.platform, Geometry.skybox()));
+
         // add spheres
         for (let i = 1; i <= 8; i++) {
             await this.registerMesh("platform",
