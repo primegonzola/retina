@@ -455,6 +455,16 @@ resources:
         - name: color
           value: "#0C141FFF"
 
+    - name: hull-test-box
+      kind: material
+      base: basic
+      mode: opaque
+      properties:
+        - name: color
+          value: "#FFFFFFFF"
+        - name: lighting
+          value: [1, 0, 1, 1]
+
     - name: hull-galaxy
       kind: material
       base: basic

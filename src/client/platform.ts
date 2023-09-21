@@ -43,6 +43,8 @@ export class Platform {
     public readonly universe: Universe;
     private _skyboxBuffer: IBuffer;
     private _skyboxHull: Hull;
+    private _testHulls: Hull[] = [];
+    private _testBuffer: IBuffer;
 
     protected constructor(graphics: GraphicsDevice, input: InputDevice) {
         // init
@@ -88,6 +90,69 @@ export class Platform {
         return platform;
     }
 
+    private _createTestContent(): void {
+
+        const mesh = this.resources.getMesh("platform", "cube");
+
+        const colors = [
+            Color.red,
+            Color.green,
+            Color.blue,
+            Color.yellow,
+            Color.cyan,
+            Color.magenta,
+        ];
+
+        const transforms = [
+            new Transform(new Vector3(0, 0, -16), Quaternion.identity, Vector3.one),
+            new Transform(new Vector3(0, 0, 16), Quaternion.identity, Vector3.one),
+            new Transform(new Vector3(-16, 0, 0), Quaternion.identity, Vector3.one),
+            new Transform(new Vector3(16, 0, 0), Quaternion.identity, Vector3.one),
+            new Transform(new Vector3(0, 16, 0), Quaternion.identity, Vector3.one),
+            new Transform(new Vector3(0, -16, 0), Quaternion.identity, Vector3.one),
+        ];
+
+        transforms.forEach((transform, index) => {
+            const material = this.resources.getMaterial("platform", "hull-test-box").clone();
+
+            // create the hull
+            const hull = new Hull(null, transform,
+                HullCapabilityOptions.Properties | HullCapabilityOptions.Texture,
+                material.shader, mesh.buffers);
+
+            material.properties.get("color").value = colors[index % colors.length];
+
+            // save material
+            hull.attributes.set("material", material);
+
+            // add 
+            this._testHulls.push(hull);
+        });
+
+        // start with empty buffer
+        let data: number[] = [];
+
+        // loop over galaxies
+        this._testHulls.forEach(hull => {
+            // add  model and properties
+            data = data.concat(
+                Utils.pad(hull.transform.extract(), 256),
+                Utils.pad((hull.attributes.get("material") as Material).extract(), 256))
+        });
+
+        // create buffer
+        const buffer = this.graphics.createF32Buffer(BufferKindOptions.Uniform, data);
+
+        // loop over galaxies
+        this._testHulls.forEach((hull, index) => {
+            // set uniforms
+            hull.uniforms.set("model", new BufferLocation(buffer, hull.transform.extract().length, (2 * index) + 0));
+            hull.uniforms.set("properties", new BufferLocation(buffer,  (hull.attributes.get("material") as Material).extract().length, (2 * index) + 1));
+        });
+
+        this._testBuffer = buffer;
+    }
+
     private _createContent(): void {
 
         // generate universe
@@ -95,6 +160,8 @@ export class Platform {
 
         // generate the world
         this.world.create();
+
+        this._createTestContent();
 
         // add a directional lighht
         this.world.lights.push(Light.createDirectional(
@@ -159,7 +226,7 @@ export class Platform {
     public reset(): void {
 
         // reset controller
-        this.controller?.reset(ModelNode.none(this), new Vector3(-45, 0, 0), 12 * 1);
+        this.controller?.reset(ModelNode.none(this), new Vector3(-45, 0, 0), 12 * 8);
 
         // destroy content
         this._destroyContent();
@@ -195,6 +262,7 @@ export class Platform {
         this.render();
     }
 
+
     private render(): void {
 
         // get all visible nodes
@@ -207,16 +275,19 @@ export class Platform {
         // // add player
         // vhulls.push(this.world.player.hull);
 
+        vhulls = this._testHulls;
+
         // generate 
         this.renderer.skybox(Vector3.zero, new Range(1, 1024), this.world.lights, vhulls);
 
-        // add the skybox hull
+        // // add the skybox hull
         vhulls = [this._skyboxHull];
 
-        // start rendering with background color and depth
-        this.renderer.capture(this.camera, Color.black, 1.0, () => {
 
-            // set textures
+        // start rendering with background color and depth
+        this.renderer.capture(this.camera, () => {
+
+            // // set textures
             this._skyboxHull.textures.set("atlas", this.renderer.skyboxTexture);
 
             // check level

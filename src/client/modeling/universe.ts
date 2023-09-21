@@ -198,10 +198,13 @@ export class Universe extends ModelNode {
         const buffer = this.platform.graphics.createF32Buffer(BufferKindOptions.Uniform, data);
 
         // loop over galaxies
-        this.galaxies.forEach<Galaxy>(galaxy => {
+        this.galaxies.forEach<Galaxy>((galaxy, index) => {
             // set uniforms
-            galaxy.hull.uniforms.set("model", new BufferLocation(buffer, hull.transform.extract().length, 0));
-            galaxy.hull.uniforms.set("properties", new BufferLocation(buffer, (galaxy.hull.attributes.get("material") as Material).extract().length, 1));
+            galaxy.hull.uniforms.set("model", new BufferLocation(buffer, galaxy.hull.transform.extract().length, (2 * index) + 0));
+            galaxy.hull.uniforms.set("properties", new BufferLocation(buffer,  (galaxy.hull.attributes.get("material") as Material).extract().length, (2 * index) + 1));
+   
+            // galaxy.hull.uniforms.set("model", new BufferLocation(buffer, hull.transform.extract().length, 0));
+            // galaxy.hull.uniforms.set("properties", new BufferLocation(buffer, (galaxy.hull.attributes.get("material") as Material).extract().length, 1));
         });
 
         // save

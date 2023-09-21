@@ -322,7 +322,7 @@ export class Renderer {
         return buffer;
     }
 
-    public capture(camera: Camera, color: Color, depth: number, action: () => void): void {
+    public capture(camera: Camera, action: () => void): void {
 
         // ensure initialized
         this._ensureInitialized();
@@ -522,6 +522,15 @@ export class Renderer {
     public skybox(position: Vector3, range: Range, lights: Light[], hulls: Hull[], clip = true): void {
 
         // angles to use
+        // const angles: Vector3[] = [
+        //     new Vector3(0, -90, 0),
+        //     new Vector3(0, 90, 0),
+        //     new Vector3(90, 0, 0),
+        //     new Vector3(-90, 0, 0),
+        //     new Vector3(0, 180, 0),
+        //     new Vector3(0, 0, 0),
+        // ];
+
         const angles: Vector3[] = [
             new Vector3(0, -90, 0),
             new Vector3(0, 90, 0),

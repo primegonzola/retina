@@ -46,7 +46,7 @@ groups:
           - name: textures
             kind: vector4
       - name: albedo-atlas
-        kind: albedo-texture-cube
+        kind: albedo-texture
         index: 1        
       - name: albedo-atlas-sampler
         kind: albedo-sampler
